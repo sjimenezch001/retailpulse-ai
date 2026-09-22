@@ -1,56 +1,62 @@
 # RetailPulse AI — Product Brief
 
-## Producto
-RetailPulse AI es una plataforma de analítica de demanda para retail que transforma ventas históricas, calendario/eventos y precios en métricas verificables, comparaciones por tienda/departamento y pronósticos de demanda.
+## Product
+RetailPulse AI is a retail demand analytics platform that transforms historical sales, calendar/events and prices into verifiable metrics, comparisons by store/department and demand forecasts.
 
-## Usuario objetivo
-- Gerencia comercial: entender dónde cambia la demanda y qué segmentos explican la variación.
-- Analista BI: consultar KPIs con definiciones únicas y filtros controlados.
-- Planificación: revisar pronósticos y error histórico por segmento.
-- Equipo de datos: rastrear qué lote, transformación y modelo produjo cada cifra.
+## Target user
 
-## Problema
-Los equipos de retail pueden terminar con análisis dispersos y definiciones inconsistentes de métricas. RetailPulse AI centraliza el flujo desde datos crudos hasta KPIs, forecast y consulta asistida, conservando trazabilidad y reproducibilidad.
+- Commercial management: understand where demand changes and which segments explain the variation.
+- BI analyst: query KPIs with consistent definitions and controlled filters.
+- Planning: review forecasts and historical error by segment.
+- Data team: trace which batch, transformation and model produced each figure.
 
-## Piloto del MVP
-Dataset M5 Forecasting — Accuracy.
+## Problem
+Retail teams can end up with fragmented analysis and inconsistent metric definitions. RetailPulse AI centralizes the flow from raw data to KPIs, forecasting and assisted queries, preserving traceability and reproducibility.
 
-Subconjunto inicial configurable:
-- 3 tiendas
-- 2 departamentos
+## MVP pilot
+M5 Forecasting — Accuracy dataset.
 
-La selección concreta se definirá en configuración durante RP-02; no se incrustará en el código.
+Configurable initial subset:
 
-## Decisiones que habilita
-1. Cómo evolucionan las unidades y el revenue_proxy en las últimas semanas.
-2. Qué tiendas o departamentos explican la mayor variación.
-3. Qué demanda se espera en el horizonte seleccionado y cuál es el error histórico.
-4. Qué eventos o variaciones de precio coinciden con cambios de demanda.
-5. Cómo se define cada métrica y de qué tabla/período proviene.
+- 3 stores
+- 2 departments
 
-## MVP congelado
-- Ingesta batch reproducible.
-- Capas Bronze / Silver / Gold.
-- Contratos y pruebas de calidad.
-- KPIs y capa semántica SQL.
-- Baseline de forecasting y modelo candidato.
-- Dashboard Power BI de tres páginas.
-- API FastAPI.
-- Asistente de IA con herramientas de solo lectura y cifras verificables.
-- Reproducibilidad local y README técnico.
+The specific selection will be defined in configuration during RP-02; it will not be hardcoded.
 
-## Restricciones y honestidad del producto
-- M5 no contiene inventario real.
-- revenue_proxy = units × sell_price; no representa ingreso contable auditado.
-- Las alertas de demanda no implican causalidad.
-- Cualquier escenario de reposición será simulado y estará rotulado como tal.
-- El MVP debe funcionar localmente sin gasto obligatorio.
+## Decisions supported
 
-## Resultado demostrable
-En menos de 3 minutos, una persona debe poder ver el flujo de datos, consultar KPIs, comparar tiendas/departamentos, revisar un forecast y obtener una respuesta del asistente con fuente, período y fecha de actualización.
+1. How units and revenue_proxy have evolved over recent weeks.
+2. Which stores or departments explain the largest variation.
+3. What demand is expected over the selected horizon and what the historical error is.
+4. Which events or price changes coincide with changes in demand.
+5. How each metric is defined and which table/period it comes from.
 
-## Criterio de éxito de RP-00
-- El problema se explica en ~30 segundos.
-- Cada función Must responde a una pregunta de negocio.
-- Existe una lista explícita de exclusiones.
-- No se agregan funciones nuevas al MVP sin moverlas al backlog.
+## Locked MVP scope
+
+- Reproducible batch ingestion.
+- Bronze / Silver / Gold layers.
+- Contracts and quality tests.
+- KPIs and SQL semantic layer.
+- Forecasting baseline and candidate model.
+- Three-page Power BI dashboard.
+- FastAPI API.
+- AI assistant with read-only tools and verifiable figures.
+- Local reproducibility and technical README.
+
+## Limitations and product transparency
+
+- M5 does not contain actual inventory data.
+- revenue_proxy = units × sell_price; it does not represent audited accounting revenue.
+- Demand alerts do not imply causality.
+- Any replenishment scenario will be simulated and labeled as such.
+- The MVP must run locally without mandatory costs.
+
+## Demonstrable outcome
+In under 3 minutes, a user should be able to view the data flow, query KPIs, compare stores/departments, review a forecast and get an assistant response with its source, period and update date.
+
+## RP-00 success criteria
+
+- The problem can be explained in ~30 seconds.
+- Each Must feature answers a business question.
+- An explicit list of exclusions exists.
+- No new features are added to the MVP without first being added to the backlog.

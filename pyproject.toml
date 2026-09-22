@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "retailpulse-ai"
 version = "0.1.0"
-description = "Analítica de demanda para retail con trazabilidad y reproducibilidad."
+description = "Retail demand analytics with traceability and reproducibility."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [

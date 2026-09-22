@@ -1,42 +1,42 @@
 # RetailPulse AI
 
-Plataforma de analítica de demanda para retail. Busca convertir ventas
-históricas, calendario y precios en métricas verificables para comparar
-tiendas y departamentos, reduciendo análisis dispersos y definiciones
-inconsistentes de negocio.
+Retail demand analytics platform. It aims to turn historical sales,
+calendar data and prices into verifiable business metrics for comparing
+stores and departments, reducing fragmented analysis and inconsistent
+business definitions.
 
-**Estado: RP-01 — Repository, environment and standards.** Base Python con
-packaging, configuración local, prueba de importación y lint. El dataset M5
-todavía no se incluye ni se descarga; la ingesta no está implementada.
+**Status: RP-01 — Repository, environment and standards.** Python foundation
+with packaging, local configuration, an import test and linting. The M5 dataset
+is not yet included or downloaded; ingestion is not implemented.
 
-Stack inicial: Python 3.12, pandas, PyArrow, DuckDB, Pydantic y PyYAML.
-Desarrollo: pytest y Ruff. Packaging: setuptools y pip.
+Initial stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
+Development: pytest and Ruff. Packaging: setuptools and pip.
 
-## Estructura
+## Repository structure
 
 ```text
-config/local.yaml      Rutas relativas y selección de piloto pendiente
-data/sample/           Muestras pequeñas versionables
-data/contracts/        Contratos de datos
-notebooks/             Exploración
+config/local.yaml      Relative paths and pending pilot selection
+data/sample/           Small samples suitable for version control
+data/contracts/        Data contracts
+notebooks/             Exploration
 sql/{silver,gold,checks}/
-src/retailpulse/        Paquete Python (versión 0.1.0)
+src/retailpulse/        Python package (version 0.1.0)
   ingestion/ transforms/ quality/ features/ models/ api/ agent/
-tests/                 Smoke test; unit/ e integration/ reservados
-docs/                  Producto, alcance, arquitectura y evidence/
-pyproject.toml         Metadatos, dependencias y configuración de herramientas
-requirements.txt       Versiones exactas del entorno validado
-.env.example           Plantilla sin credenciales
+tests/                 Smoke test; unit/ and integration/ reserved
+docs/                  Product, scope, architecture and evidence/
+pyproject.toml         Metadata, dependencies and tool configuration
+requirements.txt       Exact versions from the validated environment
+.env.example           Template without credentials
 ```
 
-Los subpaquetes y directorios reservados aún no contienen funcionalidad.
-Los datos crudos, procesados y artefactos generados se excluyen de Git.
+The reserved subpackages and directories do not yet contain functionality.
+Raw and processed data and generated artifacts are excluded from Git.
 
 ## Quick Start — Windows PowerShell
 
-Desde la raíz del repositorio, usar Python 3.12 (validado con 3.12.10).
-Solo si todavía no existe `.venv`, crearlo con `py -3.12 -m venv .venv`.
-Los comandos siguientes usan directamente ese entorno, sin activación:
+From the repository root, use Python 3.12 (validated with 3.12.10).
+Only if `.venv` does not already exist, create it with `py -3.12 -m venv .venv`.
+The following commands use that environment directly, without activation:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -45,15 +45,15 @@ Los comandos siguientes usan directamente ese entorno, sin activación:
 .\.venv\Scripts\python.exe -m ruff check .
 ```
 
-`pyproject.toml` es la fuente principal de configuración. `requirements.txt`
-fija las dependencias directas y transitivas validadas en Windows con Python
-3.12; instalarlo primero permite reproducir esas versiones. El paquete local
-se instala después en modo editable. pytest usa el paquete instalado desde
-`src/` y descubre las pruebas en `tests/`.
+`pyproject.toml` is the primary source of configuration. `requirements.txt`
+pins the direct and transitive dependencies validated on Windows with Python
+3.12; installing it first reproduces those versions. The local package
+is then installed in editable mode. pytest uses the package installed from
+`src/` and discovers tests in `tests/`.
 
-`config/local.yaml` reserva las rutas `data/raw` y `data/processed`, relativas
-a la raíz del repositorio. Tiendas y departamentos permanecen sin seleccionar.
-No se necesitan secretos ni un archivo `.env` en esta etapa.
+`config/local.yaml` reserves the paths `data/raw` and `data/processed`, relative
+to the repository root. Stores and departments remain unselected.
+No secrets or `.env` file are required at this stage.
 
-Ver el [producto](docs/product_brief.md), el [alcance](docs/scope.md) y la
-[arquitectura objetivo](docs/architecture.md).
+See the [product brief](docs/product_brief.md), [scope](docs/scope.md) and
+[target architecture](docs/architecture.md).

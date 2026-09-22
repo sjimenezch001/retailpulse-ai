@@ -1,31 +1,34 @@
-# RetailPulse AI — Backlog inicial
+# RetailPulse AI — Initial backlog
 
-## Must — bloquear hasta completar MVP
-- RP-01 Repositorio y entorno
-- RP-02 Perfilado de datos
+## Must — locked until MVP completion
+
+- RP-01 Repository and environment
+- RP-02 Data profiling
 - RP-03 Bronze
 - RP-04 Silver
-- RP-05 Gold + métricas
+- RP-05 Gold + metrics
 - RP-06 Baselines
-- RP-07 Modelo
+- RP-07 Model
 - RP-08 Power BI
-- RP-09 Asistente IA
+- RP-09 AI assistant
 - RP-10 API/demo
-- RP-11 CI/calidad/observabilidad
-- RP-13 Empaquetado final
+- RP-11 CI/quality/observability
+- RP-13 Final packaging
 
 ## Should
+
 - Databricks Free Edition
 - Streamlit
-- MLflow consolidado
-- Golden set de 25 preguntas
+- Consolidated MLflow
+- Golden set of 25 questions
 - README pt-BR
 
 ## Could
-- RP-12 AWS temporal
-- Bedrock adapter
-- IaC cloud
-- Escenario de reposición simulado
 
-## Regla
-No promover elementos Should/Could a Must mientras exista una puerta crítica abierta en las etapas activas.
+- RP-12 Temporary AWS deployment
+- Bedrock adapter
+- Cloud IaC
+- Simulated replenishment scenario
+
+## Rule
+Do not promote Should/Could items to Must while a critical gate remains open in the active stages.

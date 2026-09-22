@@ -1,16 +1,16 @@
-# RP-00 — Checklist de aprobación
+# RP-00 — Approval checklist
 
-- [x] Usuario objetivo definido
-- [x] Problema definido
-- [x] MVP delimitado
-- [x] Piloto definido: 3 tiendas × 2 departamentos
-- [x] 5 preguntas de negocio definidas
-- [x] Exclusiones explícitas
-- [x] Backlog Must / Should / Could
-- [x] Restricciones del dataset documentadas
-- [ ] Crear repositorio GitHub
-- [ ] Crear issue: `MVP scope locked`
-- [ ] Cerrar el issue después de subir estos documentos
+- [x] Target user defined
+- [x] Problem defined
+- [x] MVP scoped
+- [x] Pilot defined: 3 stores × 2 departments
+- [x] 5 business questions defined
+- [x] Explicit exclusions documented
+- [x] Must / Should / Could backlog defined
+- [x] Dataset limitations documented
+- [x] GitHub repository created
+- [x] Issue `MVP scope locked` created
+- [x] Issue closed after documentation was pushed
 
-## Estado
-Contenido de RP-00 preparado. La puerta queda técnicamente lista para cerrarse cuando los archivos estén versionados en GitHub.
+## Status
+RP-00 is completed. The documentation is versioned and published on GitHub, and the `MVP scope locked` issue is closed.

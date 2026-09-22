@@ -1,11 +1,11 @@
-# Arquitectura objetivo
+# Target architecture
 
-CSV público → Python → Bronze/Silver/Gold → DuckDB → Power BI
+Public CSV → Python → Bronze/Silver/Gold → DuckDB → Power BI
 
-Python preparará los datos públicos en capas de datos crudos, depurados y
-analíticos. DuckDB permitirá consultar los resultados y Power BI presentará
-las métricas de negocio.
+Python will prepare public data in raw, cleaned and analytical layers.
+DuckDB will support queries on the results, and Power BI will present
+business metrics.
 
-RP-01 establece únicamente el repositorio, el entorno y los estándares; este
-flujo todavía no está implementado. ML, API, agente y AWS se incorporarán en
-etapas posteriores.
+RP-01 only establishes the repository, environment and standards; this
+flow is not yet implemented. ML, API, agent and AWS will be introduced
+in later stages.
