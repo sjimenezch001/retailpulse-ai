@@ -1,45 +1,49 @@
-# RetailPulse AI — Alcance congelado del MVP
+# RetailPulse AI — Locked MVP scope
 
 ## MUST
-- Dataset M5 con subset configurable de 3 tiendas × 2 departamentos.
-- Ingesta batch reproducible.
+
+- M5 dataset with a configurable subset of 3 stores × 2 departments.
+- Reproducible batch ingestion.
 - Bronze / Silver / Gold.
-- Validaciones y pruebas de datos.
+- Data validations and tests.
 - KPIs: units, revenue_proxy, rolling_7d, rolling_28d, price_change_pct, demand_spike_flag, data_freshness.
-- SQL / DuckDB como capa analítica local.
-- Baseline temporal y modelo candidato de forecasting.
-- WMAPE como métrica principal; MAE/RMSE complementarias.
-- Power BI con 3 páginas.
+- SQL / DuckDB as the local analytics layer.
+- Time-series baseline and candidate forecasting model.
+- WMAPE as the primary metric; MAE/RMSE as supplementary metrics.
+- Power BI with 3 pages.
 - FastAPI.
-- Asistente con get_kpi, get_forecast y search_metric_docs.
-- Docker/entorno reproducible para la versión consolidada.
-- README, evidencias y demo.
+- Assistant with get_kpi, get_forecast and search_metric_docs.
+- Docker/reproducible environment for the consolidated release.
+- README, evidence and demo.
 
 ## SHOULD
-- PySpark / Databricks Free Edition como evidencia adicional.
+
+- PySpark / Databricks Free Edition as additional evidence.
 - MLflow.
 - Streamlit.
-- Evaluación de 25 preguntas del asistente.
-- Logging estructurado.
+- Evaluation of 25 assistant questions.
+- Structured logging.
 - README.pt-BR.
 
 ## COULD
-- AWS temporal: S3 + Glue/Athena + Lambda/API Gateway.
-- IaC.
-- Adaptador Bedrock.
-- Escenario de reposición simulado.
 
-## NO AHORA
+- Temporary AWS deployment: S3 + Glue/Athena + Lambda/API Gateway.
+- IaC.
+- Bedrock adapter.
+- Simulated replenishment scenario.
+
+## NOT NOW
+
 - Kafka / streaming.
 - Kubernetes.
 - Deep learning.
 - Redshift.
-- RDS persistente.
-- Microservicios múltiples.
-- Datos en tiempo real.
-- Entrenar un LLM propio.
-- SLA de producción.
-- Datos personales.
+- Persistent RDS.
+- Multiple microservices.
+- Real-time data.
+- Training a custom LLM.
+- Production SLA.
+- Personal data.
 
-## Regla anti-scope-creep
-Cualquier idea nueva se registra en backlog y no modifica los MUST hasta cerrar la versión publicable del MVP.
+## Scope control rule
+Any new idea is recorded in the backlog and does not change the MUST items until the release-ready MVP is finalized.

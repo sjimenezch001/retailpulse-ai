@@ -1,10 +1,10 @@
-# RetailPulse AI — 5 preguntas obligatorias de la demo
+# RetailPulse AI — 5 required demo questions
 
-1. ¿Cómo evolucionaron las unidades y el revenue_proxy en las últimas semanas?
-2. ¿Qué tiendas o departamentos explican la mayor variación de demanda?
-3. ¿Cuál es el pronóstico para el horizonte seleccionado y cuál fue su error histórico?
-4. ¿Qué eventos o variaciones de precio coinciden con cambios relevantes de demanda?
-5. ¿Cómo se define esta métrica y de qué tabla, período y actualización proviene la cifra?
+1. How have units and revenue_proxy evolved over recent weeks?
+2. Which stores or departments explain the largest variation in demand?
+3. What is the forecast for the selected horizon, and what was its historical error?
+4. Which events or price changes coincide with significant changes in demand?
+5. How is this metric defined, and which table, period and update does the figure come from?
 
-## Regla de aceptación
-Las cinco preguntas deben poder responderse con evidencia verificable en la demo final y sin redefinir métricas en cada interfaz.
+## Acceptance rule
+All five questions must be answerable with verifiable evidence in the final demo, without redefining metrics in each interface.
