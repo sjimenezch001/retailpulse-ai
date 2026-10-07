@@ -4,6 +4,8 @@ import pytest
 
 from retailpulse.data.source import read_sources
 
+pytest_plugins = ["tests.conftest_model"]
+
 
 @pytest.fixture
 def fixture_dir():
