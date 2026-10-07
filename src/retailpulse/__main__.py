@@ -16,8 +16,13 @@ def main():
     profile.add_argument("--select-pilot", action="store_true")
     profile.add_argument("--sample", action="store_true", help="Export a small real pilot sample")
     commands.add_parser("bronze", help="Ingest configured CSV sources into Parquet")
+    commands.add_parser("silver", help="Build validated daily sales and dimensions")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "silver":
+        from retailpulse.transforms.silver import run_silver
+
+        print(run_silver(settings.output_path, settings.pilot.stores, settings.pilot.departments))
     if args.command == "bronze":
         from retailpulse.ingestion.bronze import ingest
 
