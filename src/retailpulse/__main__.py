@@ -28,8 +28,21 @@ def main():
     baseline.add_argument("--test-days", type=int, default=28)
     baseline.add_argument("--rolling-window", type=int, default=7)
     baseline.add_argument("--future-horizon", type=int, default=28)
+    model = commands.add_parser("model", help="Compare LightGBM on validation, freeze and evaluate once")
+    model.add_argument("--validation-only", action="store_true", help="Freeze selection without reading test actuals")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "model":
+        import json
+
+        from retailpulse.models.workflow import run_model
+
+        result = run_model(settings.output_path, root / "artifacts", validation_only=args.validation_only)
+        summary = {"status": result["status"], "winner": result["winner"]["configuration"]["name"],
+                   "validation": result["winner"]["validation_metrics"],
+                   "test": result.get("test", {}).get("metrics"),
+                   "reused": result.get("reused", False), "artifacts": result["artifact_path"]}
+        print(json.dumps(summary, indent=2))
     if args.command == "baseline":
         from retailpulse.models.baseline import run_baselines
 
