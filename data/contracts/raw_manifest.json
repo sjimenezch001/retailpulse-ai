@@ -1,0 +1,12 @@
+{
+  "dataset_version": "m5-accuracy-evaluation-v1",
+  "generated_at": "2026-10-07T20:07:40.993651+00:00",
+  "source": "https://www.kaggle.com/competitions/m5-forecasting-accuracy/data",
+  "status": "REAL-DATA VALIDATION PENDING",
+  "missing_files": [
+    "calendar.csv",
+    "sell_prices.csv",
+    "sales_train_evaluation.csv"
+  ],
+  "files": []
+}
