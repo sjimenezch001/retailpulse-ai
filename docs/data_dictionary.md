@@ -14,6 +14,7 @@
 | fact_forecast | origin/target/store/item/model/split | Predicted/actual units, horizon, department, demand level, training dates, source run ID; RP-06 populates it |
 | forecast_evaluation | split/model/segment type/segment | WMAPE, MAE, RMSE, observation count, zero-denominator flag and source run ID; RP-06 populates it |
 | mart_demand_alerts | daily sales key | View of explicit demand spike flags; not causal or inventory alerts |
+| baseline_run | one active baseline evaluation | Exact holdout/training boundaries, model parameters, version and timestamp |
 | metric_definitions | metric name | Canonical definition, grain and filter rules |
 | pipeline_metadata | one active Gold generation | Bronze/Silver/Gold run IDs, source ingestion timestamp, sales range, as_of date and generation timestamp |
 
