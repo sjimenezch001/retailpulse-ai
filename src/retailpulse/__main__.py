@@ -1,5 +1,6 @@
 """Local stage commands; failures propagate and return a nonzero exit code."""
 import argparse
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -17,8 +18,23 @@ def main():
     profile.add_argument("--sample", action="store_true", help="Export a small real pilot sample")
     commands.add_parser("bronze", help="Ingest configured CSV sources into Parquet")
     commands.add_parser("silver", help="Build validated daily sales and dimensions")
+    gold = commands.add_parser("gold", help="Build the canonical DuckDB analytics layer")
+    gold.add_argument("--as-of", type=date.fromisoformat)
+    query = commands.add_parser("query", help="Run a named repository business query")
+    query.add_argument("name", choices=["01_sales_trend", "02_segment_changes", "03_forecast_errors",
+                                      "04_events_and_prices", "05_metric_provenance"])
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "gold":
+        from retailpulse.transforms.gold import run_gold
+
+        print(run_gold(settings.output_path, root / "sql", args.as_of))
+    if args.command == "query":
+        import duckdb
+
+        with duckdb.connect(str(settings.output_path / "gold/retailpulse.duckdb"), read_only=True) as db:
+            sql = (root / "sql/queries" / f"{args.name}.sql").read_text(encoding="utf-8")
+            print(db.execute(sql).fetchdf().to_csv(index=False))
     if args.command == "silver":
         from retailpulse.transforms.silver import run_silver
 
