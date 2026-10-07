@@ -4,10 +4,10 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-02–RP-06 code complete; REAL-DATA VALIDATION PENDING.** RP-00 and
-RP-01 are complete. Local profiling, Bronze/Silver/Gold and forecasting baselines
-are tested with clearly synthetic fixtures. No real M5 dataset, sample, measured
-forecast quality or successful real-data execution is claimed.
+**Status: RP-02–RP-06 REAL-DATA VALIDATED** on the configured M5 pilot. RP-00
+and RP-01 are complete. Real profiling, Bronze/Silver/Gold, baseline evaluation
+and exact rerun checks passed. Full inputs and generated datasets remain local
+and Git-ignored; the report records measurements and remaining limitations.
 
 Stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
 Development: pytest and Ruff. Packaging: setuptools and pip.
@@ -15,9 +15,9 @@ Development: pytest and Ruff. Packaging: setuptools and pip.
 ## Repository structure
 
 ```text
-config/local.yaml      Relative paths and pending real pilot selection
-data/contracts/        Source manifest (pending until real files are inspected)
-data/sample/           Reserved for samples derived from real M5 only
+config/local.yaml      Relative paths and the derived real M5 pilot
+data/contracts/        Inspected source manifest with hashes and profiles
+data/sample/           Local-only M5 samples; tracked guidance and provenance
 notebooks/             Thin profiling notebook
 sql/{silver,gold,checks,queries}/
 src/retailpulse/        data/, ingestion/, transforms/, quality/, models/
@@ -31,7 +31,8 @@ requirements.txt       Exact versions from the validated environment
 .env.example           Template without credentials
 ```
 
-Raw and processed data and generated artifacts are excluded from Git.
+Raw and processed data, real M5 samples and generated artifacts are excluded from Git.
+Real row-level samples are generated locally and are not distributed in the repository.
 The synthetic fixtures are stored only under `tests/fixtures/`.
 
 ## Quick Start — Windows PowerShell
@@ -68,9 +69,10 @@ fixtures there. Then run the stages in order:
 .\.venv\Scripts\python.exe -m retailpulse query 03_forecast_errors
 ```
 
-Profiling derives the deterministic 3-store/2-department pilot from actual
-source identifiers. Until those files exist, lists remain empty and the
-manifest remains pending; downstream stages fail on missing inputs.
+Profiling derived `CA_1`, `CA_2`, `CA_3` and `FOODS_1`, `FOODS_2` from the
+real source identifiers. This pilot contains 614 items, 1,842 series and
+3,575,322 daily rows. Missing inputs still produce a pending manifest and stop
+downstream stages; tests remain independent of the local real data.
 Configuration paths are relative to the repository root. Use
 `--config config/local.yaml` before the subcommand to select configuration.
 For reproducible freshness, use `gold --as-of YYYY-MM-DD` with a date no earlier

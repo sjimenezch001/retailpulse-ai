@@ -19,7 +19,7 @@ Thumbs.db
 build/
 dist/
 
-# Datasets and generated artifacts (keep sample and contracts tracked)
+# Datasets and generated artifacts (keep contracts and safe metadata tracked)
 /data/raw/
 /data/processed/
 /data/bronze/
@@ -27,3 +27,8 @@ dist/
 /data/gold/
 /artifacts/
 /models/
+
+# Real M5 samples are local only; distribute documentation and provenance metadata.
+/data/sample/*
+!/data/sample/README.md
+!/data/sample/provenance.json

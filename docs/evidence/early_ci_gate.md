@@ -30,3 +30,10 @@ Validation:
 
 The hosted workflow has NOT run: this branch has not been pushed. Linux runtime
 validation and a GitHub Actions run remain pending. Dependency files are unchanged.
+
+## Subsequent validation context
+
+At the start of real M5 validation, the user confirmed that the early workflow
+had passed remotely. No remote workflow was triggered or GitHub state changed
+during this validation task; the statement above records the original local
+sprint state. Current local regression results are in the sprint report.

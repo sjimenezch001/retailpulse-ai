@@ -9,8 +9,9 @@ consumer; it is not implemented in this sprint.
 RP-01 established the repository, environment and standards. RP-02 through
 RP-06 now provide local source inspection, Parquet Bronze snapshots, pandas
 Silver transformations, DuckDB Gold marts and chronological forecasting
-baselines. They are code complete and tested on synthetic fixtures only;
-real M5 data validation is pending.
+baselines. These stages are now validated on the real M5 pilot (3 stores ×
+2 departments), with 3,575,322 daily rows and 4,530,250 reconciled units.
+Synthetic regression fixtures remain independent of the real dataset.
 
 Bronze → Silver identity links and checksums make source changes traceable.
 Failed quality checks prevent publication. Gold owns metric definitions for

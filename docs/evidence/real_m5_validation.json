@@ -1,0 +1,966 @@
+{
+  "validation_date": "2026-10-07",
+  "branch": "feat/data-backbone",
+  "implementation_baseline": "0fac514",
+  "status": {
+    "RP-02": "REAL-DATA VALIDATED",
+    "RP-03": "REAL-DATA VALIDATED",
+    "RP-04": "REAL-DATA VALIDATED",
+    "RP-05": "REAL-DATA VALIDATED",
+    "RP-06": "REAL-DATA VALIDATED"
+  },
+  "sources": [
+    {
+      "source_filename": "calendar.csv",
+      "sha256": "d12b5914ef03e66649adf5dd9e996e6602251c22b7a6af8f1f7e3aa12f8860f5",
+      "size_bytes": 103469,
+      "rows": 1969,
+      "columns": 14,
+      "duplicate_rows": 0,
+      "schema_problems": [],
+      "date_range": {
+        "min": "2011-01-29 00:00:00",
+        "max": "2016-06-19 00:00:00",
+        "invalid_dates": 0
+      }
+    },
+    {
+      "source_filename": "sell_prices.csv",
+      "sha256": "9da3ad1f8b8ccacdbdc70612191dd375ec24a4ac6625c24b75b3bc60b0bed2ef",
+      "size_bytes": 203395785,
+      "rows": 6841121,
+      "columns": 4,
+      "duplicate_rows": 0,
+      "schema_problems": []
+    },
+    {
+      "source_filename": "sales_train_evaluation.csv",
+      "sha256": "4b4a47c44c38380d2a9168216fea8c9ff2f31b1ddb772f8a0995952a038b8aa0",
+      "size_bytes": 121736518,
+      "rows": 30490,
+      "columns": 1947,
+      "duplicate_rows": 0,
+      "schema_problems": [],
+      "store_count": 10,
+      "department_count": 7
+    }
+  ],
+  "pilot": {
+    "stores": [
+      "CA_1",
+      "CA_2",
+      "CA_3"
+    ],
+    "departments": [
+      "FOODS_1",
+      "FOODS_2"
+    ]
+  },
+  "full_source_price_coverage": {
+    "grain": "store_id × item_id × observed wm_yr_wk",
+    "expected_keys": 8476220,
+    "covered_keys": 6719161,
+    "coverage_ratio": 0.7927072445028562
+  },
+  "bronze": {
+    "pipeline_run_id": "47b8b962c868f3c60fc8",
+    "ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+    "snapshot": "data/processed/bronze/runs/47b8b962c868f3c60fc8",
+    "tables": {
+      "calendar": {
+        "source_file": "calendar.csv",
+        "source_checksum": "d12b5914ef03e66649adf5dd9e996e6602251c22b7a6af8f1f7e3aa12f8860f5",
+        "input_rows": 1969,
+        "output_rows": 1969,
+        "output_checksum": "9f9e4a7fc4b8ef678562326b3ea464c15f162c3d7eddf7cfc24a2db5f7128597",
+        "columns": 18,
+        "path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/calendar.parquet",
+        "source_schema": [
+          [
+            "date",
+            "large_string"
+          ],
+          [
+            "wm_yr_wk",
+            "int64"
+          ],
+          [
+            "weekday",
+            "large_string"
+          ],
+          [
+            "wday",
+            "int64"
+          ],
+          [
+            "month",
+            "int64"
+          ],
+          [
+            "year",
+            "int64"
+          ],
+          [
+            "d",
+            "large_string"
+          ],
+          [
+            "event_name_1",
+            "large_string"
+          ],
+          [
+            "event_type_1",
+            "large_string"
+          ],
+          [
+            "event_name_2",
+            "large_string"
+          ],
+          [
+            "event_type_2",
+            "large_string"
+          ],
+          [
+            "snap_CA",
+            "int64"
+          ],
+          [
+            "snap_TX",
+            "int64"
+          ],
+          [
+            "snap_WI",
+            "int64"
+          ],
+          [
+            "ingestion_ts",
+            "large_string"
+          ],
+          [
+            "source_file",
+            "large_string"
+          ]
+        ]
+      },
+      "prices": {
+        "source_file": "sell_prices.csv",
+        "source_checksum": "9da3ad1f8b8ccacdbdc70612191dd375ec24a4ac6625c24b75b3bc60b0bed2ef",
+        "input_rows": 6841121,
+        "output_rows": 6841121,
+        "output_checksum": "ca720f0ae942d110bc0793d60b8f47d9aca9afbe7f568a2c0585abca705c6e1f",
+        "columns": 8,
+        "path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/prices.parquet",
+        "source_schema": [
+          [
+            "store_id",
+            "dictionary<values=string, indices=int8, ordered=0>"
+          ],
+          [
+            "item_id",
+            "dictionary<values=string, indices=int16, ordered=0>"
+          ],
+          [
+            "wm_yr_wk",
+            "int64"
+          ],
+          [
+            "sell_price",
+            "double"
+          ],
+          [
+            "ingestion_ts",
+            "large_string"
+          ],
+          [
+            "source_file",
+            "large_string"
+          ],
+          [
+            "source_checksum",
+            "large_string"
+          ],
+          [
+            "pipeline_run_id",
+            "large_string"
+          ]
+        ]
+      },
+      "sales": {
+        "source_file": "sales_train_evaluation.csv",
+        "source_checksum": "4b4a47c44c38380d2a9168216fea8c9ff2f31b1ddb772f8a0995952a038b8aa0",
+        "input_rows": 30490,
+        "output_rows": 30490,
+        "output_checksum": "95ad2adfd7503590d6000bf827d6fe6876d6f524eb999e48f4499f8784ad4684",
+        "columns": 1951,
+        "path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/sales.parquet",
+        "source_schema": [
+          [
+            "id",
+            "large_string"
+          ],
+          [
+            "item_id",
+            "dictionary<values=string, indices=int16, ordered=0>"
+          ],
+          [
+            "dept_id",
+            "dictionary<values=string, indices=int8, ordered=0>"
+          ],
+          [
+            "cat_id",
+            "dictionary<values=string, indices=int8, ordered=0>"
+          ],
+          [
+            "store_id",
+            "dictionary<values=string, indices=int8, ordered=0>"
+          ],
+          [
+            "state_id",
+            "dictionary<values=string, indices=int8, ordered=0>"
+          ],
+          [
+            "d_1",
+            "int64"
+          ],
+          [
+            "d_2",
+            "int64"
+          ],
+          [
+            "d_3",
+            "int64"
+          ],
+          [
+            "d_4",
+            "int64"
+          ],
+          [
+            "d_5",
+            "int64"
+          ],
+          [
+            "d_6",
+            "int64"
+          ],
+          [
+            "d_7",
+            "int64"
+          ],
+          [
+            "d_8",
+            "int64"
+          ],
+          [
+            "d_9",
+            "int64"
+          ],
+          [
+            "d_10",
+            "int64"
+          ]
+        ]
+      }
+    },
+    "sales_units_domain": {
+      "minimum": 0,
+      "maximum": 763,
+      "nulls": 0,
+      "dtype": "int64"
+    }
+  },
+  "silver": {
+    "pilot": {
+      "stores": [
+        "CA_1",
+        "CA_2",
+        "CA_3"
+      ],
+      "departments": [
+        "FOODS_1",
+        "FOODS_2"
+      ]
+    },
+    "tables": {
+      "fact_sales_daily": {
+        "rows": 3575322,
+        "schema": "item_id: large_string\nstore_id: large_string\ndept_id: large_string\ncat_id: large_string\nstate_id: large_string\npipeline_run_id: large_string\ningestion_ts: large_string\nsource_checksum: large_string\nd: large_string\nunits: int64\ndate: timestamp[us]\nwm_yr_wk: int64\nsell_price: double\nprice_missing: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1694"
+      },
+      "dim_calendar": {
+        "rows": 1969,
+        "schema": "date: timestamp[us]\nwm_yr_wk: int64\nweekday: large_string\nwday: int64\nmonth: int64\nyear: int64\nd: large_string\nevent_name_1: large_string\nevent_type_1: large_string\nevent_name_2: large_string\nevent_type_2: large_string\nsnap_CA: int64\nsnap_TX: int64\nsnap_WI: int64\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1661"
+      },
+      "dim_product": {
+        "rows": 614,
+        "schema": "item_id: large_string\ndept_id: large_string\ncat_id: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 421"
+      },
+      "dim_store": {
+        "rows": 3,
+        "schema": "store_id: large_string\nstate_id: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 317"
+      }
+    },
+    "bronze_run_id": "47b8b962c868f3c60fc8",
+    "silver_run_id": "3bb14677a2a3a1205013",
+    "pilot_series": 1842,
+    "pilot_items": 614,
+    "bronze_pilot_units": 4530250,
+    "sales": {
+      "rows": 3575322,
+      "date_count": 1941,
+      "first_date": "2011-01-29 00:00:00",
+      "last_date": "2016-05-22 00:00:00",
+      "units": 4530250,
+      "missing_prices": 977382,
+      "minimum_units": 0,
+      "maximum_units": 157,
+      "invalid_units": 0,
+      "positive_units_missing_price": 0,
+      "missing_price_rate": 0.273368944111887
+    },
+    "quality": {
+      "duplicate_fact_keys": 0,
+      "invalid_calendar_mapping": 0,
+      "invalid_product_mapping": 0,
+      "invalid_store_mapping": 0,
+      "incorrect_price_join": 0,
+      "wrong_source_run": 0
+    },
+    "wide_long_spot_days": [
+      1,
+      7,
+      365,
+      1000,
+      1941
+    ]
+  },
+  "gold_before_baselines": {
+    "rows": {
+      "fact_sales_daily": 3575322,
+      "mart_sales_daily": 3575322,
+      "mart_store_weekly": 1668,
+      "fact_forecast": 0,
+      "mart_demand_alerts": 380925
+    },
+    "units": {
+      "fact_sales_daily": 4530250,
+      "mart_sales_daily": 4530250,
+      "mart_store_weekly": 4530250
+    },
+    "quality_sql": [],
+    "quality": {
+      "duplicate_daily_keys": 0,
+      "duplicate_weekly_keys": 0,
+      "incorrect_revenue_proxy": 0,
+      "incorrect_freshness": 0,
+      "incorrect_price_change": 0,
+      "incorrect_rolling_7d": 0,
+      "incorrect_rolling_28d": 0,
+      "incorrect_spike_flags": 0
+    },
+    "metadata": {
+      "gold_run_id": "20f4dae75fff8e79204e",
+      "silver_run_id": "3bb14677a2a3a1205013",
+      "bronze_run_id": "47b8b962c868f3c60fc8",
+      "first_sales_date": "2011-01-29 00:00:00",
+      "last_sales_date": "2016-05-22 00:00:00",
+      "as_of_date": "2026-10-07 00:00:00",
+      "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+      "generated_at": "2026-10-07T21:33:38.610052+00:00",
+      "identity_json": "{\"as_of\": \"2026-10-07\", \"silver_run_id\": \"3bb14677a2a3a1205013\", \"sql_sha256\": \"282e5f5a9cbf456e7df4505da7d1061d04919377c302b9f28a77f63e6823deac\", \"version\": \"gold-v1\"}"
+    },
+    "revenue_findings": {
+      "known_revenue_proxy": 13500903.560024139,
+      "missing_price_rows": 977382,
+      "weekly_rows_with_unknown_proxy": 1383,
+      "data_freshness_days": 3790
+    }
+  },
+  "baseline": {
+    "run": {
+      "source_run_id": "20f4dae75fff8e79204e",
+      "generated_at": "2026-10-07T21:39:29.739882+00:00",
+      "validation_days": 28,
+      "test_days": 28,
+      "rolling_window": 7,
+      "future_horizon": 28,
+      "windows_json": "{\"test\": {\"evaluation_end\": \"2016-05-22\", \"evaluation_start\": \"2016-04-25\", \"training_end\": \"2016-04-24\", \"training_start\": \"2011-01-29\"}, \"validation\": {\"evaluation_end\": \"2016-04-24\", \"evaluation_start\": \"2016-03-28\", \"training_end\": \"2016-03-27\", \"training_start\": \"2011-01-29\"}}",
+      "models": "last_value,rolling_mean,seasonal_naive_7",
+      "baseline_version": "baseline-v1"
+    },
+    "counts": {
+      "fact_forecast": 464184,
+      "forecast_evaluation": 222
+    },
+    "split_counts": [
+      {
+        "split": "future",
+        "row_count": 154728,
+        "first_date": "2016-05-23 00:00:00",
+        "last_date": "2016-06-19 00:00:00"
+      },
+      {
+        "split": "test",
+        "row_count": 154728,
+        "first_date": "2016-04-25 00:00:00",
+        "last_date": "2016-05-22 00:00:00"
+      },
+      {
+        "split": "validation",
+        "row_count": 154728,
+        "first_date": "2016-03-28 00:00:00",
+        "last_date": "2016-04-24 00:00:00"
+      }
+    ],
+    "quality": {
+      "duplicate_forecasts": 0,
+      "invalid_temporal_bounds": 0,
+      "invalid_values": 0,
+      "incorrect_actuals": 0,
+      "future_has_actual": 0,
+      "wrong_source_run": 0,
+      "incorrect_last_value": 0,
+      "incorrect_seasonal_naive": 0,
+      "incorrect_rolling_mean": 0,
+      "invalid_wmape_null_flag": 0,
+      "incorrect_overall_errors": 0
+    },
+    "zero_denominator_segments": 0
+  },
+  "baseline_rerun": {
+    "fact_forecast": {
+      "rows": 464184,
+      "changed_rows": 0
+    },
+    "forecast_evaluation": {
+      "rows": 222,
+      "changed_rows": 0
+    },
+    "real_zero_actual_slice": {
+      "selection": "First 100 ordered test forecast rows with actual_units=0; diagnostic slice only",
+      "observations": 100,
+      "WMAPE": null,
+      "MAE": 0.26,
+      "RMSE": 0.648074069840786,
+      "wmape_zero_denominator": true
+    }
+  },
+  "runtimes": [
+    {
+      "stage": "baseline-first",
+      "arguments": [
+        "baseline"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 246.431,
+      "peak_working_set_mib": 1259.42,
+      "peak_private_mib": 1405.48,
+      "minimum_available_mib": 3472.64,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "baseline-rerun",
+      "arguments": [
+        "baseline"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 214.232,
+      "peak_working_set_mib": 1254.66,
+      "peak_private_mib": 1401.73,
+      "minimum_available_mib": 3442.41,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "bronze-first",
+      "arguments": [
+        "bronze"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 56.685,
+      "peak_working_set_mib": 1781.96,
+      "peak_private_mib": 1948.86,
+      "minimum_available_mib": 1488.63,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "bronze-rerun",
+      "arguments": [
+        "bronze"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.529,
+      "peak_working_set_mib": 91.22,
+      "peak_private_mib": 162.2,
+      "minimum_available_mib": 3400.71,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "gold-initial",
+      "arguments": [
+        "gold",
+        "--as-of",
+        "2026-10-07"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 73.076,
+      "peak_working_set_mib": 3260.63,
+      "peak_private_mib": 3497.28,
+      "minimum_available_mib": 749.7,
+      "resource_guard_stopped": true
+    },
+    {
+      "stage": "profile-initial",
+      "arguments": [
+        "profile",
+        "--select-pilot",
+        "--sample"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 75.837,
+      "peak_working_set_mib": 3.89,
+      "peak_private_mib": 0.85,
+      "minimum_available_mib": 3280.87,
+      "resource_guard_stopped": false,
+      "memory_measurement_note": "Initial monitor measured only the virtualenv redirector. Ignore its peak fields; independent process observation saw 1229.2 MiB peak. Later stages monitor descendants."
+    },
+    {
+      "stage": "query-01",
+      "arguments": [
+        "query",
+        "01_sales_trend"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.243,
+      "peak_working_set_mib": 139.38,
+      "peak_private_mib": 206.16,
+      "minimum_available_mib": 4647.1,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "query-02",
+      "arguments": [
+        "query",
+        "02_segment_changes"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.258,
+      "peak_working_set_mib": 126.2,
+      "peak_private_mib": 191.57,
+      "minimum_available_mib": 4651.69,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "query-03-after",
+      "arguments": [
+        "query",
+        "03_forecast_errors"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.499,
+      "peak_working_set_mib": 110.17,
+      "peak_private_mib": 179.75,
+      "minimum_available_mib": 4518.36,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "query-03-before",
+      "arguments": [
+        "query",
+        "03_forecast_errors"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.998,
+      "peak_working_set_mib": 102.52,
+      "peak_private_mib": 167.75,
+      "minimum_available_mib": 4694.74,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "query-04",
+      "arguments": [
+        "query",
+        "04_events_and_prices"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 12.222,
+      "peak_working_set_mib": 376.62,
+      "peak_private_mib": 484.34,
+      "minimum_available_mib": 4397.85,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "query-05",
+      "arguments": [
+        "query",
+        "05_metric_provenance"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.243,
+      "peak_working_set_mib": 107.16,
+      "peak_private_mib": 171.85,
+      "minimum_available_mib": 4649.49,
+      "resource_guard_stopped": false
+    },
+    {
+      "stage": "silver-initial",
+      "arguments": [
+        "silver"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 79.778,
+      "peak_working_set_mib": 2616.09,
+      "peak_private_mib": 3200.25,
+      "minimum_available_mib": 750.9,
+      "resource_guard_stopped": true
+    }
+  ],
+  "regressions": [
+    {
+      "check": "pytest",
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "seconds": 63.363,
+      "summary": [
+        "============================== warnings summary ===============================",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "======================= 53 passed, 1 warning in 58.74s ========================"
+      ]
+    },
+    {
+      "check": "pytest-no-cache",
+      "command": "python -m pytest -p no:cacheprovider",
+      "exit_code": 0,
+      "seconds": 64.288,
+      "summary": [
+        "======================== 53 passed in 60.85s (0:01:00) ========================"
+      ]
+    },
+    {
+      "check": "ruff",
+      "command": "python -m ruff check .",
+      "exit_code": 0,
+      "seconds": 2.455,
+      "summary": [
+        "All checks passed!"
+      ]
+    },
+    {
+      "check": "pip-check",
+      "command": "python -m pip check",
+      "exit_code": 0,
+      "seconds": 2.03,
+      "summary": [
+        "No broken requirements found."
+      ]
+    },
+    {
+      "check": "verify",
+      "command": "python scripts/verify.py",
+      "exit_code": 0,
+      "seconds": 69.094,
+      "summary": [
+        "All checks passed!",
+        "============================== warnings summary ===============================",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "================== 53 passed, 1 warning in 62.12s (0:01:02) ===================",
+        "No broken requirements found.",
+        "warning: in the working copy of 'README.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'config/local.yaml', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'data/contracts/raw_manifest.json', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/architecture.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/baselines.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/data_dictionary.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/data_source.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/early_ci_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/rp02_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/rp03_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/rp04_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/rp05_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/evidence/rp06_gate.md', CRLF will be replaced by LF the next time Git touches it",
+        "warning: in the working copy of 'docs/metric_catalog.md', CRLF will be replaced by LF the next time Git touches it"
+      ]
+    }
+  ],
+  "implementation_bugs_found": [],
+  "dependencies_changed": false,
+  "query_samples": {
+    "query-01": {
+      "rows": 1941,
+      "first": [
+        {
+          "date": "2011-01-29",
+          "units": "2557.0",
+          "revenue_proxy": "",
+          "missing_price_rows": "1118"
+        },
+        {
+          "date": "2011-01-30",
+          "units": "2658.0",
+          "revenue_proxy": "",
+          "missing_price_rows": "1118"
+        },
+        {
+          "date": "2011-01-31",
+          "units": "1790.0",
+          "revenue_proxy": "",
+          "missing_price_rows": "1118"
+        }
+      ],
+      "last": [
+        {
+          "date": "2016-05-20",
+          "units": "2781.0",
+          "revenue_proxy": "8772.10000000001",
+          "missing_price_rows": "0"
+        },
+        {
+          "date": "2016-05-21",
+          "units": "3827.0",
+          "revenue_proxy": "12107.68000000001",
+          "missing_price_rows": "0"
+        },
+        {
+          "date": "2016-05-22",
+          "units": "4119.0",
+          "revenue_proxy": "13012.340000000007",
+          "missing_price_rows": "0"
+        }
+      ]
+    },
+    "query-02": {
+      "rows": 6,
+      "first": [
+        {
+          "store_id": "CA_3",
+          "dept_id": "FOODS_2",
+          "current_units": "4492.0",
+          "previous_units": "5284.0",
+          "units_change": "-792.0"
+        },
+        {
+          "store_id": "CA_1",
+          "dept_id": "FOODS_2",
+          "current_units": "3649.0",
+          "previous_units": "4084.0",
+          "units_change": "-435.0"
+        },
+        {
+          "store_id": "CA_2",
+          "dept_id": "FOODS_1",
+          "current_units": "3777.0",
+          "previous_units": "3628.0",
+          "units_change": "149.0"
+        }
+      ],
+      "last": [
+        {
+          "store_id": "CA_3",
+          "dept_id": "FOODS_1",
+          "current_units": "3194.0",
+          "previous_units": "3125.0",
+          "units_change": "69.0"
+        },
+        {
+          "store_id": "CA_1",
+          "dept_id": "FOODS_1",
+          "current_units": "2377.0",
+          "previous_units": "2421.0",
+          "units_change": "-44.0"
+        },
+        {
+          "store_id": "CA_2",
+          "dept_id": "FOODS_2",
+          "current_units": "3947.0",
+          "previous_units": "3961.0",
+          "units_change": "-14.0"
+        }
+      ]
+    },
+    "query-03-before": {
+      "rows": 0,
+      "first": [],
+      "last": []
+    },
+    "query-04": {
+      "rows": 648455,
+      "first": [],
+      "last": [],
+      "columns": [
+        "date",
+        "store_id",
+        "dept_id",
+        "item_id",
+        "event_name_1",
+        "event_name_2",
+        "units",
+        "rolling_28d",
+        "price_change_pct",
+        "demand_spike_flag"
+      ],
+      "preview_note": "Item-level M5 observations are retained only in ignored local artifacts and are not distributed. The aggregate query row count and column schema are preserved."
+    },
+    "query-05": {
+      "rows": 7,
+      "first": [
+        {
+          "metric": "data_freshness",
+          "grain": "dataset snapshot",
+          "definition": "Calendar days from latest observed sales date to explicit as_of date",
+          "filters": "Global snapshot metric; not recomputed for a segment filter",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        },
+        {
+          "metric": "demand_spike_flag",
+          "grain": "date Ãƒâ€” store Ãƒâ€” item",
+          "definition": "units > 2 * previous 28-day mean with complete history and positive mean; otherwise false; no causality claim",
+          "filters": "Date, store, department, item",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        },
+        {
+          "metric": "price_change_pct",
+          "grain": "date Ãƒâ€” store Ãƒâ€” item",
+          "definition": "100 * (price - previous day price) / previous day price; NULL for missing or zero denominator",
+          "filters": "Date, store, department, item; not additive",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        }
+      ],
+      "last": [
+        {
+          "metric": "rolling_28d",
+          "grain": "date Ãƒâ€” store Ãƒâ€” item",
+          "definition": "Mean units over the previous 28 days, excluding today; NULL until 28 days exist",
+          "filters": "Filter after window calculation; not additive across dates",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        },
+        {
+          "metric": "rolling_7d",
+          "grain": "date Ãƒâ€” store Ãƒâ€” item",
+          "definition": "Mean units over the previous 7 days, excluding today; NULL until 7 days exist",
+          "filters": "Filter after window calculation; not additive across dates",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        },
+        {
+          "metric": "units",
+          "grain": "date Ãƒâ€” store Ãƒâ€” item",
+          "definition": "Observed nonnegative daily unit sales",
+          "filters": "Date, store, department, item",
+          "source_table": "mart_sales_daily",
+          "first_sales_date": "2011-01-29",
+          "last_sales_date": "2016-05-22",
+          "as_of_date": "2026-10-07",
+          "silver_run_id": "3bb14677a2a3a1205013",
+          "bronze_run_id": "47b8b962c868f3c60fc8",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00"
+        }
+      ]
+    },
+    "query-03-after": {
+      "rows": 168,
+      "first": [
+        {
+          "model": "last_value",
+          "split": "test",
+          "horizon": "1",
+          "observations": "1842",
+          "predicted_units": "3678.0",
+          "actual_units": "2769.0",
+          "WMAPE": "1.12639942217407",
+          "MAE": "1.6932681867535289",
+          "RMSE": "3.1592718962165427"
+        },
+        {
+          "model": "last_value",
+          "split": "test",
+          "horizon": "2",
+          "observations": "1842",
+          "predicted_units": "3678.0",
+          "actual_units": "2499.0",
+          "WMAPE": "1.2344937975190076",
+          "MAE": "1.6748099891422368",
+          "RMSE": "2.7579713704727697"
+        },
+        {
+          "model": "last_value",
+          "split": "test",
+          "horizon": "3",
+          "observations": "1842",
+          "predicted_units": "3678.0",
+          "actual_units": "2427.0",
+          "WMAPE": "1.3444581788215904",
+          "MAE": "1.771444082519001",
+          "RMSE": "3.1100865641460986"
+        }
+      ],
+      "last": [
+        {
+          "model": "seasonal_naive_7",
+          "split": "validation",
+          "horizon": "26",
+          "observations": "1842",
+          "predicted_units": "3316.0",
+          "actual_units": "2730.0",
+          "WMAPE": "1.0893772893772893",
+          "MAE": "1.6145494028230185",
+          "RMSE": "3.038836568046465"
+        },
+        {
+          "model": "seasonal_naive_7",
+          "split": "validation",
+          "horizon": "27",
+          "observations": "1842",
+          "predicted_units": "3985.0",
+          "actual_units": "3442.0",
+          "WMAPE": "0.9328878558977339",
+          "MAE": "1.743213897937025",
+          "RMSE": "3.310972774972995"
+        },
+        {
+          "model": "seasonal_naive_7",
+          "split": "validation",
+          "horizon": "28",
+          "observations": "1842",
+          "predicted_units": "3203.0",
+          "actual_units": "3678.0",
+          "WMAPE": "0.8833605220228385",
+          "MAE": "1.763843648208469",
+          "RMSE": "3.004611005840346"
+        }
+      ]
+    }
+  },
+  "memory_note": "Silver/Gold supervisor threshold crossed near successful completion; CLI exit 0, complete outputs, independent audits passed. Peaks are sampled, except separately noted process observations."
+}

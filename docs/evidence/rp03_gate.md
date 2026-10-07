@@ -1,22 +1,28 @@
-# RP-03 gate — 2026-10-07
+# RP-03 real-data gate — 2026-10-07
 
-Status: CODE COMPLETE; REAL-DATA VALIDATION PENDING.
+Status: **REAL-DATA VALIDATED — PASS**.
 
-`python -m retailpulse bronze` reads the configured three source files and
-preserves each source table in Parquet. A run ID derives from source SHA-256
-checksums and the ingestion contract version. Unchanged reruns verify and reuse
-the immutable snapshot, including its original ingestion timestamp. Changed
-sources create a new snapshot; `current.json` selects one complete generation.
-There is no append or row duplication. Writes assume one local pipeline writer.
+Executed `python -m retailpulse bronze` twice on unchanged real inputs.
+First run: 56.685 seconds. Rerun: 4.529 seconds, `reused=True`.
+Both returned run ID `47b8b962c868f3c60fc8` and ingestion timestamp
+`2026-10-07T21:29:04.505820+00:00`. Output root:
+`data/processed/bronze/runs/47b8b962c868f3c60fc8/`.
 
-Each row has `ingestion_ts`, `source_file`, `source_checksum`, `pipeline_run_id`.
-The structured `summary.json` reconciles input/output counts and stores output
-checksums. Missing, empty or malformed sources and corrupted output fail loudly.
-Incomplete runs do not replace the active snapshot. Historical snapshots are
-retained under the ignored output directory for traceability.
+| Dataset | Input rows | Parquet rows |
+| --- | ---: | ---: |
+| calendar | 1,969 | 1,969 |
+| prices | 6,841,121 | 6,841,121 |
+| sales | 30,490 | 30,490 |
 
-Validation: `python -m pytest -p no:cacheprovider` → `16 passed in 1.74s`;
-`python -m ruff check .` → `All checks passed!`.
-Tests use only synthetic fixtures and temporary directories. No real M5
-execution or real ingestion counts are claimed. Real ingestion remains pending.
-Dependencies are unchanged.
+Files are `calendar.parquet`, `prices.parquet`, `sales.parquet`; the snapshot's
+`summary.json` stores their counts, source SHA-256 and output SHA-256 values.
+Every output checksum was independently verified. A full metadata grouping
+found exactly one correct `source_file`, `source_checksum`, `pipeline_run_id`
+and `ingestion_ts` value per source table. All original source columns and
+source row counts were preserved. The rerun retained identical checksums,
+counts and timestamp; no appended data or second active generation appeared.
+
+Peak sampled process-tree working set was 1,781.96 MiB initially and 91.22 MiB
+on reuse. The source hashes are recorded in [RP-02 evidence](rp02_gate.md).
+All Bronze files are under ignored `data/processed/`; none are committed.
+No Bronze implementation defect or dependency change was required.
