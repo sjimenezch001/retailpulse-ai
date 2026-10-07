@@ -17,5 +17,11 @@ Bronze → Silver identity links and checksums make source changes traceable.
 Failed quality checks prevent publication. Gold owns metric definitions for
 future BI/API/agent consumers; baseline outputs share its forecast schema.
 
-Advanced ML, API, agent and AWS will be introduced in later stages. Early CI
-checks lint and tests with repository fixtures; this does not complete RP-11.
+RP-07 adds reusable past-only features, a global LightGBM model and local
+MLflow/SQLite experiment tracking. Validation selects and freezes the design
+before the one-time test evaluation. ML and baseline forecasts coexist in Gold;
+real observations, model files and tracking artifacts remain local and ignored.
+See the [model card](model_card.md) and [gate evidence](evidence/rp07_gate.md).
+
+Power BI, API, agent and AWS remain future stages. Early CI checks lint and
+tests with repository fixtures; this does not complete RP-11. RP-08 has not started.

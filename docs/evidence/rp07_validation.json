@@ -1,0 +1,512 @@
+{
+  "artifact_hashes": {
+    "baseline_segments.csv": "bf9bbf4dff27e6b18b868a2b2d6024ca826c300624c67e42ebd44f8ebd4ae750",
+    "final/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "final/model.txt": "b0fe6861c508088589d4d699650c2dfb035523ef151b3c6cab903428d93f82ec",
+    "forecasts.parquet": "84302fb9a3d123a28715e68f3ed7c0a1094fba4bad5bf4b2386b582bec14175b",
+    "segmented_metrics.csv": "e2ca5679dfeba788c0c9e558b9c7b743986d5faa57dc5e931adda0282c1496ee"
+  },
+  "audit": [
+    {
+      "at": "2026-10-07T23:04:49.006380+00:00",
+      "event": "plan_created",
+      "plan_sha256": "dbf72f66af3639b71120f9558744dabf6f815d67c38d664b25eeae89a28b0b99"
+    },
+    {
+      "at": "2026-10-07T23:05:28.436993+00:00",
+      "candidate": "A_core_poisson",
+      "event": "validation_candidate_completed",
+      "mlflow_run_id": "9957d4715083451d8244e8135e54c847"
+    },
+    {
+      "at": "2026-10-07T23:06:09.164430+00:00",
+      "candidate": "B_extended_poisson",
+      "event": "validation_candidate_completed",
+      "mlflow_run_id": "a84509b19cd64310bce268361b23ba5f"
+    },
+    {
+      "at": "2026-10-07T23:06:52.066639+00:00",
+      "candidate": "C_extended_l1",
+      "event": "validation_candidate_completed",
+      "mlflow_run_id": "bee906ed856440f5b08dbae5c9fe38d7"
+    },
+    {
+      "at": "2026-10-07T23:06:52.082597+00:00",
+      "event": "winner_frozen",
+      "sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c",
+      "winner": "C_extended_l1"
+    },
+    {
+      "at": "2026-10-07T23:08:07.335057+00:00",
+      "event": "validation_reproduction_confirmed",
+      "model_sha256": "ef658517156c61c82e57033a2ac94731a5d9ea2c6f87ca67361f5b48682746a5",
+      "prediction_rows": 51576
+    },
+    {
+      "at": "2026-10-07T23:09:16.453246+00:00",
+      "event": "final_model_trained",
+      "model_sha256": "b0fe6861c508088589d4d699650c2dfb035523ef151b3c6cab903428d93f82ec"
+    },
+    {
+      "at": "2026-10-07T23:09:16.483172+00:00",
+      "event": "test_evaluation_started",
+      "freeze_sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c"
+    },
+    {
+      "at": "2026-10-07T23:09:16.716620+00:00",
+      "event": "test_evaluation_completed",
+      "freeze_sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c"
+    },
+    {
+      "at": "2026-10-07T23:09:22.817411+00:00",
+      "event": "gold_persisted",
+      "forecasts": 103152,
+      "mlflow_run_id": "5e5ccd6aca564bcb9e16bf240f7a02aa"
+    }
+  ],
+  "baseline_validation": {
+    "MAE": 1.288365020275211,
+    "RMSE": 2.1900552852602093,
+    "WMAPE": 0.8377401919554494
+  },
+  "candidates": [
+    {
+      "configuration": {
+        "feature_set": "core",
+        "name": "A_core_poisson",
+        "params": {
+          "bagging_seed": 2026,
+          "data_random_seed": 2026,
+          "deterministic": true,
+          "feature_fraction_seed": 2026,
+          "force_col_wise": true,
+          "histogram_pool_size": 128,
+          "learning_rate": 0.05,
+          "max_bin": 127,
+          "min_data_in_leaf": 100,
+          "num_leaves": 31,
+          "num_threads": 4,
+          "objective": "poisson",
+          "seed": 2026,
+          "verbosity": -1
+        },
+        "rounds": 200
+      },
+      "details": {
+        "features": [
+          "store_id",
+          "item_id",
+          "dept_id",
+          "cat_id",
+          "state_id",
+          "day_of_week",
+          "day_of_month",
+          "week_of_year",
+          "month",
+          "year",
+          "weekend",
+          "lag_1",
+          "lag_7",
+          "lag_14",
+          "lag_28"
+        ],
+        "fit_seconds": 27.255725899944082,
+        "history_start": "2014-03-01",
+        "runtime_seconds": 30.77283059991896,
+        "sampled_peak_rss_mib": 506.83984375,
+        "training_end": "2016-03-27",
+        "training_rows": 1344660,
+        "training_seconds": 27.529110200004652,
+        "training_start": "2014-03-29"
+      },
+      "metrics": {
+        "MAE": 1.3125544546318972,
+        "RMSE": 2.0184813383196527,
+        "WMAPE": 0.8534690118646823,
+        "observations": 51576,
+        "wmape_zero_denominator": false
+      },
+      "mlflow_run_id": "9957d4715083451d8244e8135e54c847",
+      "split": "validation"
+    },
+    {
+      "configuration": {
+        "feature_set": "extended",
+        "name": "B_extended_poisson",
+        "params": {
+          "bagging_seed": 2026,
+          "data_random_seed": 2026,
+          "deterministic": true,
+          "feature_fraction_seed": 2026,
+          "force_col_wise": true,
+          "histogram_pool_size": 128,
+          "learning_rate": 0.05,
+          "max_bin": 127,
+          "min_data_in_leaf": 100,
+          "num_leaves": 31,
+          "num_threads": 4,
+          "objective": "poisson",
+          "seed": 2026,
+          "verbosity": -1
+        },
+        "rounds": 200
+      },
+      "details": {
+        "features": [
+          "store_id",
+          "item_id",
+          "dept_id",
+          "cat_id",
+          "state_id",
+          "day_of_week",
+          "day_of_month",
+          "week_of_year",
+          "month",
+          "year",
+          "weekend",
+          "lag_1",
+          "lag_7",
+          "lag_14",
+          "lag_28",
+          "rolling_mean_7",
+          "rolling_mean_14",
+          "rolling_mean_28",
+          "rolling_std_7",
+          "rolling_std_28",
+          "sell_price_lag_1",
+          "price_missing_lag_1",
+          "price_change_pct_lag_1",
+          "event_1",
+          "event_2",
+          "snap"
+        ],
+        "fit_seconds": 36.27881349995732,
+        "history_start": "2014-03-01",
+        "runtime_seconds": 40.184423699975014,
+        "sampled_peak_rss_mib": 725.71875,
+        "training_end": "2016-03-27",
+        "training_rows": 1344660,
+        "training_seconds": 36.798212399939075,
+        "training_start": "2014-03-29"
+      },
+      "metrics": {
+        "MAE": 1.2658915770080252,
+        "RMSE": 1.9620277575121057,
+        "WMAPE": 0.8231271697293953,
+        "observations": 51576,
+        "wmape_zero_denominator": false
+      },
+      "mlflow_run_id": "a84509b19cd64310bce268361b23ba5f",
+      "split": "validation"
+    },
+    {
+      "configuration": {
+        "feature_set": "extended",
+        "name": "C_extended_l1",
+        "params": {
+          "bagging_seed": 2026,
+          "data_random_seed": 2026,
+          "deterministic": true,
+          "feature_fraction_seed": 2026,
+          "force_col_wise": true,
+          "histogram_pool_size": 128,
+          "learning_rate": 0.05,
+          "max_bin": 127,
+          "min_data_in_leaf": 100,
+          "num_leaves": 31,
+          "num_threads": 4,
+          "objective": "regression_l1",
+          "seed": 2026,
+          "verbosity": -1
+        },
+        "rounds": 200
+      },
+      "details": {
+        "features": [
+          "store_id",
+          "item_id",
+          "dept_id",
+          "cat_id",
+          "state_id",
+          "day_of_week",
+          "day_of_month",
+          "week_of_year",
+          "month",
+          "year",
+          "weekend",
+          "lag_1",
+          "lag_7",
+          "lag_14",
+          "lag_28",
+          "rolling_mean_7",
+          "rolling_mean_14",
+          "rolling_mean_28",
+          "rolling_std_7",
+          "rolling_std_28",
+          "sell_price_lag_1",
+          "price_missing_lag_1",
+          "price_change_pct_lag_1",
+          "event_1",
+          "event_2",
+          "snap"
+        ],
+        "fit_seconds": 38.434099700069055,
+        "history_start": "2014-03-01",
+        "runtime_seconds": 42.01599039998837,
+        "sampled_peak_rss_mib": 746.84375,
+        "training_end": "2016-03-27",
+        "training_rows": 1344660,
+        "training_seconds": 38.91873780009337,
+        "training_start": "2014-03-29"
+      },
+      "metrics": {
+        "MAE": 1.1185337960184778,
+        "RMSE": 2.041507653922988,
+        "WMAPE": 0.7273099643647677,
+        "observations": 51576,
+        "wmape_zero_denominator": false
+      },
+      "mlflow_run_id": "bee906ed856440f5b08dbae5c9fe38d7",
+      "split": "validation"
+    }
+  ],
+  "checks": {
+    "artifacts_unchanged_after_rerun": true,
+    "baseline_fingerprints": {
+      "baseline_run": [
+        1,
+        11325071125709109193,
+        11325071125709109193
+      ],
+      "fact_forecast": [
+        464184,
+        13149616977095598815,
+        4283532589128857474754907
+      ],
+      "forecast_evaluation": [
+        222,
+        10214848483379624647,
+        2093728572675434469563
+      ]
+    },
+    "baseline_fingerprints_unchanged": true,
+    "duplicates": 0,
+    "evaluation_rows": 296,
+    "forecast_rows": 567336,
+    "ml_evaluation_rows": 74,
+    "ml_forecast_rows": 103152,
+    "model_run_rows": 1,
+    "rerun_reused": true,
+    "served_ml_horizon_rows": 56,
+    "status": "PASS",
+    "test_evaluation_count": 1
+  },
+  "evaluation_rows": 74,
+  "experiment": "RetailPulse-RP07",
+  "final_run_id": "5e5ccd6aca564bcb9e16bf240f7a02aa",
+  "forecast_rows": 103152,
+  "freeze_sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c",
+  "frozen_at": "2026-10-07T23:06:52.068634+00:00",
+  "gate": "PASS",
+  "local_artifact_directory": "artifacts/rp07/20f4dae75fff8e79204e",
+  "local_mlflow_database": "artifacts/mlflow/mlflow.db",
+  "model": "lightgbm_global_v1",
+  "model_environment": {
+    "duckdb": "1.5.5",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6"
+  },
+  "plan_sha256": "dbf72f66af3639b71120f9558744dabf6f815d67c38d664b25eeae89a28b0b99",
+  "reproduction": {
+    "model_bytes_exactly_equal": true,
+    "native_model_sha256": "ef658517156c61c82e57033a2ac94731a5d9ea2c6f87ca67361f5b48682746a5",
+    "prediction_rows": 51576,
+    "predictions_exactly_equal": true,
+    "resources": {
+      "features": [
+        "store_id",
+        "item_id",
+        "dept_id",
+        "cat_id",
+        "state_id",
+        "day_of_week",
+        "day_of_month",
+        "week_of_year",
+        "month",
+        "year",
+        "weekend",
+        "lag_1",
+        "lag_7",
+        "lag_14",
+        "lag_28",
+        "rolling_mean_7",
+        "rolling_mean_14",
+        "rolling_mean_28",
+        "rolling_std_7",
+        "rolling_std_28",
+        "sell_price_lag_1",
+        "price_missing_lag_1",
+        "price_change_pct_lag_1",
+        "event_1",
+        "event_2",
+        "snap"
+      ],
+      "fit_seconds": 33.992239400045946,
+      "history_start": "2014-03-01",
+      "runtime_seconds": 36.62021279986948,
+      "sampled_peak_rss_mib": 597.1484375,
+      "training_end": "2016-03-27",
+      "training_rows": 1344660,
+      "training_seconds": 34.37248979997821,
+      "training_start": "2014-03-29"
+    },
+    "status": "PASS",
+    "test_evaluated": false
+  },
+  "source_run_id": "20f4dae75fff8e79204e",
+  "test": {
+    "baseline": {
+      "MAE": 1.3472517671563737,
+      "RMSE": 2.36119399840347,
+      "WMAPE": 0.7948235263358284
+    },
+    "details": {
+      "features": [
+        "store_id",
+        "item_id",
+        "dept_id",
+        "cat_id",
+        "state_id",
+        "day_of_week",
+        "day_of_month",
+        "week_of_year",
+        "month",
+        "year",
+        "weekend",
+        "lag_1",
+        "lag_7",
+        "lag_14",
+        "lag_28",
+        "rolling_mean_7",
+        "rolling_mean_14",
+        "rolling_mean_28",
+        "rolling_std_7",
+        "rolling_std_28",
+        "sell_price_lag_1",
+        "price_missing_lag_1",
+        "price_change_pct_lag_1",
+        "event_1",
+        "event_2",
+        "snap"
+      ],
+      "fit_seconds": 32.31630019983277,
+      "history_start": "2014-03-29",
+      "runtime_seconds": 35.79821150004864,
+      "sampled_peak_rss_mib": 694.609375,
+      "training_end": "2016-04-24",
+      "training_rows": 1344660,
+      "training_seconds": 32.721413399791345,
+      "training_start": "2014-04-26"
+    },
+    "evaluated_at": "2026-10-07T23:09:16.704653+00:00",
+    "freeze_sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c",
+    "metrics": {
+      "MAE": 1.2683243673229323,
+      "RMSE": 2.4311766199741083,
+      "WMAPE": 0.7482595835083166,
+      "observations": 51576,
+      "wmape_zero_denominator": false
+    }
+  },
+  "training_commit": "c0a8e3e83ac10a4788376dc26cb4d118cf2a2a6a",
+  "training_git_dirty": false,
+  "validation": {
+    "git_diff_check": "PASS",
+    "pip_check": "No broken requirements found",
+    "pytest": "63 passed in 55.56s; one upstream SQLAlchemy warning",
+    "ruff": "PASS",
+    "verify_script": "PASS: 63 passed in 51.13s; upstream SQLAlchemy and local pytest cache warnings"
+  },
+  "winner": {
+    "configuration": {
+      "feature_set": "extended",
+      "name": "C_extended_l1",
+      "params": {
+        "bagging_seed": 2026,
+        "data_random_seed": 2026,
+        "deterministic": true,
+        "feature_fraction_seed": 2026,
+        "force_col_wise": true,
+        "histogram_pool_size": 128,
+        "learning_rate": 0.05,
+        "max_bin": 127,
+        "min_data_in_leaf": 100,
+        "num_leaves": 31,
+        "num_threads": 4,
+        "objective": "regression_l1",
+        "seed": 2026,
+        "verbosity": -1
+      },
+      "rounds": 200
+    },
+    "feature_version": "past-only-recursive-v1",
+    "features": [
+      "store_id",
+      "item_id",
+      "dept_id",
+      "cat_id",
+      "state_id",
+      "day_of_week",
+      "day_of_month",
+      "week_of_year",
+      "month",
+      "year",
+      "weekend",
+      "lag_1",
+      "lag_7",
+      "lag_14",
+      "lag_28",
+      "rolling_mean_7",
+      "rolling_mean_14",
+      "rolling_mean_28",
+      "rolling_std_7",
+      "rolling_std_28",
+      "sell_price_lag_1",
+      "price_missing_lag_1",
+      "price_change_pct_lag_1",
+      "event_1",
+      "event_2",
+      "snap"
+    ],
+    "implementation_sha256": "1bf50110f3bd33ad726fd814992032a8fc8bcd8167676b2923550b0dce1d58e0",
+    "model": "lightgbm_global_v1",
+    "plan_sha256": "dbf72f66af3639b71120f9558744dabf6f815d67c38d664b25eeae89a28b0b99",
+    "selection_metric": "WMAPE",
+    "selection_split": "validation",
+    "source_run_id": "20f4dae75fff8e79204e",
+    "training_days": 730,
+    "validation_metrics": {
+      "MAE": 1.1185337960184778,
+      "RMSE": 2.041507653922988,
+      "WMAPE": 0.7273099643647677,
+      "observations": 51576,
+      "wmape_zero_denominator": false
+    },
+    "validation_run_id": "bee906ed856440f5b08dbae5c9fe38d7",
+    "windows": {
+      "test": {
+        "days": 28,
+        "end": "2016-05-22",
+        "origin": "2016-04-24",
+        "start": "2016-04-25"
+      },
+      "validation": {
+        "days": 28,
+        "end": "2016-04-24",
+        "origin": "2016-03-27",
+        "start": "2016-03-28"
+      }
+    }
+  }
+}
