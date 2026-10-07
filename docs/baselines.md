@@ -1,7 +1,7 @@
 # RP-06 forecasting baselines
 
 These are reference algorithms, not advanced ML or evidence of production model
-quality. No real M5 metrics have been measured in this sprint.
+quality. Real M5 pilot measurements are recorded below.
 
 `python -m retailpulse baseline` reads daily Gold sales and performs a fixed
 chronological split: final 28 dates for test, preceding 28 for validation, all
@@ -49,5 +49,35 @@ To inspect results after a run:
 .\.venv\Scripts\python.exe -m retailpulse query 03_forecast_errors
 ```
 
-All current validation uses explicitly synthetic fixtures. Real-data metrics,
-baseline comparisons and scale behavior remain pending real M5 execution.
+## Real M5 evaluation — 2026-10-07
+
+Pilot: `CA_1`, `CA_2`, `CA_3` × `FOODS_1`, `FOODS_2` (1,842 series).
+Each model has 51,576 observations per holdout. Initial training covers
+2011-01-29–2016-03-27. Validation is 2016-03-28–2016-04-24; test is
+2016-04-25–2016-05-22. The test origin retrains through 2016-04-24.
+
+| Split | Model | WMAPE (percentage display) | MAE (units) | RMSE (units) |
+| --- | --- | ---: | ---: | ---: |
+| test | last_value | 105.934365% | 1.795622 | 3.014355 |
+| test | rolling_mean | 79.482353% | 1.347252 | 2.361194 |
+| test | seasonal_naive_7 | 93.280944% | 1.581142 | 2.789959 |
+| validation | last_value | 105.247167% | 1.618602 | 2.915572 |
+| validation | rolling_mean | 83.774019% | 1.288365 | 2.190055 |
+| validation | seasonal_naive_7 | 100.186588% | 1.540775 | 2.873446 |
+
+Rolling mean has the lowest measured WMAPE, MAE and RMSE among these three
+baselines on both holdouts. This is a comparison on this pilot and these dates,
+not a production-quality or generalization claim. WMAPE can exceed 100%; it is
+not an accuracy score bounded at 100%. No winner was selected or tuned on test.
+
+The [complete segmented measurements](evidence/real_m5_baseline_metrics.csv)
+contain 222 aggregate rows covering store, department, training-derived demand
+level and horizons 1–28, for all three models and both holdouts. WMAPE is stored
+as a ratio in that CSV. The real aggregate segments have no zero denominators;
+synthetic tests still exercise the explicit undefined-WMAPE branch.
+
+The Gold-compatible output has 464,184 rows: 154,728 each for validation, test
+and future. Future dates are 2016-05-23–2016-06-19, with NULL actuals and no
+claimed future metrics. Full-grain independent SQL verifies the last value,
+seven-day mean and prior-week cycle using observations at or before each origin.
+See [RP-06 evidence](evidence/rp06_gate.md) for rerun and regression checks.

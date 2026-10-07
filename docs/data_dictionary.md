@@ -29,3 +29,17 @@ entities and canonical marts. Rebuilding with identical source, SQL and as_of
 preserves the database, including forecasts. A changed Gold generation replaces
 it and invalidates previous forecasts; rerun RP-06 afterward. All generated data
 is ignored by Git. Writes assume a single local pipeline process.
+
+## Validated real M5 pilot — 2026-10-07
+
+The source has 30,490 wide sales rows, 6,841,121 price rows and 1,969 calendar
+rows. The selected 1,842 series (614 items × 3 stores, 2 departments) span 1,941
+observed dates, 2011-01-29–2016-05-22. Silver contains 3,575,322 daily fact rows,
+1,969 calendar rows, 614 product rows and 3 store rows. The calendar extends
+28 days beyond observed sales to 2016-06-19.
+
+Gold contains 3,575,322 daily rows and 1,668 weekly rows. Both reconcile to
+4,530,250 selected Bronze units. There are 464,184 baseline forecast rows and
+222 aggregate evaluation rows. Missing daily prices remain explicit on 977,382
+rows. The schemas above remain unchanged after real-data validation; see the
+[sprint report](evidence/DATA_BACKBONE_SPRINT_REPORT.md) for lineage and checks.

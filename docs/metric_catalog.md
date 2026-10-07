@@ -38,3 +38,18 @@ Run any numbered SQL file in `sql/queries/` using `python -m retailpulse query N
 
 Query 2 requires at least 14 observed daily dates for two complete periods;
 inspect the data range in query 5 before interpreting shorter samples.
+
+## Real M5 pilot findings — 2026-10-07
+
+The validated 3-store × 2-department pilot retains 977,382 missing-price rows
+(27.336894% of 3,575,322 daily rows). All those rows have zero observed units;
+prices remain NULL and the quality flag remains true. This does not establish
+inventory availability. Under the existing conservative aggregation rule,
+1,383 of 1,668 weekly rows have unknown canonical revenue_proxy. The known-price
+partial sum is approximately 13,500,903.56 and is not audited revenue.
+
+The documented spike rule flags 380,925 daily rows. These are heuristic review
+signals, not confirmed demand events or causal conclusions. At `as_of = 2026-10-07`,
+data_freshness is 3,790 days because the final sales date is 2016-05-22, despite
+the pipeline being executed in 2026. Independent audits found no metric formula
+mismatch; no canonical calculation was changed for these findings.
