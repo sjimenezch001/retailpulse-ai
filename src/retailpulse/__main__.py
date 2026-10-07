@@ -23,8 +23,19 @@ def main():
     query = commands.add_parser("query", help="Run a named repository business query")
     query.add_argument("name", choices=["01_sales_trend", "02_segment_changes", "03_forecast_errors",
                                       "04_events_and_prices", "05_metric_provenance"])
+    baseline = commands.add_parser("baseline", help="Evaluate baselines and write Gold forecasts")
+    baseline.add_argument("--validation-days", type=int, default=28)
+    baseline.add_argument("--test-days", type=int, default=28)
+    baseline.add_argument("--rolling-window", type=int, default=7)
+    baseline.add_argument("--future-horizon", type=int, default=28)
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "baseline":
+        from retailpulse.models.baseline import run_baselines
+
+        print(run_baselines(settings.output_path, validation_days=args.validation_days,
+                            test_days=args.test_days, rolling_window=args.rolling_window,
+                            future_horizon=args.future_horizon))
     if args.command == "gold":
         from retailpulse.transforms.gold import run_gold
 
