@@ -1,59 +1,86 @@
 # RetailPulse AI
 
-Retail demand analytics platform. It aims to turn historical sales,
-calendar data and prices into verifiable business metrics for comparing
-stores and departments, reducing fragmented analysis and inconsistent
-business definitions.
+Retail demand analytics platform. It turns historical sales, calendar data and
+prices into verifiable business metrics for comparing stores and departments,
+reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-01 — Repository, environment and standards.** Python foundation
-with packaging, local configuration, an import test and linting. The M5 dataset
-is not yet included or downloaded; ingestion is not implemented.
+**Status: RP-02–RP-06 code complete; REAL-DATA VALIDATION PENDING.** RP-00 and
+RP-01 are complete. Local profiling, Bronze/Silver/Gold and forecasting baselines
+are tested with clearly synthetic fixtures. No real M5 dataset, sample, measured
+forecast quality or successful real-data execution is claimed.
 
-Initial stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
+Stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
 Development: pytest and Ruff. Packaging: setuptools and pip.
 
 ## Repository structure
 
 ```text
-config/local.yaml      Relative paths and pending pilot selection
-data/sample/           Small samples suitable for version control
-data/contracts/        Data contracts
-notebooks/             Exploration
-sql/{silver,gold,checks}/
-src/retailpulse/        Python package (version 0.1.0)
-  ingestion/ transforms/ quality/ features/ models/ api/ agent/
-tests/                 Smoke test; unit/ and integration/ reserved
-docs/                  Product, scope, architecture and evidence/
+config/local.yaml      Relative paths and pending real pilot selection
+data/contracts/        Source manifest (pending until real files are inspected)
+data/sample/           Reserved for samples derived from real M5 only
+notebooks/             Thin profiling notebook
+sql/{silver,gold,checks,queries}/
+src/retailpulse/        data/, ingestion/, transforms/, quality/, models/
+                       features/, api/, agent/ reserved for later stages
+tests/                 Synthetic fixtures, unit, integration and SQL checks
+docs/                  Source, metrics, dictionary, baselines and gate evidence
+scripts/verify.py      Local checks using the invoking Python environment
+.github/workflows/     Early CI; no datasets or secrets required
 pyproject.toml         Metadata, dependencies and tool configuration
 requirements.txt       Exact versions from the validated environment
 .env.example           Template without credentials
 ```
 
-The reserved subpackages and directories do not yet contain functionality.
 Raw and processed data and generated artifacts are excluded from Git.
+The synthetic fixtures are stored only under `tests/fixtures/`.
 
 ## Quick Start — Windows PowerShell
 
 From the repository root, use Python 3.12 (validated with 3.12.10).
-Only if `.venv` does not already exist, create it with `py -3.12 -m venv .venv`.
-The following commands use that environment directly, without activation:
+Reuse the existing `.venv`; only create one if absent with `py -3.12 -m venv .venv`.
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m pip check
 ```
 
-`pyproject.toml` is the primary source of configuration. `requirements.txt`
-pins the direct and transitive dependencies validated on Windows with Python
-3.12; installing it first reproduces those versions. The local package
-is then installed in editable mode. pytest uses the package installed from
-`src/` and discovers tests in `tests/`.
+Alternatively, `.\.venv\Scripts\python.exe scripts/verify.py` runs all local
+checks. Tests require no real dataset, network access or credentials.
+`pyproject.toml` is the primary configuration; `requirements.txt` pins runtime
+and development dependencies. The project uses an editable `src/` installation.
 
-`config/local.yaml` reserves the paths `data/raw` and `data/processed`, relative
-to the repository root. Stores and departments remain unselected.
-No secrets or `.env` file are required at this stage.
+## Real-data pipeline
+
+Follow [source acquisition instructions](docs/data_source.md) to obtain the three
+official M5 CSVs and extract them into `data/raw/m5/`. Do not copy synthetic
+fixtures there. Then run the stages in order:
+
+```powershell
+.\.venv\Scripts\python.exe -m retailpulse profile --select-pilot --sample
+.\.venv\Scripts\python.exe -m retailpulse bronze
+.\.venv\Scripts\python.exe -m retailpulse silver
+.\.venv\Scripts\python.exe -m retailpulse gold
+.\.venv\Scripts\python.exe -m retailpulse baseline
+.\.venv\Scripts\python.exe -m retailpulse query 01_sales_trend
+.\.venv\Scripts\python.exe -m retailpulse query 03_forecast_errors
+```
+
+Profiling derives the deterministic 3-store/2-department pilot from actual
+source identifiers. Until those files exist, lists remain empty and the
+manifest remains pending; downstream stages fail on missing inputs.
+Configuration paths are relative to the repository root. Use
+`--config config/local.yaml` before the subcommand to select configuration.
+For reproducible freshness, use `gold --as-of YYYY-MM-DD` with a date no earlier
+than the latest sales date. Baselines default to 28-day validation/test holdouts
+and a 28-day future horizon, with visible training boundaries.
+
+Read the [metric catalog](docs/metric_catalog.md), [data dictionary](docs/data_dictionary.md),
+[baseline protocol](docs/baselines.md) and [sprint report](docs/evidence/DATA_BACKBONE_SPRINT_REPORT.md).
+`revenue_proxy` is a proxy, not audited revenue; M5 provides no real inventory.
+Early CI is a guardrail, not completion of RP-11. RP-07 has not started.
 
 See the [product brief](docs/product_brief.md), [scope](docs/scope.md) and
 [target architecture](docs/architecture.md).
