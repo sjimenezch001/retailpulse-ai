@@ -40,8 +40,9 @@ avoid fitting segments on holdout data; no commercial meaning is implied.
 units, segment, training bounds and Gold run ID. `forecast_evaluation` contains
 segmented errors. `baseline_run` records exact temporal boundaries, parameters,
 algorithm version and execution timestamp. `--future-horizon` defaults to 28.
-The run replaces its prior results transactionally; reruns do not duplicate
-forecasts. A failed evaluation leaves earlier database results intact.
+The run replaces only its three baseline models transactionally; reruns do not
+duplicate forecasts or erase RP-07 ML forecasts. A failed evaluation leaves
+earlier database results intact.
 
 To inspect results after a run:
 
