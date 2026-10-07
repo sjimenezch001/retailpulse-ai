@@ -1,4 +1,4 @@
-dataset_path: data/raw
+dataset_path: data/raw/m5
 output_path: data/processed
 
 pilot:
