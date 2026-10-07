@@ -15,8 +15,14 @@ def main():
     profile = commands.add_parser("profile", help="Inspect local real M5 source files")
     profile.add_argument("--select-pilot", action="store_true")
     profile.add_argument("--sample", action="store_true", help="Export a small real pilot sample")
+    commands.add_parser("bronze", help="Ingest configured CSV sources into Parquet")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "bronze":
+        from retailpulse.ingestion.bronze import ingest
+
+        result = ingest(settings.dataset_path, settings.output_path / "bronze")
+        print(result)
     if args.command == "profile":
         manifest = inspect_sources(settings.dataset_path)
         write_json(root / "data/contracts/raw_manifest.json", manifest)
