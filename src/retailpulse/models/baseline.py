@@ -136,8 +136,8 @@ def run_baselines(output: Path, *, validation_days=28, test_days=28,
         db.execute("BEGIN TRANSACTION")
         try:
             # Replace the active baseline run in one transaction; do not append duplicates.
-            db.execute("DELETE FROM fact_forecast")
-            db.execute("DELETE FROM forecast_evaluation")
+            db.execute("DELETE FROM fact_forecast WHERE model IN (?, ?, ?)", list(MODELS))
+            db.execute("DELETE FROM forecast_evaluation WHERE model IN (?, ?, ?)", list(MODELS))
             db.execute("INSERT INTO fact_forecast BY NAME SELECT * FROM forecast_input")
             db.execute("INSERT INTO forecast_evaluation BY NAME SELECT * FROM metrics_input")
             db.execute("CREATE OR REPLACE TABLE baseline_run AS SELECT * FROM run_input")

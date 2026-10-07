@@ -27,6 +27,9 @@ dist/
 /data/gold/
 /artifacts/
 /models/
+/mlruns/
+/mlartifacts/
+/mlflow.db*
 
 # Real M5 samples are local only; distribute documentation and provenance metadata.
 /data/sample/*
