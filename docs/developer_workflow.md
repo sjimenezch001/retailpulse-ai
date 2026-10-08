@@ -83,3 +83,13 @@ in both the corrected PR and post-merge CI. See the dated
 [RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08).
 These results apply to the recorded revisions; local portfolio commits still
 require their own authorized remote checks.
+
+## Optional RP-12A offline checks
+
+The [AWS runbook](aws_runbook.md) isolates its pinned SDK and Terraform downloads
+under ignored `artifacts/rp12/`. The `aws-offline` CI job runs only preparation,
+mocked infrastructure validation and offline cloud tests. Existing Windows,
+Linux and container jobs retain their names and behavior. Ordinary application
+startup and packaging do not require AWS tooling. The existing 85% branch
+coverage gate still covers `src/retailpulse` and `app`; added cloud tests are
+behavioral checks, not cloud-module line coverage or live acceptance.

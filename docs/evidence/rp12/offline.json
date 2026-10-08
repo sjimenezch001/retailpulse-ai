@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-08",
+  "stage": "RP-12A",
+  "implementation": "PASS (offline)",
+  "platform": "Windows",
+  "python": "3.12.10",
+  "terraform": "1.15.9",
+  "aws_provider": "6.68.0",
+  "terraform_mock_tests": {
+    "passed": 4,
+    "failed": 0,
+    "live_calls": 0
+  },
+  "offline_cloud_tests": {
+    "passed": 89,
+    "failed": 0,
+    "seconds": 27.66
+  },
+  "full_suite": {
+    "passed": 343,
+    "existing_baseline": 254,
+    "new_cloud_tests": 89,
+    "failed": 0,
+    "warnings": 2,
+    "seconds": 447.82
+  },
+  "application_coverage_percent": 88.15,
+  "coverage_scope": [
+    "src/retailpulse",
+    "app"
+  ],
+  "coverage_threshold_percent": 85,
+  "ruff": "PASS",
+  "mypy": "PASS (existing 4-file strict scope)",
+  "pip_check": "PASS",
+  "git_diff_check": "PASS",
+  "dependency_audit": {
+    "application_pins": 123,
+    "isolated_sdk_pins": 7,
+    "known_vulnerabilities": 0,
+    "skipped": 0
+  },
+  "secret_scan": {
+    "result": "PASS",
+    "detectors": "unchanged",
+    "baseline": "unchanged",
+    "new_exceptions": 0
+  },
+  "package_build": "PASS; unchanged 0.1.0; AWS SDK/infra/private artifacts excluded",
+  "synthetic_reference": {
+    "input_bytes": 55218,
+    "facts": 252,
+    "units": 1386,
+    "stores": {
+      "SYN_A": 378,
+      "SYN_B": 462,
+      "SYN_C": 546
+    },
+    "start": "2020-01-01",
+    "end": "2020-02-11"
+  },
+  "preservation": {
+    "gold_unchanged": true,
+    "frozen_artifacts_unchanged": 45,
+    "all_protected_hashes_match": 52,
+    "media_and_captions_unchanged": true
+  },
+  "aws_resources_created": "NONE",
+  "aws_live_acceptance": "NOT RUN",
+  "native_spark": "NOT RUN: Java and PySpark unavailable",
+  "redshift": "DISABLED / ACCESS UNVERIFIED",
+  "remote_ci_and_docker": "NOT RUN in RP-12A; original required CI job definitions unchanged",
+  "later_estimated_gross_usd": 0.41017,
+  "planning_reserve_usd": 1.5,
+  "owner_target_usd": 5,
+  "credit_offsets_deducted": false,
+  "spend_authorized": false,
+  "independent_human_quick_start": "PENDING, deferred by owner",
+  "public_hosting_license_release": "Separate authorization pending",
+  "internal_links": {
+    "checked": 234,
+    "errors": 0
+  }
+}

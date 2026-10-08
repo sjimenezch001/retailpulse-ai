@@ -84,3 +84,14 @@ response did not enumerate bypass actors; it cannot substantiate a no-bypass cla
 No protection setting was changed during this verification. The successful
 [PR and main runs](evidence/rp11_gate.md#verified-closure--2026-10-08) establish
 the recorded CI acceptance; they do not certify new unpublished commits.
+
+## Optional AWS lab boundary
+
+The [RP-12A lab](aws_runbook.md) does not expose the local application. It uses
+synthetic allowlisted inputs, private SSE-S3/TLS storage, separate execution
+roles, an AWS_IAM-only optional route and bounded artifact reads. Offline tests
+block sockets and credential discovery. Future operations require explicit
+account/profile/region/environment selection; mutations additionally require
+exact confirmation. Cleanup checks state identifiers and ownership evidence,
+not names alone. State, plans, credentials and generated bundles are not public
+artifacts. No cloud execution or account security change occurred in RP-12A.
