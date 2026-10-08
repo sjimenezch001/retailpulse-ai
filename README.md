@@ -4,14 +4,18 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-07 PASS**, following real-data validation of RP-02–RP-06.
+**Status: RP-08 PASS**, following real-data validation of RP-02–RP-07.
 The frozen LightGBM model scores 74.825958% test WMAPE versus 79.482353% for
 rolling mean; RMSE is worse (2.431177 versus 2.361194). Selection used validation
 only. RP-00 and RP-01 are complete. Full inputs, forecasts, model files and
-MLflow artifacts remain local and Git-ignored. RP-08 has not started.
+MLflow artifacts remain local and Git-ignored. RP-08 adds three native Power BI
+pages, a reconciled serving layer and a validated local PBIX. The PBIX was saved
+and reopened in Desktop; data-filled binaries and CSV exports remain ignored.
+See the [dashboard gate and screenshots](docs/evidence/rp08_gate.md).
 
 Stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
 Modeling: LightGBM and local MLflow tracking with SQLite.
+BI: Power BI Desktop, native PBIR reports and a TMDL import model.
 Development: pytest and Ruff. Packaging: setuptools and pip.
 
 ## Repository structure
@@ -21,11 +25,12 @@ config/local.yaml      Relative paths and the derived real M5 pilot
 data/contracts/        Inspected source manifest with hashes and profiles
 data/sample/           Local-only M5 samples; tracked guidance and provenance
 notebooks/             Thin profiling notebook
-sql/{silver,gold,checks,queries}/
-src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/
+sql/{silver,gold,bi,checks,queries}/
+src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/
                        api/, agent/ reserved for later stages
 tests/                 Synthetic fixtures, unit, integration and SQL checks
 docs/                  Source, metrics, dictionary, baselines and gate evidence
+dashboards/powerbi/     Portable PBIP/PBIR/TMDL, measures and reproducible build tools
 scripts/verify.py      Local checks using the invoking Python environment
 .github/workflows/     Early CI; no datasets or secrets required
 pyproject.toml         Metadata, dependencies and tool configuration
@@ -93,6 +98,29 @@ The [model card](docs/model_card.md) and [RP-07 gate](docs/evidence/rp07_gate.md
 record candidate selection, the final test, segment regressions and MLflow runs.
 `revenue_proxy` is a proxy, not audited revenue; M5 provides no real inventory.
 Early CI is a guardrail, not completion of RP-11.
+
+## Local Power BI dashboard
+
+With the existing RP-07 Gold database, export the BI data and configure an
+ignored local project without rerunning earlier stages:
+
+```powershell
+.\.venv\Scripts\python.exe -m retailpulse export-bi
+.\.venv\Scripts\python.exe dashboards/powerbi/prepare_desktop.py
+```
+
+Open `artifacts/powerbi/project/RetailPulse.pbip` in Power BI Desktop and refresh.
+The pages are **Executive Overview**, **Store & Product Diagnostics** and
+**Forecast Performance**. The import uses 11,646 daily summaries, 512,076
+product-week summaries and 412,608 historical forecast observations. Gold
+remains the canonical metric source. WMAPE uses a ratio of totals, partial
+revenue is labeled, and the model's RMSE regression remains visible.
+
+Follow the [build guide](dashboards/powerbi/BUILD_GUIDE.md),
+[dashboard specification](dashboards/powerbi/dashboard_spec.md) and
+[DAX measure contract](dashboards/powerbi/measures.md). The local
+`dashboards/powerbi/RetailPulse.pbix` contains real data and is not distributed.
+No Power BI sign-in or cloud publication is required. RP-09 has not started.
 
 See the [product brief](docs/product_brief.md), [scope](docs/scope.md) and
 [target architecture](docs/architecture.md).

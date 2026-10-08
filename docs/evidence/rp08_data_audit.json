@@ -1,0 +1,235 @@
+{
+  "source_run_id": "20f4dae75fff8e79204e",
+  "manifest_sha256": "a89a2dedf49c4946b9ab23e705f479ebbcf0beff35518c5958e4ee8d9ce3da32",
+  "exports": {
+    "date": {
+      "rows": 1941,
+      "sha256": "72a7e01d48e6e66ab339c85b2c2c3a5cd3d8585e6cc642abaf1c6917ea5f30bd",
+      "bytes": 84785
+    },
+    "demand_level": {
+      "rows": 3,
+      "sha256": "9c0be98c120ae3bb6d9a5c032f31d58097b1e4587c7a7a699997b45457d1dd53",
+      "bytes": 29
+    },
+    "department": {
+      "rows": 2,
+      "sha256": "a973481d8feac72097483dc53c289abf9e53d797498f8f52fa2fbfa248764400",
+      "bytes": 24
+    },
+    "forecast": {
+      "rows": 412608,
+      "sha256": "85146683c016ba9fc33115b65394ab5bc0f8b868685d507563a74708d27bb2ea",
+      "bytes": 54787279
+    },
+    "horizon": {
+      "rows": 28,
+      "sha256": "72ba2e158920c5e2bb092b65cc1f0bb3a8500e313ca8d6e7c87f36c1c34777cc",
+      "bytes": 83
+    },
+    "metadata": {
+      "rows": 1,
+      "sha256": "4bec69a216320215f558f50b43a00949f675cf64d827760b0f26519df90c2059",
+      "bytes": 318
+    },
+    "model": {
+      "rows": 4,
+      "sha256": "e175c0d6a6f4f304375a4adb8ca2a97c0019c62a72aa75c870f1ba7be4c1eb12",
+      "bytes": 130
+    },
+    "product": {
+      "rows": 614,
+      "sha256": "35cc56f36f9a24d321afc7b7cba2bc7240f7f0dd1690bf64a8c62064027147aa",
+      "bytes": 15987
+    },
+    "sales_daily": {
+      "rows": 11646,
+      "sha256": "6daf775aea17df739641e08ee8a9314e891b48e83ef3608e4ed8387e6480b443",
+      "bytes": 1064153
+    },
+    "sales_product_week": {
+      "rows": 512076,
+      "sha256": "01f70a9320f12cf133341de0b6d36c4b5fe35a8974c311c3a226f0f32ac4fef5",
+      "bytes": 24029059
+    },
+    "split": {
+      "rows": 2,
+      "sha256": "3b425d110032050860389d426d177caf4691908603e8a9c95fee40f58f449f55",
+      "bytes": 22
+    },
+    "store": {
+      "rows": 3,
+      "sha256": "5639d22123574a30b62509bae2dd148bd45acd9f779b37306909b7f880be89e4",
+      "bytes": 42
+    },
+    "week": {
+      "rows": 278,
+      "sha256": "b4f1804a98cc7e83bd7722c900f1e98aec773e373ac52a574941d3be92cfec3d",
+      "bytes": 8383
+    }
+  },
+  "lineage": {
+    "gold_run_id": "20f4dae75fff8e79204e",
+    "silver_run_id": "3bb14677a2a3a1205013",
+    "bronze_run_id": "47b8b962c868f3c60fc8",
+    "first_sales_date": "2011-01-29 00:00:00",
+    "last_sales_date": "2016-05-22 00:00:00",
+    "as_of_date": "2026-10-07 00:00:00",
+    "data_freshness": 3790,
+    "excluded_future_forecasts": 154728,
+    "model_freeze_sha256": "7872c99ea7eefef443eb31aca405909c8c222b61424d4f5e28eaeb6a78ead39c"
+  },
+  "gold_tables": {
+    "mart_sales_daily": 3575322,
+    "mart_store_weekly": 1668,
+    "mart_demand_alerts": 380925,
+    "fact_forecast": 567336,
+    "forecast_evaluation": 296,
+    "model_run": 1,
+    "dim_calendar": 1969,
+    "dim_product": 614,
+    "dim_store": 3
+  },
+  "sales": {
+    "units": 4530250.0,
+    "known_revenue_proxy": 13500903.560069311,
+    "observations": 3575322,
+    "priced_observations": 2597940,
+    "missing_prices": 977382,
+    "canonical_revenue_proxy": null,
+    "price_coverage": 0.726631055888113
+  },
+  "forecast_metrics": [
+    {
+      "model": "last_value",
+      "split": "test",
+      "observations": 51576,
+      "WMAPE": 1.0593436509842948,
+      "MAE": 1.7956219947262293,
+      "RMSE": 3.0143554214962904
+    },
+    {
+      "model": "last_value",
+      "split": "validation",
+      "observations": 51576,
+      "WMAPE": 1.0524716650487274,
+      "MAE": 1.6186016751977663,
+      "RMSE": 2.915572375542764
+    },
+    {
+      "model": "lightgbm_global_v1",
+      "split": "test",
+      "observations": 51576,
+      "WMAPE": 0.7482595835083141,
+      "MAE": 1.268324367322928,
+      "RMSE": 2.4311766199741
+    },
+    {
+      "model": "lightgbm_global_v1",
+      "split": "validation",
+      "observations": 51576,
+      "WMAPE": 0.72730996436477,
+      "MAE": 1.1185337960184814,
+      "RMSE": 2.041507653922986
+    },
+    {
+      "model": "rolling_mean",
+      "split": "test",
+      "observations": 51576,
+      "WMAPE": 0.7948235263358311,
+      "MAE": 1.3472517671563782,
+      "RMSE": 2.3611939984033627
+    },
+    {
+      "model": "rolling_mean",
+      "split": "validation",
+      "observations": 51576,
+      "WMAPE": 0.8377401919554468,
+      "MAE": 1.2883650202752073,
+      "RMSE": 2.19005528525998
+    },
+    {
+      "model": "seasonal_naive_7",
+      "split": "test",
+      "observations": 51576,
+      "WMAPE": 0.9328094437390618,
+      "MAE": 1.5811423918101442,
+      "RMSE": 2.789959201086239
+    },
+    {
+      "model": "seasonal_naive_7",
+      "split": "validation",
+      "observations": 51576,
+      "WMAPE": 1.0018658833318626,
+      "MAE": 1.5407747789669615,
+      "RMSE": 2.873445520233121
+    }
+  ],
+  "independent_filter_checks": [
+    {
+      "check": "daily_date_store_department",
+      "groups": 6,
+      "status": "PASS"
+    },
+    {
+      "check": "product_week_store_product",
+      "groups": 1842,
+      "status": "PASS"
+    },
+    {
+      "check": "forecast_model_split_store_department_demand_horizon",
+      "groups": 3808,
+      "status": "PASS"
+    }
+  ],
+  "gold_sha256": "7228489a792fcf4e464014f729313c8731180621df378e31567894cccba7e620",
+  "gold_unchanged_during_audit": true,
+  "frozen_artifact_hashes": {
+    "A_core_poisson/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "A_core_poisson/evaluated.parquet": "2c79a8ebd084ceb3abf77c9b9988dfb9bca737c43387f308d0705105865aabb7",
+    "A_core_poisson/importance.csv": "f65fe5b48ec8ce3646b36a8939dff93bcd8255d89b5ffe9887bf99d600b188bb",
+    "A_core_poisson/model.txt": "51f5372bbce9c9453336d3f7ad4789e4c77e471911e4de0f6d73c7b1e3881ec0",
+    "A_core_poisson/predictions.parquet": "3a99429df897abf67dc60b2b834dcbdd582d1af17c7185dcd59cac7a8373a3bb",
+    "A_core_poisson/result.json": "9be5dd98ce237719cc8630cb6bff11367379d59b734189004c3296162c90f746",
+    "A_core_poisson/training.json": "3c5141c31d22d0c821c312c9f2b174b5a1141ad0625905a5fcde5c501935f13e",
+    "audit.json": "65a7bc848c78be16b0f945bd115f70404a4aebb6531a9baa8562eb5bc117b80d",
+    "audit_results.json": "ae1ed4218b84daa4a974a46df82668bcf0e4b5d446159ba51a644fc9fb374e6f",
+    "B_extended_poisson/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "B_extended_poisson/evaluated.parquet": "8275cc3673546e04a025cba9468937f8496ff9f3837c62e95667ddc90bc9251e",
+    "B_extended_poisson/importance.csv": "d251a729191a8c1f4f61d28dad515a8ffe203edcb2a9e240e104047c5b5e06a9",
+    "B_extended_poisson/model.txt": "c33c8a23f023166d9635a5bd93d718319614898045d640510a9eb8b154014051",
+    "B_extended_poisson/predictions.parquet": "e864e586425c98726786c0256a5ae23523c8d97ab7ff46fbc64a02d40e661752",
+    "B_extended_poisson/result.json": "918ada8273a9361b5a18196fec6623795fdee72a5bdb3f1bcd2b434d4803977b",
+    "B_extended_poisson/training.json": "7778092e15b47d93d706c1939aa8478c16ee36b52d757deeffab3fd2a648753a",
+    "baseline_segments.csv": "bf9bbf4dff27e6b18b868a2b2d6024ca826c300624c67e42ebd44f8ebd4ae750",
+    "C_extended_l1/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "C_extended_l1/evaluated.parquet": "cd2ffad83a1e5d998c180a1fd6541dfc44e6e15fdc28fcba69aee2ef0a470e2b",
+    "C_extended_l1/importance.csv": "9e17bae55fa2f331d3a7a96a185ec89a6de66449da8d41ee5ac4f7b69501765d",
+    "C_extended_l1/model.txt": "ef658517156c61c82e57033a2ac94731a5d9ea2c6f87ca67361f5b48682746a5",
+    "C_extended_l1/predictions.parquet": "d31cda25b7cd5da9e9378a6ceca5ea6ee077f432eac63b6f5205f46cfdd05b62",
+    "C_extended_l1/result.json": "620c4815f5dbc600a26cb374d9d2f26507291f00a23e6e44585a9c9788510b22",
+    "C_extended_l1/training.json": "8bcd5de038a62cda4dbe994a0db6e54a560fdd0204fac314178120f751a40d34",
+    "complete.json": "b420c2c4aa9a56e22119dfe38f6d14b8a585585d7fc04ef4f8a5c2a610302c61",
+    "final/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "final/evaluated.parquet": "59ebb5d5c7fde7dc0a6d4e284a601de24156c47e8ffb442d72f9e68d263ead0e",
+    "final/importance.csv": "8ef293c15fb3e555ebb331324d34a61de50fd09b8dd6b0ed1ed77131a0e0beea",
+    "final/mlflow_run.json": "deb0fea6b726829c9f9789c74d9a9999a4779e7bb6393e5cbf089bef18e49bb4",
+    "final/model.txt": "b0fe6861c508088589d4d699650c2dfb035523ef151b3c6cab903428d93f82ec",
+    "final/predictions.parquet": "27819d8eccb10c79c0750c79bd593d50dc4fb0809beafe8788e2abbfef872d51",
+    "final/result.json": "4bc72810ba58bdcf50983b4e1617027f74379bbc452b9a82c9381a94eb293ff9",
+    "final/test_evaluation_started.json": "35f21ce8d2d585eeaa560be6dad5cb7bcd203527936504202288b6334bbedacd",
+    "final/training.json": "cb60139bfff8384d4d872dfd458a049385a2d1abe870188a9416178f45187105",
+    "forecasts.parquet": "84302fb9a3d123a28715e68f3ed7c0a1094fba4bad5bf4b2386b582bec14175b",
+    "freeze.json": "b62cef52d75256ef38759e4915d3400e491e2bb6437a88eb8d8a7c2bc3381eb9",
+    "plan.json": "c7158a83aa4e36673e6e2652d622a10c78b3f8e70725ba2dac078f72309bd867",
+    "reproduction/categories.json": "ad7796b04f0645e0e7958bb690324ac7e91c0ef33e0293e33d39a345ab56d1ef",
+    "reproduction/importance.csv": "9e17bae55fa2f331d3a7a96a185ec89a6de66449da8d41ee5ac4f7b69501765d",
+    "reproduction/model.txt": "ef658517156c61c82e57033a2ac94731a5d9ea2c6f87ca67361f5b48682746a5",
+    "reproduction/predictions.parquet": "d31cda25b7cd5da9e9378a6ceca5ea6ee077f432eac63b6f5205f46cfdd05b62",
+    "reproduction/training.json": "a29eb6afafc71447d0f7741bad4476dbe9102221653a1bffbc6144287095aaf2",
+    "reproduction.json": "5591ec81ba46ddeae34d7fc34370de3762fd5e878f0423516698477f5b1130b4",
+    "segment_comparison.csv": "3e1ed6e1b1cfe579a1256dd8ab9c85733e33e04abb4e719436da664f8b26af6d",
+    "segmented_metrics.csv": "e2ca5679dfeba788c0c9e558b9c7b743986d5faa57dc5e931adda0282c1496ee"
+  },
+  "sql_reconciliation": "PASS"
+}

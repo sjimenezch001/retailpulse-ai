@@ -1,0 +1,178 @@
+{
+  "status": "PASS",
+  "interface": "Local Desktop ADOMD DAX",
+  "checks": [
+    {
+      "check": "full_sales",
+      "status": "PASS",
+      "values": {
+        "units": 4530250,
+        "revenue": 13500903.560000002,
+        "coverage": 0.726631055888113,
+        "canonical": null,
+        "freshness": 3790
+      }
+    },
+    {
+      "check": "daily_date_store_department",
+      "status": "PASS",
+      "values": {
+        "units": 17604,
+        "revenue": 44166.87,
+        "coverage": 1.0,
+        "previous": 18347,
+        "change": -0.04049708399193329
+      }
+    },
+    {
+      "check": "weekly_date_store_department_product",
+      "status": "PASS",
+      "values": {
+        "units": 52,
+        "coverage": 1.0,
+        "events": 6,
+        "snap": 11,
+        "spikes": 10
+      }
+    },
+    {
+      "check": "forecast_last_value_validation",
+      "status": "PASS",
+      "values": {
+        "actual": 79319.0,
+        "predicted": 89684.0,
+        "WMAPE": 1.0524716650487274,
+        "MAE": 1.6186016751977663,
+        "RMSE": 2.915572375542764,
+        "bias": 0.13067486982942297
+      }
+    },
+    {
+      "check": "forecast_rolling_mean_validation",
+      "status": "PASS",
+      "values": {
+        "actual": 79319.0,
+        "predicted": 82784.00000000003,
+        "WMAPE": 0.8377401919554488,
+        "MAE": 1.2883650202752104,
+        "RMSE": 2.1900552852602098,
+        "bias": 0.043684363141239774
+      }
+    },
+    {
+      "check": "forecast_seasonal_naive_7_validation",
+      "status": "PASS",
+      "values": {
+        "actual": 79319.0,
+        "predicted": 82784.0,
+        "WMAPE": 1.0018658833318626,
+        "MAE": 1.5407747789669615,
+        "RMSE": 2.873445520233121,
+        "bias": 0.0436843631412398
+      }
+    },
+    {
+      "check": "forecast_lightgbm_global_v1_validation",
+      "status": "PASS",
+      "values": {
+        "actual": 79319.0,
+        "predicted": 50642.09972361735,
+        "WMAPE": 0.7273099643647678,
+        "MAE": 1.118533796018478,
+        "RMSE": 2.041507653922988,
+        "bias": -0.3615388529404387
+      }
+    },
+    {
+      "check": "forecast_last_value_test",
+      "status": "PASS",
+      "values": {
+        "actual": 87423.0,
+        "predicted": 102984.0,
+        "WMAPE": 1.0593436509842948,
+        "MAE": 1.7956219947262293,
+        "RMSE": 3.0143554214962904,
+        "bias": 0.17799663704059573
+      }
+    },
+    {
+      "check": "forecast_rolling_mean_test",
+      "status": "PASS",
+      "values": {
+        "actual": 87423.0,
+        "predicted": 77507.99999999997,
+        "WMAPE": 0.7948235263358288,
+        "MAE": 1.3472517671563742,
+        "RMSE": 2.3611939984034693,
+        "bias": -0.11341409011358557
+      }
+    },
+    {
+      "check": "forecast_seasonal_naive_7_test",
+      "status": "PASS",
+      "values": {
+        "actual": 87423.0,
+        "predicted": 77508.0,
+        "WMAPE": 0.9328094437390618,
+        "MAE": 1.5811423918101442,
+        "RMSE": 2.789959201086239,
+        "bias": -0.11341409011358566
+      }
+    },
+    {
+      "check": "forecast_lightgbm_global_v1_test",
+      "status": "PASS",
+      "values": {
+        "actual": 87423.0,
+        "predicted": 47294.577172987905,
+        "WMAPE": 0.7482595835083168,
+        "MAE": 1.2683243673229327,
+        "RMSE": 2.4311766199741074,
+        "bias": -0.45901447933624
+      }
+    },
+    {
+      "check": "forecast_all_slicers",
+      "status": "PASS",
+      "values": {
+        "actual": 252.0,
+        "WMAPE": 0.8795969401363926,
+        "MAE": 1.0167817840108757,
+        "RMSE": 1.6187504728937248
+      }
+    },
+    {
+      "check": "actuals_deduplicated_across_models",
+      "status": "PASS",
+      "values": {
+        "actual": 166742.0,
+        "predicted": null
+      }
+    },
+    {
+      "check": "comparison_ignores_only_model_selector",
+      "status": "PASS",
+      "values": {
+        "WMAPE": 0.8424855325072765,
+        "MAE": 1.21697799641029,
+        "RMSE": 2.0794360719799263
+      }
+    },
+    {
+      "check": "empty_selection_is_blank",
+      "status": "PASS",
+      "values": {
+        "units": null,
+        "RMSE": null,
+        "WMAPE": null
+      }
+    },
+    {
+      "check": "cross_fact_filter_isolation",
+      "status": "PASS",
+      "values": {
+        "units": 4530250
+      }
+    }
+  ]
+}
