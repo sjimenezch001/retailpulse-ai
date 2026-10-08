@@ -4,7 +4,10 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-08 PASS**, following real-data validation of RP-02–RP-07.
+**Status: RP-09 engineering PASS; full gate PENDING LIVE LLM VALIDATION.**
+RP-00–RP-08 remain validated. The local grounded assistant passes all 36
+golden questions against synthetic and real M5 Gold. Ollama is not installed
+on the validated machine; responses use an explicit deterministic fallback.
 The frozen LightGBM model scores 74.825958% test WMAPE versus 79.482353% for
 rolling mean; RMSE is worse (2.431177 versus 2.361194). Selection used validation
 only. RP-00 and RP-01 are complete. Full inputs, forecasts, model files and
@@ -16,6 +19,8 @@ See the [dashboard gate and screenshots](docs/evidence/rp08_gate.md).
 Stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
 Modeling: LightGBM and local MLflow tracking with SQLite.
 BI: Power BI Desktop, native PBIR reports and a TMDL import model.
+Assistant: approved read-only Gold tools, deterministic document retrieval and
+an optional loopback-only Ollama adapter; no additional dependencies.
 Development: pytest and Ruff. Packaging: setuptools and pip.
 
 ## Repository structure
@@ -26,10 +31,11 @@ data/contracts/        Inspected source manifest with hashes and profiles
 data/sample/           Local-only M5 samples; tracked guidance and provenance
 notebooks/             Thin profiling notebook
 sql/{silver,gold,bi,checks,queries}/
-src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/
-                       api/, agent/ reserved for later stages
+src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/, agent/
+                       api/ reserved for a later stage
 tests/                 Synthetic fixtures, unit, integration and SQL checks
 docs/                  Source, metrics, dictionary, baselines and gate evidence
+traces/sample.json     Redacted illustrative assistant trace; runtime traces are ignored
 dashboards/powerbi/     Portable PBIP/PBIR/TMDL, measures and reproducible build tools
 scripts/verify.py      Local checks using the invoking Python environment
 .github/workflows/     Early CI; no datasets or secrets required
@@ -120,7 +126,33 @@ Follow the [build guide](dashboards/powerbi/BUILD_GUIDE.md),
 [dashboard specification](dashboards/powerbi/dashboard_spec.md) and
 [DAX measure contract](dashboards/powerbi/measures.md). The local
 `dashboards/powerbi/RetailPulse.pbix` contains real data and is not distributed.
-No Power BI sign-in or cloud publication is required. RP-09 has not started.
+No Power BI sign-in or cloud publication is required.
+
+## Local grounded assistant
+
+Use the existing Gold snapshot without rerunning the pipeline or models:
+
+```powershell
+.\.venv\Scripts\python.exe -m retailpulse ask "How many units did CA_1 sell during April 2016?"
+.\.venv\Scripts\python.exe -m retailpulse ask "Compare LightGBM and rolling mean WMAPE on the test period"
+.\.venv\Scripts\python.exe -m retailpulse ask "What does revenue_proxy mean?"
+.\.venv\Scripts\python.exe -m retailpulse agent-eval
+```
+
+The approved tools are `get_kpi`, `get_forecast` and `search_metric_docs`.
+Every numerical answer includes its filters, period and Gold provenance.
+The first example returns **25,307 units** for April 2016 in `CA_1`.
+Questions about current sales, inventory or causation receive explicit
+limitations. English routing supports documented question patterns and asks
+for clarification when scope is ambiguous.
+
+`--provider deterministic` disables the Ollama probe. By default the assistant
+checks the local endpoint and falls back explicitly if no installed model can
+be used. It never downloads models. `ask --json` exposes the typed result.
+Runtime traces and evaluation outputs stay under ignored `artifacts/agent/`.
+See the [demo and activation guide](docs/agent_demo.md),
+[safety contract](docs/agent_safety.md) and [RP-09 evidence](docs/evidence/rp09_gate.md).
+The reusable core is ready for a future API adapter; RP-10 has not started.
 
 See the [product brief](docs/product_brief.md), [scope](docs/scope.md) and
 [target architecture](docs/architecture.md).

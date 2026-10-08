@@ -15,7 +15,7 @@ Synthetic regression fixtures remain independent of the real dataset.
 
 Bronze → Silver identity links and checksums make source changes traceable.
 Failed quality checks prevent publication. Gold owns metric definitions for
-future BI/API/agent consumers; baseline outputs share its forecast schema.
+BI and agent consumers and the future API; baseline outputs share its forecast schema.
 
 RP-07 adds reusable past-only features, a global LightGBM model and local
 MLflow/SQLite experiment tracking. Validation selects and freezes the design
@@ -42,5 +42,25 @@ project, caches and data-filled PBIX remain ignored. See the
 [dashboard specification](../dashboards/powerbi/dashboard_spec.md) and
 [RP-08 gate](evidence/rp08_gate.md).
 
-API, agent and AWS remain future stages. Early CI checks lint and tests with
-repository fixtures; this does not complete RP-11. RP-09 has not started.
+RP-09 adds a reusable `Assistant.ask` core and local `ask` / `agent-eval`
+commands. Its path is English question → validated typed plan → one approved
+tool → deterministic response with provenance. `get_kpi` and `get_forecast`
+use fixed aggregate SQL templates against read-only Gold. Values are bound
+parameters; external DuckDB access is disabled. Response rows, query time,
+threads and memory are bounded. `search_metric_docs` quotes a fixed local
+corpus with actual file and line references.
+
+An optional Ollama adapter proposes a strict typed tool selection over
+loopback HTTP. The proposal must match the application's validated scope.
+Provider text never supplies numerical answers, SQL or tool results.
+Deterministic routing remains available without a model or network access.
+The validated machine has no Ollama installation or responding model, so
+RP-09 engineering passes while live local LLM validation remains pending.
+Runtime traces contain metadata only and stay in ignored `artifacts/agent/`;
+public evidence contains aggregate findings, never real M5 row-level samples.
+
+The core has no CLI or HTTP dependency and can be reused by RP-10 without
+rewriting tool contracts. No API endpoints, cloud services or new training
+were introduced. API and AWS remain future stages. Early CI checks lint and
+tests with repository fixtures; this does not complete RP-11.
+See the [assistant safety contract](agent_safety.md) and [RP-09 gate](evidence/rp09_gate.md).

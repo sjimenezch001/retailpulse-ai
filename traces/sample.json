@@ -1,0 +1,18 @@
+{
+  "request_id": "REDACTED-ILLUSTRATIVE-REQUEST",
+  "time": "2026-10-07T00:00:00Z",
+  "intent_category": "get_kpi",
+  "tool": "get_kpi",
+  "validated_filters": {
+    "metric": "data_freshness",
+    "granularity": "total",
+    "limit": 100
+  },
+  "duration_ms": 0.0,
+  "source": "pipeline_metadata",
+  "gold_run_id": "REDACTED-SNAPSHOT-ID",
+  "outcome": "answered",
+  "error_category": null,
+  "grounding_validated": true,
+  "provider": "deterministic:illustrative_sample"
+}
