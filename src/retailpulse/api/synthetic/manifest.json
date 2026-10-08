@@ -9,5 +9,13 @@
     "pipeline_metadata": "\"gold_run_id\" VARCHAR,\"silver_run_id\" VARCHAR,\"bronze_run_id\" VARCHAR,\"first_sales_date\" DATE,\"last_sales_date\" DATE,\"as_of_date\" DATE,\"source_ingestion_ts\" VARCHAR,\"generated_at\" VARCHAR,\"identity_json\" VARCHAR",
     "fact_forecast": "\"forecast_origin\" DATE,\"target_date\" DATE,\"store_id\" VARCHAR,\"item_id\" VARCHAR,\"dept_id\" VARCHAR,\"model\" VARCHAR,\"split\" VARCHAR,\"horizon\" INTEGER,\"predicted_units\" DOUBLE,\"actual_units\" DOUBLE,\"demand_level\" VARCHAR,\"training_start\" DATE,\"training_end\" DATE,\"source_run_id\" VARCHAR",
     "metric_definitions": "\"metric\" VARCHAR,\"grain\" VARCHAR,\"definition\" VARCHAR,\"filters\" VARCHAR"
+  },
+  "sha256": {
+    "mart_sales_daily": "6458e04ee485b780642fc595510a269758ce4e3290899194876b7463a10bf45a",
+    "dim_store": "5eb18916927ba2d66f7cba3730dbae369408d0fc23dc783052c1734d02593f96",
+    "dim_product": "9e766c684cc951303513be633392464e6a5fe2ed2a0399b6258295573c414499",
+    "pipeline_metadata": "3ce47a729cc34d3bc26be488a06e82910f235cc6d55d1af500a804ed9925be00",
+    "fact_forecast": "6d8ed4ec74bef02312b5e9671344da8400554e1efd7563abfc98b84e7854099f",
+    "metric_definitions": "58b4c5075e2058c2d719a0dd7a07aa3d848b0f5c9dcf7aef4496fb2139e01790"
   }
 }

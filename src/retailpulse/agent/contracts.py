@@ -1,6 +1,6 @@
 """Public, closed contracts shared by CLI and future application adapters."""
 from datetime import date, datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -28,7 +28,7 @@ class Period(Contract):
     end: date
 
     @model_validator(mode="after")
-    def ordered(self):
+    def ordered(self) -> Self:
         if self.start > self.end or (self.end - self.start).days > 3660:
             raise ValueError("Use an ordered date interval of at most 3661 days.")
         return self
@@ -41,7 +41,7 @@ class Filters(Contract):
 
     @field_validator("start_date", "end_date", mode="before", check_fields=False)
     @classmethod
-    def iso_dates(cls, value):
+    def iso_dates(cls, value: object) -> object:
         if value is not None and type(value) is not date and not (isinstance(value, str) and len(value) == 10 and value[4] == "-" and value[7] == "-"):
             raise ValueError("Dates must be date objects or ISO YYYY-MM-DD strings.")
         return value
@@ -56,7 +56,7 @@ class KpiRequest(Filters):
     limit: Annotated[int, Field(strict=True, ge=1, le=100)] = 100
 
     @model_validator(mode="after")
-    def dates(self):
+    def dates(self) -> Self:
         if self.metric == "data_freshness":
             if self.start_date or self.end_date or self.store or self.department or self.item or self.granularity != "total" or self.comparison:
                 raise ValueError("data_freshness is a global snapshot; segment and date filters are unsupported.")
@@ -80,12 +80,12 @@ class ForecastRequest(Filters):
     limit: Annotated[int, Field(strict=True, ge=1, le=100)] = 100
 
     @model_validator(mode="after")
-    def ranges(self):
+    def ranges(self) -> Self:
         if not 1 <= len(self.models) <= 4 or len(set(self.models)) != len(self.models):
             raise ValueError("Select one to four distinct approved models.")
         if bool(self.start_date) != bool(self.end_date):
             raise ValueError("Supply both target-date bounds or neither.")
-        if self.start_date:
+        if self.start_date and self.end_date:
             Period(start=self.start_date, end=self.end_date)
         return self
 
@@ -220,7 +220,7 @@ class Trace(Contract):
     time: datetime
     intent_category: str
     tool: str | None
-    validated_filters: dict
+    validated_filters: dict[str, object]
     duration_ms: float
     source: str | None
     gold_run_id: str | None

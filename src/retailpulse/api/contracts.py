@@ -1,7 +1,7 @@
 """Closed HTTP contracts around the existing agent contracts."""
 
 from datetime import date
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
@@ -57,15 +57,28 @@ class Health(Contract):
     message: str
 
 
+class Readiness(Contract):
+    status: Literal["ready", "degraded", "unavailable"]
+    process_alive: bool = True
+    api_accepting_requests: bool = True
+    mode: Mode
+    dataset_available: bool
+    gold_available: bool
+    synthetic_available: bool
+    deterministic_available: bool
+    ollama_available: bool
+    source_version: str | None
+
+
 class SummaryQuery(Filters):
     start_date: date | None = None
     end_date: date | None = None
 
     @model_validator(mode="after")
-    def dates(self):
+    def dates(self) -> Self:
         if bool(self.start_date) != bool(self.end_date):
             raise ValueError("Supply both date bounds or neither.")
-        if self.start_date:
+        if self.start_date and self.end_date:
             Period(start=self.start_date, end=self.end_date)
         return self
 
@@ -79,7 +92,7 @@ class ForecastQuery(ForecastRequest):
     limit: Annotated[int, Field(ge=1, le=100)] = 100
 
     @model_validator(mode="after")
-    def approved(self):
+    def approved(self) -> Self:
         ForecastRequest.model_validate(self.model_dump())
         return self
 

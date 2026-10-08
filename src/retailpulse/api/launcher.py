@@ -11,6 +11,8 @@ from pathlib import Path
 import httpx
 import psutil
 
+from retailpulse.api.observability import configure, emit
+
 
 def free_port(port):
     if not 1024 <= port <= 65535:
@@ -52,6 +54,10 @@ def launch(
     settings, root, *, mode="real", provider="ollama", api_port=8000, ui_port=8501
 ):
     children, logs = [], []
+    container = os.environ.get("RETAILPULSE_CONTAINER") == "1"
+    if container and mode != "synthetic":
+        raise ValueError("Container mode supports the synthetic snapshot only.")
+    bind_host = "0.0.0.0" if container else "127.0.0.1"
     if api_port == ui_port:
         raise ValueError("API and UI ports must differ.")
     for port in (api_port, ui_port):
@@ -80,7 +86,7 @@ def launch(
             "retailpulse.api.app:from_environment",
             "--factory",
             "--host",
-            "127.0.0.1",
+            bind_host,
             "--port",
             str(api_port),
             "--no-access-log",
@@ -92,7 +98,7 @@ def launch(
             "run",
             str(root / "app/streamlit_app.py"),
             "--server.address",
-            "127.0.0.1",
+            bind_host,
             "--server.port",
             str(ui_port),
             "--server.headless",
@@ -108,7 +114,9 @@ def launch(
         raise KeyboardInterrupt
 
     previous = signal.signal(signal.SIGTERM, interrupted)
+    configure()
     try:
+        emit("startup", mode, component="launcher")
         for name, command in zip(("api", "streamlit"), commands, strict=True):
             log = (directory / f"{name}.log").open("a", encoding="utf-8")
             logs.append(log)
@@ -161,6 +169,7 @@ def launch(
         return 0
     finally:
         stop_children(children)
+        emit("shutdown", mode, component="launcher")
         for log in logs:
             log.close()
         signal.signal(signal.SIGTERM, previous)
@@ -176,6 +185,6 @@ def run(args, settings, root):
             api_port=args.api_port,
             ui_port=args.ui_port,
         )
-    except (OSError, ValueError, RuntimeError) as exc:
-        print(f"Demo could not start: {exc}", file=sys.stderr)
+    except (OSError, ValueError, RuntimeError):
+        print("Demo could not start. Check ports, mode and local permissions.", file=sys.stderr)
         return 1

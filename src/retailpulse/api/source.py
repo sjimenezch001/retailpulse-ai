@@ -33,7 +33,10 @@ def portable_database(directory: Path) -> Path:
     manifest = json.loads((SYNTHETIC / "manifest.json").read_text(encoding="utf-8"))
     digest = hashlib.sha256((SYNTHETIC / "manifest.json").read_bytes())
     for table in manifest["tables"]:
-        digest.update((SYNTHETIC / f"{table}.csv").read_bytes())
+        content = (SYNTHETIC / f"{table}.csv").read_bytes()
+        if hashlib.sha256(content).hexdigest() != manifest["sha256"][table]:
+            raise ValueError("The packaged synthetic snapshot failed integrity validation.")
+        digest.update(content)
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / f"synthetic-{digest.hexdigest()[:16]}.duckdb"
     if not target.exists():
