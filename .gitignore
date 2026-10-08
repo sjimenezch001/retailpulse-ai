@@ -31,6 +31,13 @@ dist/
 /mlartifacts/
 /mlflow.db*
 
+# Power BI local caches, data-filled binaries and machine configuration.
+**/.pbi/
+*.pbix
+*.pbit
+*.abf
+dashboards/powerbi/local.config.json
+
 # Real M5 samples are local only; distribute documentation and provenance metadata.
 /data/sample/*
 !/data/sample/README.md
