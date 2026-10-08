@@ -1,0 +1,8 @@
+metric,grain,definition,filters
+data_freshness,dataset snapshot,Calendar days from latest observed sales date to explicit as_of date,Global snapshot metric; not recomputed for a segment filter
+demand_spike_flag,date × store × item,units > 2 * previous 28-day mean with complete history and positive mean; otherwise false; no causality claim,"Date, store, department, item"
+price_change_pct,date × store × item,100 * (price - previous day price) / previous day price; NULL for missing or zero denominator,"Date, store, department, item; not additive"
+revenue_proxy,date × store × item,"units * sell_price; NULL when price is missing; proxy, not audited revenue","Date, store, department, item; aggregate is NULL if any included price is missing"
+rolling_28d,date × store × item,"Mean units over the previous 28 days, excluding today; NULL until 28 days exist",Filter after window calculation; not additive across dates
+rolling_7d,date × store × item,"Mean units over the previous 7 days, excluding today; NULL until 7 days exist",Filter after window calculation; not additive across dates
+units,date × store × item,Observed nonnegative daily unit sales,"Date, store, department, item"

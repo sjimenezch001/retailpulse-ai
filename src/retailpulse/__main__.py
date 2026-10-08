@@ -31,6 +31,11 @@ def main():
     model = commands.add_parser("model", help="Compare LightGBM on validation, freeze and evaluate once")
     model.add_argument("--validation-only", action="store_true", help="Freeze selection without reading test actuals")
     commands.add_parser("export-bi", help="Export reconciled, local Power BI datasets from Gold")
+    demo = commands.add_parser("demo", help="Start the local FastAPI and Streamlit portfolio demo")
+    demo.add_argument("--mode", choices=["real", "synthetic"], default="real")
+    demo.add_argument("--provider", choices=["ollama", "deterministic"], default="ollama")
+    demo.add_argument("--api-port", type=int, default=8000)
+    demo.add_argument("--ui-port", type=int, default=8501)
     ask = commands.add_parser("ask", help="Ask a grounded historical retail question")
     ask.add_argument("question")
     ask.add_argument("--json", dest="json_output", action="store_true")
@@ -40,6 +45,10 @@ def main():
         command.add_argument("--ollama-model", help="Use an already installed local model; never downloads one")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "demo":
+        from retailpulse.api.launcher import run
+
+        raise SystemExit(run(args, settings, root))
     if args.command in ("ask", "agent-eval"):
         from retailpulse.agent.cli import run
 
