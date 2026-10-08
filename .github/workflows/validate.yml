@@ -1,4 +1,4 @@
-name: Early validation
+name: Validation
 
 on:
   push:
@@ -8,26 +8,76 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    name: validate (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: requirements.txt
-      - name: Install validated dependencies and project
+          cache-dependency-path: 'requirements*.txt'
+      - name: Install pinned application and toolchain
+        run: python scripts/tasks.py setup
+      - name: Lint, scoped strict types, portable tests and coverage
+        run: python scripts/tasks.py verify
+      - name: Dependency vulnerability and entire-tree secret scans
+        run: python scripts/tasks.py security
+      - name: Build distributable
+        run: python scripts/tasks.py build
+      - name: Publish coverage and sanitized reports
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: reports-${{ matrix.os }}
+          path: |
+            reports/coverage.xml
+            reports/coverage.json
+            reports/dependencies.json
+            reports/secrets.json
+          retention-days: 14
+          if-no-files-found: warn
+
+  container:
+    name: container
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Validate Compose and build actual image
         run: |
-          python -m pip install -r requirements.txt
-          python -m pip install -e ".[dev]"
-      - name: Check dependency compatibility
-        run: python -m pip check
-      - name: Lint
-        run: python -m ruff check .
-      - name: Test with repository synthetic fixtures only
-        run: python -m pytest
+          docker compose -p rp11-ci config --quiet
+          docker compose -p rp11-ci build
+      - name: Start synthetic demo and wait for health
+        run: docker compose -p rp11-ci up -d --wait --wait-timeout 120
+      - name: Check API/UI and grounded synthetic response
+        run: |
+          python scripts/check_portable.py
+          test "$(docker compose -p rp11-ci exec -T demo id -u)" = "10001"
+          docker compose -p rp11-ci exec -T demo python -c "from pathlib import Path; assert not list(Path('/app').rglob('*.pbix')); assert not Path('/app/data').exists(); assert not Path('/app/models').exists()"
+      - name: Publish sanitized container acceptance
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: container-acceptance
+          path: reports/portable.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Stop this job's containers
+        if: always()
+        run: docker compose -p rp11-ci down --volumes --remove-orphans

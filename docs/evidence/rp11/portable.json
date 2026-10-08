@@ -1,0 +1,9 @@
+{
+  "result": "PASS",
+  "mode": "synthetic",
+  "readiness": "ready",
+  "api_access": true,
+  "ui_access": true,
+  "grounded_units": 378,
+  "provider": "deterministic:explicit_offline_mode"
+}
