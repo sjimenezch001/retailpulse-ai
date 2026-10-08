@@ -3,8 +3,8 @@
 RetailPulse AI is a local Python application. pandas and PyArrow prepare the data;
 DuckDB owns analytical definitions. Power BI, approved assistant tools and the web
 demo consume those definitions. LightGBM and local MLflow/SQLite implement the
-frozen forecasting experiment. RP-00 through RP-11 are implemented; RP-12 AWS is
-optional and deferred. No Spark, PostgreSQL, MinIO or cloud deployment is implied.
+frozen forecasting experiment. RP-00 through RP-11 are implemented; the optional RP-12A AWS lab is
+prepared for offline validation, with live acceptance not run. No Spark, PostgreSQL, MinIO or cloud deployment is implied.
 
 ## Build time and serving time
 
@@ -113,3 +113,28 @@ contain allowlisted operational metadata, not raw questions or provider bodies.
 Use the [portfolio evidence index](portfolio_evidence.md) for genuine screenshots,
 measured results and the distinction between historical real data, simulated
 portable forecasts and actual live-model validation.
+
+## Proposed/prepared AWS lab — not yet deployed
+
+RP-12A adds an isolated optional implementation under `cloud/aws/` and
+`infra/aws/`. The existing local architecture above is unchanged.
+
+```mermaid
+flowchart LR
+    Synthetic[Packaged synthetic CSVs] --> S3[Private S3 input]
+    S3 --> Glue[Bounded Glue PySpark ETL]
+    Glue --> Curated[Versioned Parquet]
+    Curated --> Catalog[Glue Data Catalog]
+    Catalog --> Athena[Controlled Athena queries]
+    Athena --> Reconciled[Reconciled metric artifact]
+    Reconciled --> Lambda[Optional Lambda]
+    Lambda --> API[IAM-authenticated HTTP API]
+```
+
+Explicit CloudWatch groups support operational logs. Only verified synthetic
+inputs can enter this flow; real M5/Gold and frozen artifacts are excluded.
+Terraform mock tests and independent local SQL checks are offline evidence,
+not a live deployment. Native Spark/Glue, account eligibility, actual costs and
+signed endpoint acceptance remain pending. Redshift is disabled/access unverified.
+See the [runbook](aws_runbook.md), [cost controls](aws_cost_controls.md) and
+[RP-12A gate](evidence/rp12_gate.md) for boundaries and actual evidence.

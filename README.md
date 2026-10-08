@@ -134,9 +134,19 @@ and spikes do not establish causes. Forecast gains on this pilot do not prove
 business revenue impact. The local app has no public-service authentication;
 the assistant is stateless with bounded English and Spanish patterns.
 
-RP-00 through RP-11 are implemented. **RP-12 AWS is optional and deferred**.
+RP-00 through RP-11 are implemented. **RP-12A is implemented for offline validation; AWS live acceptance is NOT RUN**.
 RP-13 prepares the portfolio; independent human quick-start verification and
 release approval remain explicit checkpoints. See the [release checklist](docs/release_checklist.md)
 and [draft v1.0.0 notes](docs/release_notes_v1.0.0.md). Package version remains
 `0.1.0`; no release or tag is published by this work. No code license is declared
 yet: an owner decision is required. M5 competition-data permissions are separate.
+
+## Optional AWS laboratory (RP-12A)
+
+The [AWS lab](docs/aws_runbook.md) implements an isolated synthetic S3/Glue/Athena
+pipeline and optional IAM-authenticated metric endpoint. Infrastructure and code
+are prepared for offline validation; **AWS live acceptance is NOT RUN**.
+See the [gate](docs/evidence/rp12_gate.md),
+[cost controls](docs/aws_cost_controls.md) and
+[disabled Redshift extension](docs/aws_redshift_extension.md).
+The local demo requires no AWS account, SDK, Terraform or Spark.
