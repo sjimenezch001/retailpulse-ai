@@ -1,0 +1,160 @@
+{
+  "locals": {
+    "table_columns": {
+      "mart_sales_daily": [
+        {
+          "name": "item_id",
+          "type": "string"
+        },
+        {
+          "name": "store_id",
+          "type": "string"
+        },
+        {
+          "name": "dept_id",
+          "type": "string"
+        },
+        {
+          "name": "cat_id",
+          "type": "string"
+        },
+        {
+          "name": "state_id",
+          "type": "string"
+        },
+        {
+          "name": "pipeline_run_id",
+          "type": "string"
+        },
+        {
+          "name": "ingestion_ts",
+          "type": "string"
+        },
+        {
+          "name": "source_checksum",
+          "type": "string"
+        },
+        {
+          "name": "d",
+          "type": "string"
+        },
+        {
+          "name": "units",
+          "type": "bigint"
+        },
+        {
+          "name": "date",
+          "type": "date"
+        },
+        {
+          "name": "wm_yr_wk",
+          "type": "bigint"
+        },
+        {
+          "name": "sell_price",
+          "type": "double"
+        },
+        {
+          "name": "price_missing",
+          "type": "boolean"
+        },
+        {
+          "name": "revenue_proxy",
+          "type": "double"
+        },
+        {
+          "name": "rolling_7d",
+          "type": "double"
+        },
+        {
+          "name": "rolling_28d",
+          "type": "double"
+        },
+        {
+          "name": "price_change_pct",
+          "type": "double"
+        },
+        {
+          "name": "demand_spike_flag",
+          "type": "boolean"
+        },
+        {
+          "name": "data_freshness",
+          "type": "bigint"
+        }
+      ],
+      "dim_store": [
+        {
+          "name": "store_id",
+          "type": "string"
+        },
+        {
+          "name": "state_id",
+          "type": "string"
+        }
+      ],
+      "dim_product": [
+        {
+          "name": "item_id",
+          "type": "string"
+        },
+        {
+          "name": "dept_id",
+          "type": "string"
+        },
+        {
+          "name": "cat_id",
+          "type": "string"
+        }
+      ],
+      "pipeline_metadata": [
+        {
+          "name": "gold_run_id",
+          "type": "string"
+        },
+        {
+          "name": "silver_run_id",
+          "type": "string"
+        },
+        {
+          "name": "bronze_run_id",
+          "type": "string"
+        },
+        {
+          "name": "first_sales_date",
+          "type": "date"
+        },
+        {
+          "name": "last_sales_date",
+          "type": "date"
+        },
+        {
+          "name": "as_of_date",
+          "type": "date"
+        },
+        {
+          "name": "source_ingestion_ts",
+          "type": "string"
+        },
+        {
+          "name": "generated_at",
+          "type": "string"
+        },
+        {
+          "name": "identity_json",
+          "type": "string"
+        }
+      ],
+      "store_units": [
+        {
+          "name": "store_id",
+          "type": "string"
+        },
+        {
+          "name": "units",
+          "type": "bigint"
+        }
+      ]
+    }
+  }
+}

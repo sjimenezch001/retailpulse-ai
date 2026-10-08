@@ -51,3 +51,14 @@ dashboards/powerbi/local.config.json
 # Personal interview preparation is maintained outside the public repository.
 /docs/interview_questions.md
 /docs/interview_story.md
+
+# AWS laboratory: local state, plans, SDKs and deployment bundles stay private.
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!infra/aws/example.tfvars
+/infra/aws/crash.log
+/infra/aws/crash.*.log
