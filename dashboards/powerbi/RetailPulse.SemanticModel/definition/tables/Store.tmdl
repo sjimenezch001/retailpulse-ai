@@ -1,0 +1,24 @@
+table Store
+	lineageTag: 94c7ce52-2631-5819-9f8d-9f9e2aec4199
+
+	column Store
+		dataType: string
+		lineageTag: 083faf50-578b-5a20-b907-e4fc3e178462
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column State
+		dataType: string
+		lineageTag: 149d8b67-d6d9-553a-b3ce-75d8eaa02c9a
+		summarizeBy: none
+		sourceColumn: state_id
+
+	partition Store = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/store.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"store_id", type text}, {"state_id", type text}}, "en-US")
+				in Typed

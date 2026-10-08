@@ -1,0 +1,55 @@
+relationship e13afd85-54f5-513b-b47a-3ccb406fc5ca
+	fromColumn: SalesDaily.Date
+	toColumn: Date.Date
+
+relationship d4c0924d-2e97-5915-be95-d24be87c4e62
+	fromColumn: SalesDaily.Store
+	toColumn: Store.Store
+
+relationship c2e709a1-d195-5f2a-af1d-144060f5d4cc
+	fromColumn: SalesDaily.Department
+	toColumn: Department.Department
+
+relationship 9d51f5b7-84d8-5dd5-8844-b2a1cff001c0
+	fromColumn: SalesProductWeekly.WeekKey
+	toColumn: Week.WeekKey
+
+relationship a6609b04-71b8-5fc2-acd0-586bb8124574
+	fromColumn: SalesProductWeekly.Store
+	toColumn: Store.Store
+
+relationship 13a675ee-7e49-5d02-9d49-e80fd22a5a29
+	fromColumn: SalesProductWeekly.Product
+	toColumn: Product.Product
+
+relationship fa724b82-f29a-5a92-935d-9f951b0dd88f
+	fromColumn: Product.Department
+	toColumn: Department.Department
+
+relationship 575c5454-802e-5559-ae01-9bbcdc12bded
+	fromColumn: Forecast.'Target Date'
+	toColumn: Date.Date
+
+relationship 3a60f422-1214-5921-8d07-03e55b12044c
+	fromColumn: Forecast.Store
+	toColumn: Store.Store
+
+relationship 4eb7f2fb-4c04-5d39-9b68-1c908e829b96
+	fromColumn: Forecast.Product
+	toColumn: Product.Product
+
+relationship 5cd6dd4b-f3a5-572f-8e4c-cc9230c2a034
+	fromColumn: Forecast.ModelKey
+	toColumn: Model.ModelKey
+
+relationship 000225f4-39ae-5f82-ae3e-f8fa7a2d4d20
+	fromColumn: Forecast.Split
+	toColumn: Split.Split
+
+relationship af9ed734-4770-5731-88ed-61085e98262e
+	fromColumn: Forecast.Horizon
+	toColumn: Horizon.Horizon
+
+relationship 4ed0c4b6-2ced-5a87-96b9-69b9e2e899ff
+	fromColumn: Forecast.'Demand Level'
+	toColumn: Demand.'Demand Level'

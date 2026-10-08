@@ -1,0 +1,39 @@
+table Week
+	lineageTag: d7848657-5e5d-5a92-a1cf-2eed3874956b
+
+	column WeekKey
+		dataType: int64
+		isHidden
+		lineageTag: 76326148-64d3-5142-b03e-7d091498e251
+		summarizeBy: none
+		sourceColumn: week_key
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: e75780f9-6c7b-5ec8-bbf2-c961ccbcd446
+		summarizeBy: none
+		sourceColumn: week_start
+
+	column 'Week End'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: ed4a9b95-09c0-5017-a141-4478ec747409
+		summarizeBy: none
+		sourceColumn: week_end
+
+	column observed_days
+		dataType: int64
+		lineageTag: eeb541b4-d1d1-5b70-adde-108d6702ccb8
+		summarizeBy: none
+		sourceColumn: observed_days
+
+	partition Week = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/week.csv"), [Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"week_key", Int64.Type}, {"week_start", type date}, {"week_end", type date}, {"observed_days", Int64.Type}}, "en-US")
+				in Typed

@@ -1,0 +1,179 @@
+table Metrics
+
+	/// Observed units in the selected daily period.
+	measure 'Total Units' = SUM(SalesDaily[Units])
+		formatString: #,0
+		lineageTag: 64c18ccc-688d-5e45-8b26-92ad4d8deb1d
+
+	/// Underlying item/store/day count.
+	measure 'Sales Observations' = SUM(SalesDaily[Observations])
+		formatString: #,0
+		lineageTag: 5dec2594-4466-5e41-9b97-c3d8e8a607d3
+
+	/// Observations with a known price, including zero sales.
+	measure 'Priced Observations' = SUM(SalesDaily[Priced Observations])
+		formatString: #,0
+		lineageTag: a518532c-c8b7-5e64-b79c-f63c456e70b2
+
+	/// Partial units-times-price sum for known prices; not audited revenue.
+	measure 'Known Revenue Proxy' = SUM(SalesDaily[Known Revenue])
+		formatString: #,0.00
+		lineageTag: 013b17db-da64-5353-8e26-5e6f054bde44
+
+	/// Share of observations with known prices.
+	measure 'Price Coverage' = DIVIDE([Priced Observations], [Sales Observations])
+		formatString: 0.0%
+		lineageTag: a3436335-efbb-5522-b386-f95a8d8e63ae
+
+	/// Conservative canonical revenue: unknown if any price is missing.
+	measure 'Canonical Revenue Proxy' = IF([Sales Observations] = [Priced Observations], [Known Revenue Proxy])
+		formatString: #,0.00
+		lineageTag: 0d9af407-4dc8-5d09-9719-e75145f9e919
+
+	/// Readable completeness disclosure beside known-price partial revenue.
+	measure 'Revenue Proxy Completeness' = IF(ISBLANK([Sales Observations]), "No observations", IF([Sales Observations] = [Priced Observations], "Complete price coverage", "Partial: missing prices"))
+		lineageTag: cc900c71-3c95-5223-ac26-c1b8f9e9cbf5
+
+	/// Sum across series, then average across selected dates; never add rolling values across dates.
+	measure 'Rolling 7D Demand' = AVERAGEX(VALUES('Date'[Date]), CALCULATE(SUM(SalesDaily[Rolling7])))
+		formatString: #,0.0
+		lineageTag: 2aacf0ee-98d3-5d59-aa5a-fd35cc7440d2
+
+	/// Sum across series, then average across selected dates; never add rolling values across dates.
+	measure 'Rolling 28D Demand' = AVERAGEX(VALUES('Date'[Date]), CALCULATE(SUM(SalesDaily[Rolling28])))
+		formatString: #,0.0
+		lineageTag: 491068c3-21b8-5eb1-a8cc-cced748f1f48
+
+	/// Units in the immediately preceding equal-length daily interval.
+	measure 'Previous Period Units' = VAR StartDate = MIN('Date'[Date]) VAR Days = INT(MAX('Date'[Date]) - StartDate) + 1 RETURN CALCULATE([Total Units], REMOVEFILTERS('Date'), DATESBETWEEN('Date'[Date], StartDate - Days, StartDate - 1))
+		formatString: #,0
+		lineageTag: e33bf56c-e8c6-5b96-8a73-81af44e5eda5
+
+	/// Absolute unit change versus the preceding equal-length interval.
+	measure 'Period-over-Period Change' = IF(NOT ISBLANK([Previous Period Units]) && NOT ISBLANK([Total Units]), [Total Units] - [Previous Period Units])
+		formatString: #,0
+		lineageTag: 66ff9972-e9b4-5490-8ff9-52a663201a20
+
+	/// Relative unit change versus the preceding period.
+	measure 'Period-over-Period Change %' = DIVIDE([Period-over-Period Change], [Previous Period Units])
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: a169a450-344c-5d70-b339-672c212fe735
+
+	/// Item/store/day flags from the canonical heuristic, not confirmed causal events.
+	measure 'Demand Spike Count' = SUM(SalesDaily[Spikes])
+		formatString: #,0
+		lineageTag: 1c8f0956-3d1b-50de-a62c-2cf75c9aa0c1
+
+	/// Days from last observed sales to the Gold as_of date; independent of refresh time.
+	measure 'Data Freshness' = MAX(Snapshot[Freshness Days])
+		formatString: #,0 "days"
+		lineageTag: cd25cb0c-4f73-5c20-a90e-d5a3e22fab28
+
+	/// Observed units over selected whole weeks.
+	measure 'Product Units' = SUM(SalesProductWeekly[Units])
+		formatString: #,0
+		lineageTag: 4eebf44c-c2ee-5dd0-9172-d77dd7c83363
+
+	/// Canonical spike flags in selected product-weeks.
+	measure 'Product Spike Count' = SUM(SalesProductWeekly[Spikes])
+		formatString: #,0
+		lineageTag: 0403664d-6e30-50d5-be16-b4d892f7b3d8
+
+	/// Units observed on event days; descriptive association only.
+	measure 'Event-period Units' = SUM(SalesProductWeekly[Event Units])
+		formatString: #,0
+		lineageTag: 666550a8-405a-5eae-bd92-b6481c4be687
+
+	/// Units observed on state SNAP days; descriptive association only.
+	measure 'SNAP-period Units' = SUM(SalesProductWeekly[SNAP Units])
+		formatString: #,0
+		lineageTag: 358c179e-ee5e-5262-bc6b-bd4a3b281386
+
+	/// Price coverage for selected products and observed weeks.
+	measure 'Product Price Coverage' = DIVIDE(SUM(SalesProductWeekly[Priced Observations]),SUM(SalesProductWeekly[Observations]))
+		formatString: 0.0%
+		lineageTag: f8d08f8e-6123-57ef-b28e-ad118e9df8cc
+
+	/// Mean of valid daily Gold price changes; noncausal, not a period price return.
+	measure 'Average Price Change %' = DIVIDE(SUM(SalesProductWeekly[Price Change Sum]),SUM(SalesProductWeekly[Price Change Count])) / 100
+		formatString: +0.00%;-0.00%;0.00%
+		lineageTag: 64b16c1b-b72e-5e99-8708-73cb796c9234
+
+	/// First ten positive-demand ranks; includes ties, zero-demand products are excluded.
+	measure 'Top Product Units' = VAR Demand = [Product Units] VAR Position = RANKX(FILTER(ALLSELECTED(Product[Product]), CALCULATE([Product Units]) > 0), [Product Units], , DESC, DENSE) RETURN IF(Demand > 0 && Position <= 10, Demand)
+		formatString: #,0
+		lineageTag: 8c43961c-74d3-544c-b265-231789c498a0
+
+	/// First ten positive-demand ranks; includes ties, zero-demand products are excluded.
+	measure 'Bottom Product Units' = VAR Demand = [Product Units] VAR Position = RANKX(FILTER(ALLSELECTED(Product[Product]), CALCULATE([Product Units]) > 0), [Product Units], , ASC, DENSE) RETURN IF(Demand > 0 && Position <= 10, Demand)
+		formatString: #,0
+		lineageTag: d434cd14-7caf-5c20-a7a9-9aa68434ba0a
+
+	/// Number of scored model/series/day predictions.
+	measure 'Forecast Observations' = COUNTROWS(Forecast)
+		formatString: #,0
+		lineageTag: 3c4eda43-d015-5e94-811c-131dd1a7c920
+
+	/// Observed units counted once per series/date/split even if several models are selected.
+	measure 'Actual Units' = SUMX(SUMMARIZE(Forecast, Forecast[Forecast Origin], Forecast[Target Date], Forecast[Store], Forecast[Product], Forecast[Split], "Observed", MAX(Forecast[Actual Units])), [Observed])
+		formatString: #,0
+		lineageTag: dfa3d2f3-1b37-54c9-b688-57879132eaec
+
+	/// Forecast units for the single selected model.
+	measure 'Predicted Units' = IF(HASONEVALUE('Model'[ModelKey]),SUM(Forecast[Predicted Units]))
+		formatString: #,0
+		lineageTag: 165e45f6-53b7-5af9-ba9f-735180f3db93
+
+	/// Canonical ratio of summed absolute error to actual units; never an average of segment WMAPEs.
+	measure WMAPE = DIVIDE(SUM(Forecast[Absolute Error]),SUM(Forecast[Actual Units]))
+		formatString: 0.00%
+		lineageTag: a8d7a8e3-9b42-5622-8080-8f23bfe8ab58
+
+	/// Mean absolute error in units.
+	measure MAE = DIVIDE(SUM(Forecast[Absolute Error]),[Forecast Observations])
+		formatString: 0.000
+		lineageTag: 322a4d3d-66c3-580a-b31d-bbdc4b89d5f5
+
+	/// Root mean squared error in units.
+	measure RMSE = VAR MSE = DIVIDE(SUM(Forecast[Squared Error]),[Forecast Observations]) RETURN IF(NOT ISBLANK(MSE), SQRT(MSE))
+		formatString: 0.000
+		lineageTag: 2eab6e63-2506-53e1-9fa5-86928207e95c
+
+	/// Signed relative bias; positive is overprediction.
+	measure 'Forecast Bias' = DIVIDE(SUM(Forecast[Signed Error]),SUM(Forecast[Actual Units]))
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: 412e0e79-86dc-5ac2-937c-654ba9b52caf
+
+	/// Absolute forecast-minus-actual unit difference for the selected model.
+	measure 'Forecast versus Actual Variance' = IF(HASONEVALUE('Model'[ModelKey]),[Predicted Units] - [Actual Units])
+		formatString: +#,0;-#,0;0
+		lineageTag: a70afdc5-33f6-5416-afd0-5a500b2529cd
+
+	/// All-model benchmark, retaining the other selected filters.
+	measure 'Comparison WMAPE' = CALCULATE([WMAPE], REMOVEFILTERS('Model'), TREATAS(VALUES(ComparisonModel[ModelKey]),'Model'[ModelKey]))
+		formatString: 0.00%
+		lineageTag: 6f1ab68e-06fd-52a4-b5e0-e9715407d27c
+
+	/// All-model benchmark, retaining the other selected filters.
+	measure 'Comparison MAE' = CALCULATE([MAE], REMOVEFILTERS('Model'), TREATAS(VALUES(ComparisonModel[ModelKey]),'Model'[ModelKey]))
+		formatString: 0.000
+		lineageTag: 47790832-8de3-5f44-b373-f25a95c7a2f0
+
+	/// All-model benchmark, retaining the other selected filters.
+	measure 'Comparison RMSE' = CALCULATE([RMSE], REMOVEFILTERS('Model'), TREATAS(VALUES(ComparisonModel[ModelKey]),'Model'[ModelKey]))
+		formatString: 0.000
+		lineageTag: 267c61b7-9b8c-5dd7-bb14-a226c5ecdd0b
+
+	/// Rolling-mean benchmark on the same selected backtest observations.
+	measure 'Rolling Mean WMAPE' = CALCULATE([WMAPE], REMOVEFILTERS('Model'), 'Model'[ModelKey] = "rolling_mean")
+		formatString: 0.00%
+		lineageTag: 48f45f17-36ba-5d39-a727-a5fb1a7241e9
+
+	column Value
+		dataType: int64
+		isHidden
+		sourceColumn: Value
+
+	partition Metrics = m
+		mode: import
+		source = #table(type table [Value = Int64.Type], {{0}})

@@ -1,0 +1,18 @@
+table Department
+	lineageTag: 5457cd63-f01d-5ace-9839-81a39ae9595e
+
+	column Department
+		dataType: string
+		lineageTag: 3f5c5f3f-9386-58ec-ac11-1c557a5d8919
+		summarizeBy: none
+		sourceColumn: dept_id
+
+	partition Department = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/department.csv"), [Delimiter=",", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"dept_id", type text}}, "en-US")
+				in Typed

@@ -1,0 +1,85 @@
+table SalesProductWeekly
+	isHidden
+	lineageTag: b8c135bf-15c9-53bc-9654-fe8a160cae75
+
+	column WeekKey
+		dataType: int64
+		lineageTag: f4779e9a-1b29-577b-8e28-d0c7fdb89aca
+		summarizeBy: none
+		sourceColumn: week_key
+
+	column Store
+		dataType: string
+		lineageTag: 6331a7ad-4f61-5a74-b111-050cbd625c45
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column Product
+		dataType: string
+		lineageTag: c2606e36-395f-54df-ba81-5538b78618eb
+		summarizeBy: none
+		sourceColumn: item_id
+
+	column Units
+		dataType: int64
+		lineageTag: 5b34b514-2d8f-5368-919b-a94e3ddb5d68
+		summarizeBy: none
+		sourceColumn: units
+
+	column 'Known Revenue'
+		dataType: double
+		lineageTag: 87275cdd-72e4-5af9-86ee-a181a2db60ec
+		summarizeBy: none
+		sourceColumn: known_revenue_proxy
+
+	column Observations
+		dataType: int64
+		lineageTag: f42ae9cf-acbf-54c0-82a6-226eb7c90c23
+		summarizeBy: none
+		sourceColumn: observation_count
+
+	column 'Priced Observations'
+		dataType: int64
+		lineageTag: 7a58cf75-bcd2-517e-a91e-dadcf5502d32
+		summarizeBy: none
+		sourceColumn: priced_count
+
+	column Spikes
+		dataType: int64
+		lineageTag: 885c022c-2a4a-5237-99ab-be34c1cf3ea3
+		summarizeBy: none
+		sourceColumn: spike_count
+
+	column 'Price Change Sum'
+		dataType: double
+		lineageTag: 082b2720-647e-5531-8e51-e69b94ccf9e5
+		summarizeBy: none
+		sourceColumn: price_change_sum
+
+	column 'Price Change Count'
+		dataType: int64
+		lineageTag: b4c04289-4c02-5e07-a957-a1b5f9223070
+		summarizeBy: none
+		sourceColumn: price_change_count
+
+	column 'Event Units'
+		dataType: int64
+		lineageTag: 6241cd02-e5df-54be-89d0-6ac64fd829eb
+		summarizeBy: none
+		sourceColumn: event_units
+
+	column 'SNAP Units'
+		dataType: int64
+		lineageTag: ec0675d1-2683-5ec4-a83a-835d9c50d025
+		summarizeBy: none
+		sourceColumn: snap_units
+
+	partition SalesProductWeekly = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/sales_product_week.csv"), [Delimiter=",", Columns=12, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"week_key", Int64.Type}, {"store_id", type text}, {"item_id", type text}, {"units", Int64.Type}, {"known_revenue_proxy", type number}, {"observation_count", Int64.Type}, {"priced_count", Int64.Type}, {"spike_count", Int64.Type}, {"price_change_sum", type number}, {"price_change_count", Int64.Type}, {"event_units", Int64.Type}, {"snap_units", Int64.Type}}, "en-US")
+				in Typed

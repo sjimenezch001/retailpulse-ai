@@ -1,0 +1,31 @@
+table Product
+	lineageTag: b3ebe0cb-db66-5bac-be50-ca25bff39bac
+
+	column Product
+		dataType: string
+		lineageTag: 92673fb8-2726-5c09-9a64-ae8b26224833
+		summarizeBy: none
+		sourceColumn: item_id
+
+	column Department
+		dataType: string
+		isHidden
+		lineageTag: 6f73e396-a2b3-55b3-b05a-6f88854f8cf9
+		summarizeBy: none
+		sourceColumn: dept_id
+
+	column Category
+		dataType: string
+		lineageTag: 279e608b-30ea-5198-bbec-91931b7b174e
+		summarizeBy: none
+		sourceColumn: cat_id
+
+	partition Product = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/product.csv"), [Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"item_id", type text}, {"dept_id", type text}, {"cat_id", type text}}, "en-US")
+				in Typed

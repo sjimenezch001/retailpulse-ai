@@ -1,0 +1,25 @@
+table Model
+	lineageTag: 40775690-3d1b-51da-8f92-4d46fc073b27
+
+	column ModelKey
+		dataType: string
+		isHidden
+		lineageTag: 860598a2-6ac9-5cb4-b80a-3214ea9cbc85
+		summarizeBy: none
+		sourceColumn: model
+
+	column Model
+		dataType: string
+		lineageTag: a43de32e-ccaf-5c3b-ba9c-d0d9dbc78435
+		summarizeBy: none
+		sourceColumn: model_name
+
+	partition Model = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/model.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"model", type text}, {"model_name", type text}}, "en-US")
+				in Typed

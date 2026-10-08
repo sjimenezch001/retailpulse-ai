@@ -1,0 +1,18 @@
+table Horizon
+	lineageTag: d001850c-b2f6-56c9-8c49-3214652e6a7c
+
+	column Horizon
+		dataType: int64
+		lineageTag: 0736cc45-3048-5b82-a27b-1d445c2aa331
+		summarizeBy: none
+		sourceColumn: horizon
+
+	partition Horizon = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/horizon.csv"), [Delimiter=",", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"horizon", Int64.Type}}, "en-US")
+				in Typed

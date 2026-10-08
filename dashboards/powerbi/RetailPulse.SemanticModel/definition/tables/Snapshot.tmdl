@@ -1,0 +1,70 @@
+table Snapshot
+	isHidden
+	lineageTag: e35df638-98b7-53d0-acf2-585b3149cd05
+
+	column gold_run_id
+		dataType: string
+		lineageTag: cd1cf370-8c84-5009-a652-a6860f14af69
+		summarizeBy: none
+		sourceColumn: gold_run_id
+
+	column silver_run_id
+		dataType: string
+		lineageTag: 039e55e4-67f9-537a-8f59-3084463b0808
+		summarizeBy: none
+		sourceColumn: silver_run_id
+
+	column bronze_run_id
+		dataType: string
+		lineageTag: a9e74f0c-7bac-59c9-915b-7c9d24488af2
+		summarizeBy: none
+		sourceColumn: bronze_run_id
+
+	column 'First Sales Date'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: 7111039a-e8be-5e7f-be76-48b112b18438
+		summarizeBy: none
+		sourceColumn: first_sales_date
+
+	column 'Last Sales Date'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: af8db576-33dd-5093-b0ee-6d30795da2fa
+		summarizeBy: none
+		sourceColumn: last_sales_date
+
+	column 'As Of Date'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: 819d5db6-557a-530a-a5bb-100d5d1c029f
+		summarizeBy: none
+		sourceColumn: as_of_date
+
+	column 'Freshness Days'
+		dataType: int64
+		lineageTag: 5cdcd7fc-dc63-5fd0-bf6c-df244ce6ab71
+		summarizeBy: none
+		sourceColumn: data_freshness
+
+	column excluded_future_forecasts
+		dataType: int64
+		lineageTag: 3d6c6fbd-4b84-5aea-b06c-8352a4acaddc
+		summarizeBy: none
+		sourceColumn: excluded_future_forecasts
+
+	column model_freeze_sha256
+		dataType: string
+		lineageTag: 39e385b3-dadd-5cbd-ac72-8a82f27a11d7
+		summarizeBy: none
+		sourceColumn: model_freeze_sha256
+
+	partition Snapshot = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/metadata.csv"), [Delimiter=",", Columns=9, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"gold_run_id", type text}, {"silver_run_id", type text}, {"bronze_run_id", type text}, {"first_sales_date", type date}, {"last_sales_date", type date}, {"as_of_date", type date}, {"data_freshness", Int64.Type}, {"excluded_future_forecasts", Int64.Type}, {"model_freeze_sha256", type text}}, "en-US")
+				in Typed
