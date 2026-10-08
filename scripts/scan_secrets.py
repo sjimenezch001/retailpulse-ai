@@ -82,4 +82,12 @@ def main():
 
 
 if __name__ == "__main__":
+    # detect-secrets opens text with the process default encoding and silently
+    # skips decoding failures as binary files. Use UTF-8 on Windows as on Linux.
+    if not sys.flags.utf8_mode:
+        sys.exit(
+            subprocess.call(
+                [sys.executable, "-X", "utf8", str(Path(__file__).resolve()), *sys.argv[1:]]
+            )
+        )
     sys.exit(main())

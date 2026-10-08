@@ -1,0 +1,4 @@
+# These CSV bytes are authenticated by the packaged manifest. Never convert them.
+/src/retailpulse/api/synthetic/*.csv -text
+# Manifest bytes also participate in the portable database cache identity.
+/src/retailpulse/api/synthetic/manifest.json text eol=lf
