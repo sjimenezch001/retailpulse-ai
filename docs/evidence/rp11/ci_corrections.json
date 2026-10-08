@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-08",
+  "branch": "feat/rp-11-hardening",
+  "failed_ci_run": "https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37730846032",
+  "failed_ci_revision": "c3bd076",
+  "previous_remote_jobs": {
+    "windows": "FAIL: verification step",
+    "ubuntu": "FAIL: security step",
+    "container": "PASS"
+  },
+  "corrected_remote_ci": "PENDING: no push authorized",
+  "checkout_test_host": "Windows; real isolated Git checkout-index with Linux LF and Windows CRLF settings",
+  "checkout_regressions_passed": 4,
+  "scanner_regressions_passed": 5,
+  "synthetic_files": [
+    {
+      "file": "mart_sales_daily.csv",
+      "lf_bytes": 52735,
+      "original_windows_crlf_bytes": 52988,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    },
+    {
+      "file": "dim_store.csv",
+      "lf_bytes": 66,
+      "original_windows_crlf_bytes": 70,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    },
+    {
+      "file": "dim_product.csv",
+      "lf_bytes": 73,
+      "original_windows_crlf_bytes": 76,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    },
+    {
+      "file": "pipeline_metadata.csv",
+      "lf_bytes": 276,
+      "original_windows_crlf_bytes": 278,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    },
+    {
+      "file": "fact_forecast.csv",
+      "lf_bytes": 56809,
+      "original_windows_crlf_bytes": 57272,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    },
+    {
+      "file": "metric_definitions.csv",
+      "lf_bytes": 1196,
+      "original_windows_crlf_bytes": 1204,
+      "git_blob_unchanged": true,
+      "manifest_sha256_matches": true
+    }
+  ],
+  "reviewed_provenance": [
+    {
+      "evidence_line": 15,
+      "source_path": "data/raw/m5/calendar.csv",
+      "recomputed_sha256_matches": true
+    },
+    {
+      "evidence_line": 29,
+      "source_path": "data/raw/m5/sell_prices.csv",
+      "recomputed_sha256_matches": true
+    },
+    {
+      "evidence_line": 38,
+      "source_path": "data/raw/m5/sales_train_evaluation.csv",
+      "recomputed_sha256_matches": true
+    },
+    {
+      "evidence_line": 75,
+      "source_path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/calendar.parquet",
+      "recomputed_sha256_matches": true
+    },
+    {
+      "evidence_line": 150,
+      "source_path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/prices.parquet",
+      "recomputed_sha256_matches": true
+    },
+    {
+      "evidence_line": 193,
+      "source_path": "data/processed/bronze/runs/47b8b962c868f3c60fc8/sales.parquet",
+      "recomputed_sha256_matches": true
+    }
+  ],
+  "tests": {
+    "passed": 254,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 2,
+    "seconds": 171.0
+  },
+  "coverage": {
+    "scope": "src/retailpulse and app; combined line/branch",
+    "threshold": 85,
+    "totals": {
+      "covered_lines": 2717,
+      "num_statements": 3018,
+      "percent_covered": 88.15303430079156,
+      "percent_covered_display": "88.15",
+      "missing_lines": 301,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.02650762094102,
+      "percent_statements_covered_display": "90.03",
+      "num_branches": 772,
+      "num_partial_branches": 96,
+      "covered_branches": 624,
+      "missing_branches": 148,
+      "percent_branches_covered": 80.82901554404145,
+      "percent_branches_covered_display": "80.83"
+    }
+  },
+  "ruff": "PASS",
+  "scoped_strict_mypy": "PASS: 4 modules",
+  "pip_check": "PASS",
+  "git_diff_check": "PASS",
+  "dependency_audit": {
+    "packages": 123,
+    "skipped": 0,
+    "known_vulnerabilities": 0,
+    "result": "PASS"
+  },
+  "secret_scan": {
+    "result": "PASS",
+    "reviewed_false_positives": 148,
+    "new_exact_exceptions": 6,
+    "unreviewed_findings": [],
+    "default_detectors_unchanged": true,
+    "utf8_cli_enforced": true
+  },
+  "protected_files": {
+    "gold": 1,
+    "frozen_artifacts": 45,
+    "file_set_unchanged": true,
+    "changed_hashes": []
+  },
+  "docker_code_changed": false
+}

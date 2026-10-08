@@ -4,17 +4,16 @@ Acceptance date: 2026-10-08, America/Sao_Paulo.
 Branch: `feat/rp-11-hardening`, created from the verified clean main revision
 `729ce9a2a7b245f35c7750af36eeb00e148798ae`.
 
-**RP-11 ENGINEERING: PENDING** — genuine Docker image build is still required by
-engineering criterion 9. No Docker executable was found on PATH or at the
-standard Docker Desktop location. The container definition has only static local
-validation; the successful Python wheel build is not a Docker build.
+**RP-11 ENGINEERING: PENDING CORRECTED CI** — the original remote container job
+passed, including genuine image build/startup and API/UI checks. Windows validation
+and the Linux secret scan failed independently. Local corrective validation is
+documented below; the corrected revision still requires remote confirmation.
 
-**RP-11 FULL GATE: PENDING REMOTE CI** — no feature PR or remote checks were
-created. Actual image build/startup, Windows/Linux checks on that feature PR,
-critical status checks and verification of branch protection remain outstanding.
-No push, merge, RP-12 or RP-13 work was performed.
+**RP-11 FULL GATE: PENDING REMOTE CI** — successful Windows/Linux checks on the
+corrected revision, required status checks and verification of branch protection
+remain outstanding. No push, merge, RP-12 or RP-13 work was performed in this fix.
 
-## Local validation
+## Initial local validation (before the CI corrections below)
 
 | Check | Result |
 | --- | --- |
@@ -24,7 +23,7 @@ No push, merge, RP-12 or RP-13 work was performed.
 | Strict mypy 2.4.0 | PASS, four explicitly scoped boundary modules |
 | pip compatibility | PASS, no broken requirements |
 | Dependency scan | PASS, 123 pinned packages, zero skips, zero known vulnerabilities |
-| Secret scan | PASS, all tracked files and non-ignored new files |
+| Secret scan | Reported PASS; incomplete on Windows due to locale decoding, superseded below |
 | Pre-commit configuration | PASS, validated with an ignored workspace cache |
 | Wheel and sdist build | PASS, both actually built; archive contents inspected |
 | Compose/workflow static inspection | PASS; not a Docker runtime test |
@@ -64,13 +63,15 @@ The nested requirements include was not expanded in the scanner's no-resolution
 mode; both files are now explicit inputs and a tested scope assertion fails any
 incomplete report. No unavailable or partial scan is counted as final acceptance.
 
-detect-secrets **1.5.0** found 142 reviewed false positives: public checksums and
+The initial detect-secrets **1.5.0** run found 142 reviewed false positives: public checksums and
 Power BI object identifiers, plus one deliberately invalid loopback credential
 test. Six of those checksums protect the packaged synthetic tables. Exceptions
 are exact path/type/fingerprint entries; all default detectors remain enabled.
 The baseline file itself is scanned; its fingerprint metadata is separately
-counted. No real credentials were found, and a new unexpected finding fails CI.
-This is a working-tree scan, not a historical Git scan.
+counted. That local result missed a UTF-8 document under Windows CP1252 and must
+not be treated as complete acceptance. The correction below reviews six additional
+provenance hashes and makes scanner decoding portable. This is a working-tree
+scan, not a historical Git scan.
 
 See the complete [dependency report](rp11/dependencies.json),
 [sanitized secret report](rp11/secrets.json) and [security findings](../security.md).
@@ -112,12 +113,16 @@ coverage, exact dependency audits, full-tree secret scanning, Python package bui
 and a separate actual container build/startup/non-root/API/UI check. Critical
 commands are fail-fast. Actions are pinned by verified commit IDs, permissions are
 read-only, checkout credentials are not retained, and only sanitized reports are
-published. The definitions have not run remotely in this stage.
+published. These definitions subsequently ran in
+[Actions run 37730846032](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37730846032)
+at revision `c3bd076`: the container job passed; both validation jobs failed for
+the distinct causes documented below. Docker code was not changed by this fix.
 
 Follow [developer workflow](../developer_workflow.md) for local commands and
 [manual branch-protection instructions](../security.md#ci-and-manual-branch-protection).
 Branch protection is not claimed active. Outstanding acceptance requires an
-authorized future push/PR, successful required checks and a genuine Docker run.
+authorized future push/PR and successful required checks for the corrected revision.
+The original container job provides genuine Docker evidence for `c3bd076` only.
 
 ## Protected data
 
@@ -131,3 +136,104 @@ one Gold database and 45 frozen model artifacts, with no changes. Gold SHA-256:
 See [integrity and shutdown evidence](rp11/integrity.json). Synthetic manifest
 checksums were added without modifying any synthetic CSV contents. No real M5
 row-level files, populated databases, private model binaries or secrets were added.
+
+## CI corrections — 2026-10-08
+
+The linked run's job conclusions and failed steps were independently checked using
+the public GitHub Actions API. Windows failed the verification step; Ubuntu failed
+the security step after its tests passed; the container job succeeded. The reported
+Windows totals were **187 passed, 1 failed, 57 setup errors**, with **71.95%** coverage.
+Those setup failures prevented dependent tests from running; the coverage threshold
+was not the root cause and remains **85%**.
+
+### A. Git checkout changed authenticated CSV bytes
+
+The six committed synthetic CSV blobs contain LF newlines and match every SHA-256
+in `src/retailpulse/api/synthetic/manifest.json`. Without attributes, a Git checkout
+with `core.autocrlf=true` converts every CSV to CRLF. That changes all six hashes
+before `portable_database()` reads them, correctly causing integrity rejection.
+The local repository used `core.autocrlf=input`, hiding this checkout difference.
+
+The regression uses isolated real Git repositories and `checkout-index`, with
+`core.autocrlf=true` / `core.eol=crlf` and `false` / `lf`. An unprotected control
+file proves that Git actually performs the requested conversion. It reproduces the
+original Windows rejection, then verifies exact byte equality and full SHA-256
+equality against the manifest after the fix in both checkout modes.
+
+| Synthetic CSV | Original LF bytes | Unprotected CRLF bytes | After fix, both modes |
+| --- | ---: | ---: | --- |
+| `mart_sales_daily.csv` | 52,735 | 52,988 | Exact bytes and manifest SHA-256 match |
+| `dim_store.csv` | 66 | 70 | Exact bytes and manifest SHA-256 match |
+| `dim_product.csv` | 73 | 76 | Exact bytes and manifest SHA-256 match |
+| `pipeline_metadata.csv` | 276 | 278 | Exact bytes and manifest SHA-256 match |
+| `fact_forecast.csv` | 56,809 | 57,272 | Exact bytes and manifest SHA-256 match |
+| `metric_definitions.csv` | 1,196 | 1,204 | Exact bytes and manifest SHA-256 match |
+
+`.gitattributes` applies `-text` only to `/src/retailpulse/api/synthetic/*.csv`,
+preserving their exact committed bytes. The packaged manifest uses `text eol=lf`
+because its bytes also determine the database cache identity. Its existing local
+CRLF copy was restored to the unchanged LF Git blob. No CSV, manifest checksum,
+business figure, loader logic or coverage configuration was changed. Both protected
+checkout modes create the same snapshot identity and return **378 units** for SYN_A.
+These are actual Git checkout tests on the local Windows host, not a claim that the
+corrected revision has already passed a native Linux or GitHub runner.
+
+### B. Six provenance hashes were absent from the reviewed baseline
+
+Linux correctly rejected six `Hex High Entropy String` findings in
+`docs/evidence/real_m5_validation.json`. Each was independently recomputed with
+SHA-256 from the corresponding local file; all six matched exactly:
+
+| Evidence line | Value provenance | Verification |
+| ---: | --- | --- |
+| 15 | `data/raw/m5/calendar.csv` | Exact SHA-256 match |
+| 29 | `data/raw/m5/sell_prices.csv` | Exact SHA-256 match |
+| 38 | `data/raw/m5/sales_train_evaluation.csv` | Exact SHA-256 match |
+| 75 | Bronze run `47b8b962c868f3c60fc8`, `calendar.parquet` | Exact SHA-256 match |
+| 150 | Same Bronze run, `prices.parquet` | Exact SHA-256 match |
+| 193 | Same Bronze run, `sales.parquet` | Exact SHA-256 match |
+
+The Bronze files are under `data/processed/bronze/runs/47b8b962c868f3c60fc8/`.
+Only these six path/type/fingerprint exceptions were added to `.secrets.baseline`,
+each with its individual provenance review. No file-wide exclusion, detector change,
+credential exception or automatic baseline refresh was introduced.
+
+The earlier Windows PASS had a separate explanation within this scanner failure:
+detect-secrets 1.5.0 opens text with the process's default encoding and silently
+ignores decoding errors as binary files. This UTF-8 evidence document fails CP1252
+decoding at byte 24,193 (`0x9d`). Running the unchanged scanner with `-X utf8`
+reproduced exactly the six Linux findings before the baseline correction.
+`scripts/scan_secrets.py` now re-executes its CLI in UTF-8 mode when necessary,
+keeping all default detectors and the existing exact exception checks.
+
+Five scanner regressions execute the real CLI starting with UTF-8 mode disabled.
+They require all six reviewed hashes to be detected and accepted, and fail for a
+new disposable credential in the same document, a changed unreviewed checksum,
+an approved value in another file, or an exception without a review reason.
+Reports are checked for credential redaction. The four checkout regressions and
+these five scanner regressions add **nine** tests.
+
+### Corrective validation
+
+| Check | Corrected result |
+| --- | --- |
+| Complete suite via `python scripts/verify.py` | PASS: **254 passed**, 0 failures, 0 errors, two existing deprecation warnings, **171.00s** |
+| Combined line/branch coverage | **88.1530%**, unchanged **85%** minimum; no exclusions added |
+| Actual Git checkout regressions | PASS: four cases, including original Windows failure and both corrected checkout modes |
+| Real secret scanner regressions | PASS: five cases, including four required rejections |
+| Ruff | PASS |
+| Scoped strict mypy | PASS, four modules |
+| `pip check` | PASS, no broken requirements |
+| Dependency audit | PASS: **123** pinned packages, zero skips, zero known vulnerabilities |
+| UTF-8 secret scan | PASS: **148** reviewed findings, **0** unreviewed; only six new exact exceptions |
+| `git diff --check` | PASS |
+| Gold and frozen model artifacts | All **46** pre-fix SHA-256 values and the protected file set unchanged |
+| Synthetic CSVs and manifest | Exact equality with the original committed Git blobs |
+| Docker implementation | Unchanged; original remote container job passed |
+
+See the machine-readable [corrective evidence](rp11/ci_corrections.json).
+The initial reports linked earlier remain historical evidence, including the
+incomplete Windows secret-scan result. Application behavior, pipeline logic,
+checksum enforcement, tool allowlists, database protections, dependency versions,
+Gold and frozen artifacts were preserved. Remote checks for this corrected
+revision remain pending; no push or merge was performed.
