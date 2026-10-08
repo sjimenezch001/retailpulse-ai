@@ -1,0 +1,424 @@
+{
+  "evaluated_at": "2026-10-08T01:21:06.356781+00:00",
+  "gold_run_id": "20f4dae75fff8e79204e",
+  "gold_sha256": "7228489a792fcf4e464014f729313c8731180621df378e31567894cccba7e620",
+  "matches_rp08_gold": true,
+  "frozen_artifacts_checked": 45,
+  "frozen_artifacts_unchanged": true,
+  "reference_method": "verify_answer uses independent SQL with explicit expected arguments; all public results below are aggregates, never item/store/day observations.",
+  "examples": [
+    {
+      "id": "april_store",
+      "question": "How many units did CA_1 sell during April 2016?",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_kpi",
+        "metric": "units",
+        "filters": {
+          "store": "CA_1",
+          "department": null,
+          "item": null,
+          "metric": "units",
+          "start_date": "2016-04-01",
+          "end_date": "2016-04-30",
+          "granularity": "total",
+          "comparison": null,
+          "limit": 100
+        },
+        "rows": [
+          {
+            "segment": "all",
+            "value": 25307,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-01",
+              "end": "2016-04-30"
+            },
+            "observations": 18420,
+            "missing_observations": 0,
+            "previous_value": null,
+            "previous_period": null,
+            "change": null,
+            "change_pct": null
+          }
+        ],
+        "provenance": {
+          "source_table": "mart_sales_daily",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory."
+        ]
+      }
+    },
+    {
+      "id": "department_changes",
+      "question": "Compare units by department from 2016-04-25 to 2016-05-22 with the previous period",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_kpi",
+        "metric": "units",
+        "filters": {
+          "store": null,
+          "department": null,
+          "item": null,
+          "metric": "units",
+          "start_date": "2016-04-25",
+          "end_date": "2016-05-22",
+          "granularity": "department",
+          "comparison": "previous_period",
+          "limit": 100
+        },
+        "rows": [
+          {
+            "segment": "FOODS_1",
+            "value": 37422,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "observations": 18144,
+            "missing_observations": 0,
+            "previous_value": 30820,
+            "previous_period": {
+              "start": "2016-03-28",
+              "end": "2016-04-24"
+            },
+            "change": 6602,
+            "change_pct": 0.21421155094094743
+          },
+          {
+            "segment": "FOODS_2",
+            "value": 50001,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "observations": 33432,
+            "missing_observations": 0,
+            "previous_value": 48499,
+            "previous_period": {
+              "start": "2016-03-28",
+              "end": "2016-04-24"
+            },
+            "change": 1502,
+            "change_pct": 0.03096971071568486
+          }
+        ],
+        "provenance": {
+          "source_table": "mart_sales_daily",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory."
+        ]
+      }
+    },
+    {
+      "id": "store_changes",
+      "question": "Compare units by store from 2016-04-25 to 2016-05-22 with the previous period",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_kpi",
+        "metric": "units",
+        "filters": {
+          "store": null,
+          "department": null,
+          "item": null,
+          "metric": "units",
+          "start_date": "2016-04-25",
+          "end_date": "2016-05-22",
+          "granularity": "store",
+          "comparison": "previous_period",
+          "limit": 100
+        },
+        "rows": [
+          {
+            "segment": "CA_1",
+            "value": 24834,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "observations": 17192,
+            "missing_observations": 0,
+            "previous_value": 23016,
+            "previous_period": {
+              "start": "2016-03-28",
+              "end": "2016-04-24"
+            },
+            "change": 1818,
+            "change_pct": 0.07898852971845673
+          },
+          {
+            "segment": "CA_2",
+            "value": 30086,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "observations": 17192,
+            "missing_observations": 0,
+            "previous_value": 26581,
+            "previous_period": {
+              "start": "2016-03-28",
+              "end": "2016-04-24"
+            },
+            "change": 3505,
+            "change_pct": 0.13186110379594448
+          },
+          {
+            "segment": "CA_3",
+            "value": 32503,
+            "unit": "units",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "observations": 17192,
+            "missing_observations": 0,
+            "previous_value": 29722,
+            "previous_period": {
+              "start": "2016-03-28",
+              "end": "2016-04-24"
+            },
+            "change": 2781,
+            "change_pct": 0.09356705470695108
+          }
+        ],
+        "provenance": {
+          "source_table": "mart_sales_daily",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory."
+        ]
+      }
+    },
+    {
+      "id": "full_units",
+      "question": "Show units over all observed dates",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_kpi",
+        "metric": "units",
+        "filters": {
+          "store": null,
+          "department": null,
+          "item": null,
+          "metric": "units",
+          "start_date": "2011-01-29",
+          "end_date": "2016-05-22",
+          "granularity": "total",
+          "comparison": null,
+          "limit": 100
+        },
+        "rows": [
+          {
+            "segment": "all",
+            "value": 4530250,
+            "unit": "units",
+            "period": {
+              "start": "2011-01-29",
+              "end": "2016-05-22"
+            },
+            "observations": 3575322,
+            "missing_observations": 0,
+            "previous_value": null,
+            "previous_period": null,
+            "change": null,
+            "change_pct": null
+          }
+        ],
+        "provenance": {
+          "source_table": "mart_sales_daily",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory."
+        ]
+      }
+    },
+    {
+      "id": "forecast_comparison",
+      "question": "Compare LightGBM and rolling mean WMAPE on the test period",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_forecast",
+        "metric": "forecast",
+        "filters": {
+          "store": null,
+          "department": null,
+          "item": null,
+          "models": [
+            "rolling_mean",
+            "lightgbm_global_v1"
+          ],
+          "split": "test",
+          "start_date": null,
+          "end_date": null,
+          "horizon": null,
+          "demand_level": null,
+          "segmentation": "overall",
+          "limit": 100
+        },
+        "rows": [
+          {
+            "model": "lightgbm_global_v1",
+            "split": "test",
+            "segment": "all",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "forecast_origin_start": "2016-04-24",
+            "forecast_origin_end": "2016-04-24",
+            "observations": 51576,
+            "predicted_units": 47294.57717298705,
+            "actual_units": 87423.0,
+            "WMAPE": 0.7482595835083141,
+            "MAE": 1.268324367322928,
+            "RMSE": 2.4311766199741,
+            "wmape_zero_denominator": false
+          },
+          {
+            "model": "rolling_mean",
+            "split": "test",
+            "segment": "all",
+            "period": {
+              "start": "2016-04-25",
+              "end": "2016-05-22"
+            },
+            "forecast_origin_start": "2016-04-24",
+            "forecast_origin_end": "2016-04-24",
+            "observations": 51576,
+            "predicted_units": 77507.99999999636,
+            "actual_units": 87423.0,
+            "WMAPE": 0.7948235263358311,
+            "MAE": 1.3472517671563782,
+            "RMSE": 2.3611939984033627,
+            "wmape_zero_denominator": false
+          }
+        ],
+        "provenance": {
+          "source_table": "fact_forecast",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory.",
+          "WMAPE is a ratio of summed absolute errors to summed actual units, never an average of segment percentages. Models are compared separately, never added.",
+          "Accuracy describes historical backtests, not guaranteed future performance. Demand levels use training-only history."
+        ],
+        "units": {
+          "predicted_units": "units",
+          "actual_units": "units",
+          "WMAPE": "ratio",
+          "MAE": "units",
+          "RMSE": "units"
+        }
+      }
+    },
+    {
+      "id": "freshness",
+      "question": "How fresh is the data?",
+      "reconciled": true,
+      "provider": "deterministic_fallback:ollama_or_selected_model_unavailable",
+      "result": {
+        "tool": "get_kpi",
+        "metric": "data_freshness",
+        "filters": {
+          "store": null,
+          "department": null,
+          "item": null,
+          "metric": "data_freshness",
+          "start_date": null,
+          "end_date": null,
+          "granularity": "total",
+          "comparison": null,
+          "limit": 100
+        },
+        "rows": [
+          {
+            "segment": "all",
+            "value": 3790,
+            "unit": "days",
+            "period": {
+              "start": "2011-01-29",
+              "end": "2016-05-22"
+            },
+            "observations": 1,
+            "missing_observations": 0,
+            "previous_value": null,
+            "previous_period": null,
+            "change": null,
+            "change_pct": null
+          }
+        ],
+        "provenance": {
+          "source_table": "pipeline_metadata",
+          "gold_run_id": "20f4dae75fff8e79204e",
+          "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+          "generated_at": "2026-10-07T21:33:38.610052+00:00",
+          "observed_period": {
+            "start": "2011-01-29",
+            "end": "2016-05-22"
+          },
+          "as_of_date": "2026-10-07",
+          "data_freshness": 3790
+        },
+        "warnings": [
+          "Historical M5 snapshot; these observations do not describe current sales or inventory."
+        ]
+      }
+    }
+  ]
+}
