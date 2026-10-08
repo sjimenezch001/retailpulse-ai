@@ -1,0 +1,21 @@
+# Deny by default: no host data, models, Git objects, reports or local settings.
+**
+!Dockerfile
+!requirements-runtime.txt
+!pyproject.toml
+!README.md
+!src/
+!src/retailpulse/
+!src/retailpulse/**
+!app/
+!app/streamlit_app.py
+!config/
+!config/local.yaml
+!.streamlit/
+!.streamlit/config.toml
+!docs/
+!docs/web_demo.md
+**/__pycache__/
+**/*.pyc
+**/*.duckdb*
+**/.env*

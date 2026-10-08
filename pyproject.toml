@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools==84.0.0", "wheel==0.48.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -47,3 +47,20 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src/retailpulse/agent/contracts.py", "src/retailpulse/api/contracts.py", "src/retailpulse/api/language.py", "src/retailpulse/api/observability.py"]
+strict = true
+follow_imports = "silent"
+warn_unused_configs = true
+
+[tool.coverage.run]
+branch = true
+source = ["src/retailpulse", "app"]
+relative_files = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+fail_under = 85

@@ -1,0 +1,10 @@
+{
+  "gold_files_checked": 1,
+  "frozen_artifact_files_checked": 45,
+  "changed_files": [],
+  "validation_ports_still_open": {
+    "8011": false,
+    "8511": false
+  },
+  "checked_after_final_regression": true
+}

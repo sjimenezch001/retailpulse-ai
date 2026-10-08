@@ -4,8 +4,9 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-10 engineering PASS; full gate PASS, including real browser and Ollama validation.**
-FastAPI and Streamlit expose four endpoints and four portfolio tabs, with
+**Status: RP-11 local hardening implemented; container build and remote acceptance PENDING.**
+RP-10 remains validated, including real browser and Ollama acceptance.
+FastAPI and Streamlit expose analytics endpoints and four portfolio tabs, with
 separate real Gold and explicitly synthetic portable modes. See the
 [web demo guide](docs/web_demo.md) and [RP-10 gate](docs/evidence/rp10_gate.md).
 The UI includes session-persistent English/Spanish and light/dark selectors,
@@ -30,7 +31,10 @@ BI: Power BI Desktop, native PBIR reports and a TMDL import model.
 Assistant: approved read-only Gold tools, deterministic document retrieval and
 an optional loopback-only Ollama adapter; no additional dependencies.
 Web demo: FastAPI, Uvicorn, Streamlit, HTTPX and Altair, bound to localhost.
-Development: pytest and Ruff. Packaging: setuptools and pip.
+Development: pytest/coverage, Ruff, scoped strict mypy, pip-audit and detect-secrets.
+Packaging: setuptools and pip; a synthetic-only non-root Docker definition.
+See [developer tasks](docs/developer_workflow.md), [security](docs/security.md),
+[observability](docs/observability.md) and the [RP-11 gate](docs/evidence/rp11_gate.md).
 
 ## Repository structure
 
@@ -48,7 +52,7 @@ docs/                  Source, metrics, dictionary, baselines and gate evidence
 traces/sample.json     Redacted illustrative assistant trace; runtime traces are ignored
 dashboards/powerbi/     Portable PBIP/PBIR/TMDL, measures and reproducible build tools
 scripts/verify.py      Local checks using the invoking Python environment
-.github/workflows/     Early CI; no datasets or secrets required
+.github/workflows/     Windows/Linux checks and synthetic container acceptance
 pyproject.toml         Metadata, dependencies and tool configuration
 requirements.txt       Exact versions from the validated environment
 .env.example           Template without credentials
@@ -65,9 +69,8 @@ From the repository root, use Python 3.12 (validated with 3.12.10).
 Reuse the existing `.venv`; only create one if absent with `py -3.12 -m venv .venv`.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/tasks.py setup
+.\.venv\Scripts\python.exe scripts/tasks.py verify
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe -m pip check
 ```

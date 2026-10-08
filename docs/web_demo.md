@@ -10,8 +10,7 @@ From the repository root, use Python 3.12.10 and the existing virtual environmen
 For a fresh clone, first create it with `py -3.12 -m venv .venv`.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe scripts/tasks.py setup
 # Existing local Gold and the optional installed Ollama model:
 .\.venv\Scripts\python.exe -m retailpulse demo
 ```

@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: Pinned Ruff
+        entry: python -m ruff check
+        language: system
+        types: [python]
+      - id: mypy
+        name: Typed application boundaries
+        entry: python -m mypy
+        language: system
+        pass_filenames: false
+        types: [python]
+      - id: secrets
+        name: Entire tracked tree secret scan
+        entry: python scripts/scan_secrets.py
+        language: system
+        pass_filenames: false
+        always_run: true
