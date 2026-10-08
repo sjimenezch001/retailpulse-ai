@@ -102,7 +102,7 @@ class Assistant:
         answer = answer.model_copy(update={"provider_diagnostic": diagnostic})
         source = getattr(result, "provenance", None)
         trace = Trace(request_id=request_id, time=datetime.now(UTC), intent_category=selected or error or "clarification",
-                      tool=selected, validated_filters=(result.filters.model_dump(mode="json", exclude_none=True) if source else {}),
+                      tool=selected, validated_filters={},
                       duration_ms=round((perf_counter()-started)*1000, 3), source=source.source_table if source else None,
                       gold_run_id=source.gold_run_id if source else None, outcome=answer.status,
                       error_category=answer.error_category, grounding_validated=answer.grounding_validated, provider=provider,

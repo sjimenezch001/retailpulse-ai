@@ -16,9 +16,11 @@ from retailpulse.api.contracts import (
     ForecastResponse,
     Health,
     ProviderState,
+    Readiness,
     Summary,
 )
 from retailpulse.api.language import normalize_spanish
+from retailpulse.api.observability import emit
 from retailpulse.api.source import SYNTHETIC, Source
 
 
@@ -38,7 +40,25 @@ class Service:
                 default_mode=self.settings.provider,
             )
             self.provider_at = monotonic()
+            emit("provider", self.settings.mode, provider_available=self.provider_state.available)
         return self.provider_state
+
+    def readiness(self):
+        health = self.health()
+        available = health.dataset_available
+        result = Readiness(
+            status="unavailable" if not available else "ready" if health.provider.available else "degraded",
+            mode=health.mode,
+            dataset_available=available,
+            gold_available=available and health.mode == "real",
+            synthetic_available=available and health.mode == "synthetic",
+            deterministic_available=available,
+            ollama_available=health.provider.available,
+            source_version=health.dataset.dataset_version if health.dataset else None,
+        )
+        emit("readiness", health.mode, status=result.status,
+             source_version=result.source_version, provider_available=result.ollama_available)
+        return result
 
     def health(self):
         try:
@@ -190,6 +210,11 @@ class Service:
         started = perf_counter()
         result = assistant.ask(normalize_spanish(request.question))
         self.coherent(dataset)
+        emit("assistant", self.settings.mode, status=result.status,
+             duration_ms=(perf_counter() - started) * 1000,
+             source_version=dataset.dataset_version, tool=result.tool,
+             grounded=result.grounding_validated, run_id=result.request_id,
+             error_category=result.error_category)
         return AssistantResponse(
             dataset=dataset,
             result=result,
