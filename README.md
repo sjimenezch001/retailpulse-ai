@@ -8,6 +8,8 @@ reducing fragmented analysis and inconsistent business definitions.
 FastAPI and Streamlit expose four endpoints and four portfolio tabs, with
 separate real Gold and explicitly synthetic portable modes. See the
 [web demo guide](docs/web_demo.md) and [RP-10 gate](docs/evidence/rp10_gate.md).
+The UI includes session-persistent English/Spanish and light/dark selectors,
+structured grounded answer cards and a restrained neutral visual design.
 
 RP-09 engineering and full gate passed, including live Ollama validation.
 RP-00–RP-08 remain validated. The local grounded assistant passes all 36

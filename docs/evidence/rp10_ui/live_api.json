@@ -1,0 +1,20 @@
+{
+  "spanish_provider": "ollama:qwen2.5:1.5b",
+  "live_provider_succeeded": true,
+  "spanish_latency_ms": 10796.647,
+  "units": 25307,
+  "identical_english_and_spanish_typed_results": true,
+  "diagnostic": {
+    "status": "succeeded",
+    "stage": "complete",
+    "category": null,
+    "http_status": null,
+    "elapsed_ms": 9641.0,
+    "load_ms": 15.3503,
+    "total_ms": 9594.4892,
+    "prompt_tokens": 228,
+    "generated_tokens": 111,
+    "validation_errors": 0,
+    "changed_fields": []
+  }
+}

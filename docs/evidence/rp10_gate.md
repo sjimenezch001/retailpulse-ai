@@ -4,6 +4,9 @@
 
 **RP-10 FULL GATE: PASS**
 
+UI refinement evidence is recorded in the [UI polish addendum](rp10_ui_gate.md),
+including bilingual structured answers, session themes and genuine screenshots.
+
 Validated on 2026-10-08 UTC, Windows, Python 3.12.10, Chrome 154.0.8037.98.
 Branch: `feat/rp-10-web-demo`, based on verified remote main
 `774035e82ad183d1fc13dd21cb90c5af73348fb5`. This is local acceptance;

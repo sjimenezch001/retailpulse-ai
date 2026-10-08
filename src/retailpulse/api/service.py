@@ -18,6 +18,7 @@ from retailpulse.api.contracts import (
     ProviderState,
     Summary,
 )
+from retailpulse.api.language import normalize_spanish
 from retailpulse.api.source import SYNTHETIC, Source
 
 
@@ -187,7 +188,7 @@ class Service:
             / "traces.jsonl",
         )
         started = perf_counter()
-        result = assistant.ask(request.question)
+        result = assistant.ask(normalize_spanish(request.question))
         self.coherent(dataset)
         return AssistantResponse(
             dataset=dataset,

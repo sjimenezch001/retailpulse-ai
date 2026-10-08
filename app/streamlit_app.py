@@ -1,7 +1,8 @@
-"""RetailPulse portfolio UI: presentation only; all figures arrive through the API."""
+"""Bilingual local portfolio UI. Typed API tools own all business values."""
 
 import os
-from datetime import date
+from datetime import date, datetime
+from html import escape
 from pathlib import Path
 
 import altair as alt
@@ -9,151 +10,213 @@ import pandas as pd
 import streamlit as st
 
 from retailpulse.api.client import ApiClient, ApiClientError
+from retailpulse.ui.answers import MODELS, Presentation, answer_card, forecast_cards
+from retailpulse.ui.i18n import date_label, period_label
+from retailpulse.ui.theme import PALETTES, chart_style, css
 
 API = os.environ.get("RETAILPULSE_API_URL", "http://127.0.0.1:8000")
 ROOT = Path(os.environ.get("RETAILPULSE_ROOT", Path(__file__).resolve().parents[1]))
-MODEL_LABELS = {
-    "lightgbm_global_v1": "LightGBM",
-    "rolling_mean": "Rolling mean",
-    "last_value": "Last value",
-    "seasonal_naive_7": "Seasonal naive (7)",
-}
 
 
-def value(result):
-    return result["rows"][0]["value"] if result["rows"] else None
+def present():
+    return Presentation(st.session_state.get("language", "en"))
 
 
-def formatted(number, decimals=0):
-    return "Unknown" if number is None else f"{number:,.{decimals}f}"
+def t(text, **values):
+    return present().t(text, **values)
 
 
-def chart_rows(result):
+def palette():
+    return PALETTES[st.session_state.get("theme", "light")]
+
+
+def chart(chart, height):
+    st.altair_chart(
+        chart_style(chart, st.session_state.get("theme", "light"), present().language),
+        width="stretch",
+        height=height,
+        theme=None,
+    )
+
+
+def points(result):
+    p = present()
     return pd.DataFrame(
         [
             {
-                "Date": row["period"]["start"],
-                "Units": row["value"],
-                "Segment": row["segment"],
+                "Date": r["period"]["start"],
+                "Units": r["value"],
+                "Segment": r["segment"],
+                "DisplayDate": date_label(r["period"]["start"], p.language),
+                "DisplayValue": p.n(r["value"]),
             }
-            for row in result["rows"]
+            for r in result["rows"]
         ]
     )
 
 
 def provenance(dataset):
-    lineage = dataset["lineage"]
+    p = present()
+    source = dataset["lineage"]
     st.caption(
-        f"{dataset['label']} · observed {lineage['observed_period']['start']}–{lineage['observed_period']['end']} · snapshot as of {lineage['as_of_date']}"
+        t(
+            "Observed {period} · Snapshot: {as_of}",
+            period=period_label(source["observed_period"], p.language),
+            as_of=date_label(source["as_of_date"], p.language),
+        )
     )
 
 
 def overview(client, dataset, scope):
-    st.subheader("The demand picture")
+    p = present()
+    st.subheader(t("The demand picture"))
     st.caption(
-        "Observed sales, transparent price coverage and signals worth investigating."
+        t("Observed sales, transparent price coverage and signals worth investigating.")
     )
     result = client.request("/metrics/summary", params=scope)
     metrics = result["metrics"]
-    columns = st.columns(5)
-    cards = [
-        ("Observed units", formatted(value(metrics["units"]))),
+
+    def value(key):
+        rows = metrics[key]["rows"]
+        return rows[0]["value"] if rows else None
+
+    for col, key, label in zip(
+        st.columns([1, 1, 1.55, 1.2, 1]),
         (
+            "units",
+            "price_coverage",
+            "known_revenue_proxy",
+            "demand_spike_flag",
+            "data_freshness",
+        ),
+        (
+            "Observed units",
             "Price coverage",
-            f"{value(metrics['price_coverage']) * 100:.2f}%"
-            if value(metrics["price_coverage"]) is not None
-            else "Unknown",
-        ),
-        (
             "Known-price revenue proxy",
-            formatted(value(metrics["known_revenue_proxy"]), 2),
+            "Demand spike flags",
+            "Historical freshness",
         ),
-        ("Demand spike flags", formatted(value(metrics["demand_spike_flag"]))),
-        ("Historical freshness", f"{dataset['lineage']['data_freshness']:,} days"),
-    ]
-    for column, (label, number) in zip(columns, cards, strict=True):
-        column.metric(label, number, border=True)
+        strict=True,
+    ):
+        number = (
+            dataset["lineage"]["data_freshness"]
+            if key == "data_freshness"
+            else value(key)
+        )
+        col.metric(t(label), p.metric_value(key, number), border=True)
     revenue = metrics["revenue_proxy"]["rows"]
     if revenue and revenue[0]["value"] is None:
-        st.info(
-            f"Known-price revenue is a partial proxy. {revenue[0]['missing_observations']:,} selected observations lack prices, so the complete revenue proxy is unknown. This is not audited revenue."
+        st.caption(
+            t(
+                "Partial proxy: {count} observations lack prices. Complete revenue is unknown; this is not audited revenue.",
+                count=p.n(revenue[0]["missing_observations"]),
+            )
         )
     else:
         st.caption(
-            "Known-price revenue is a price-based proxy, not audited revenue. Spike flags are heuristic, not evidence of stockouts or causes."
+            t(
+                "Revenue is a price-based proxy, not audited revenue. Spike flags do not prove stockouts or causes."
+            )
         )
-    frame = chart_rows(result["daily_trend"])
-    st.markdown("#### Daily demand")
+    st.markdown("#### " + t("Daily demand"))
     st.caption(
-        "Daily sums for up to the last 90 observed days in the selected range. KPI cards and comparisons use the entire selected range."
+        t(
+            "Last 90 days of the selected range; cards and comparisons use the entire range."
+        )
     )
+    frame = points(result["daily_trend"])
     if not frame.empty:
-        chart = (
+        chart(
             alt.Chart(frame)
             .mark_area(
-                color="#168494",
-                opacity=0.2,
-                line={"color": "#168494", "strokeWidth": 2.5},
+                color=palette()["accent"],
+                opacity=0.18,
+                line={"color": palette()["accent"], "strokeWidth": 2.5},
             )
             .encode(
-                x=alt.X("Date:T", title=None),
-                y=alt.Y("Units:Q", title="Observed units"),
-                tooltip=["Date:T", "Units:Q"],
-            )
+                x=alt.X(
+                    "Date:T",
+                    title=None,
+                    axis=alt.Axis(format="%d/%m" if p.language == "es" else "%b %d"),
+                ),
+                y=alt.Y(
+                    "Units:Q", title=t("Observed units"), axis=alt.Axis(format=",.0f")
+                ),
+                tooltip=[
+                    alt.Tooltip("DisplayDate:N", title=t("Date")),
+                    alt.Tooltip("DisplayValue:N", title=t("Units")),
+                ],
+            ),
+            255,
         )
-        st.altair_chart(chart, width="stretch", height=270)
-    left, right = st.columns(2)
-    for column, title, key in (
-        (left, "By store", "stores"),
-        (right, "By department", "departments"),
+    for col, label, key in zip(
+        st.columns(2),
+        ("By store", "By department"),
+        ("stores", "departments"),
+        strict=True,
     ):
-        with column:
-            st.markdown(f"#### {title}")
-            frame = chart_rows(result[key])
+        with col:
+            st.markdown("#### " + t(label))
+            frame = points(result[key])
             if not frame.empty:
-                chart = (
+                chart(
                     alt.Chart(frame)
-                    .mark_bar(color="#253F66", cornerRadiusEnd=4)
+                    .mark_bar(color=palette()["blue"], cornerRadiusEnd=4)
                     .encode(
-                        x=alt.X("Units:Q", title="Observed units"),
+                        x=alt.X(
+                            "Units:Q",
+                            title=t("Observed units"),
+                            axis=alt.Axis(format=",.0f"),
+                        ),
                         y=alt.Y("Segment:N", title=None, sort="-x"),
-                        tooltip=["Segment", "Units"],
-                    )
+                        tooltip=[
+                            alt.Tooltip("Segment:N", title=t("Segment")),
+                            alt.Tooltip("DisplayValue:N", title=t("Units")),
+                        ],
+                    ),
+                    155,
                 )
-                st.altair_chart(chart, width="stretch", height=175)
-    with st.expander("Source & metric definitions"):
+    with st.expander(t("Source & metric definitions")):
         st.json(
             {
-                "dataset_version": dataset["dataset_version"],
+                "dataset": dataset,
                 "filters": result["filters"],
-                "provenance": metrics["units"]["provenance"],
+                "metrics": {k: v["provenance"] for k, v in metrics.items()},
                 "cached": result["cached"],
             }
         )
 
 
 def forecast(client, dataset, scope):
-    st.subheader("Forecasts with an honest scorecard")
-    if dataset["mode"] == "real":
-        st.info(
-            "Full-pilot historical test: LightGBM improves WMAPE and MAE, but has worse RMSE than rolling mean. Filtered segments can differ. No operational future LightGBM forecast is available."
+    p = present()
+    st.subheader(t("Forecasts with an honest scorecard"))
+    st.info(
+        t(
+            "Full-pilot historical test: LightGBM improves WMAPE and MAE, but has worse RMSE than rolling mean. Filtered segments can differ. No future LightGBM forecast is available."
+            if dataset["mode"] == "real"
+            else "Synthetic comparison: the LightGBM series is simulated, not trained. These scores do not measure real model performance."
         )
-    else:
-        st.info(
-            "Synthetic demonstration: the LightGBM comparison series is simulated, not trained. These scores illustrate the interface and do not measure real model performance."
-        )
+    )
     a, b, c = st.columns([2, 1, 1])
     with a:
         models = st.multiselect(
-            "Models to compare",
-            list(MODEL_LABELS),
-            default=["lightgbm_global_v1", "rolling_mean"],
-            format_func=MODEL_LABELS.get,
+            t("Models to compare"),
+            list(MODELS),
+            default=st.session_state.get(
+                "models", ["lightgbm_global_v1", "rolling_mean"]
+            ),
+            format_func=lambda m: p.t(MODELS[m]),
             max_selections=2,
+            placeholder=t("Models to compare"),
+            key="models_" + p.language,
         )
     with b:
         split = st.selectbox(
-            "Historical split", ["test", "validation"], format_func=str.title
+            t("Historical split"),
+            ["test", "validation"],
+            format_func=lambda s: p.t(s.title()),
+            index=["test", "validation"].index(st.session_state.get("split") or "test"),
+            key="split_" + p.language,
         )
     windows = [
         w
@@ -163,323 +226,409 @@ def forecast(client, dataset, scope):
     with c:
         maximum = min((w["max_horizon"] for w in windows), default=1)
         horizon = st.selectbox(
-            "Forecast horizon",
+            t("Forecast horizon"),
             [None, *range(1, maximum + 1)],
-            format_func=lambda n: "All horizons" if n is None else f"Day {n}",
+            format_func=lambda n: (
+                p.t("All horizons") if n is None else p.t("Day {n}", n=n)
+            ),
+            index=(
+                [None, *range(1, maximum + 1)].index(st.session_state.get("horizon"))
+                if st.session_state.get("horizon") in [None, *range(1, maximum + 1)]
+                else 0
+            ),
+            key="horizon_" + p.language,
+            placeholder=t("All horizons"),
         )
+    st.session_state.update(models=models, split=split, horizon=horizon)
     st.caption(
-        "Store and department filters apply here. Sales date filters apply to Overview; forecasts use the selected historical split."
+        t(
+            "Store and department filters apply here. Sales dates apply to Overview; forecasts use the selected historical split."
+        )
     )
     if not models:
-        st.info("Choose a model to view historical performance.")
+        st.info(t("Choose a model to view historical performance."))
         return
-    params = [(k, v) for k, v in scope.items() if k in ("store", "department")]
-    params += [("models", m) for m in models] + [("split", split)]
+    params = (
+        [(k, v) for k, v in scope.items() if k in ("store", "department")]
+        + [("models", m) for m in models]
+        + [("split", split)]
+    )
     if horizon:
-        params += [("horizon", horizon)]
-    result = client.request("/forecast", params=params)
-    rows = result["result"]["rows"]
-    for column, row in zip(st.columns(len(models)), rows, strict=False):
-        with column:
-            st.markdown(f"#### {MODEL_LABELS[row['model']]}")
-            x, y, z = st.columns(3)
-            x.metric(
-                "WMAPE",
-                "Undefined" if row["WMAPE"] is None else f"{row['WMAPE'] * 100:.2f}%",
-                border=True,
-            )
-            y.metric("MAE", formatted(row["MAE"], 3), border=True)
-            z.metric("RMSE", formatted(row["RMSE"], 3), border=True)
+        params.append(("horizon", horizon))
+    response = client.request("/forecast", params=params)
+    result = response["result"]
+    rows = result["rows"]
+    forecast_cards(rows, p)
     if not rows:
-        st.info("No predictions match the selected scope.")
         return
     daily = client.request("/forecast", params=params + [("segmentation", "day")])[
         "result"
     ]["rows"]
-    observations = []
-    first = rows[0]["model"]
+    frame = []
     for row in daily:
-        observations.append(
+        frame.append(
             {
                 "Date": row["period"]["start"],
                 "Units": row["predicted_units"],
-                "Series": MODEL_LABELS[row["model"]],
+                "Series": t(MODELS[row["model"]]),
             }
         )
-        if row["model"] == first:
-            observations.append(
+        if row["model"] == rows[0]["model"]:
+            frame.append(
                 {
                     "Date": row["period"]["start"],
                     "Units": row["actual_units"],
-                    "Series": "Observed actuals",
+                    "Series": t("Observed actuals"),
                 }
             )
-    st.markdown("#### Observed vs predicted demand")
-    if observations:
-        chart = (
-            alt.Chart(pd.DataFrame(observations))
-            .mark_line(strokeWidth=2.5, point=True)
-            .encode(
-                x=alt.X("Date:T", title=None),
-                y=alt.Y("Units:Q", title="Daily units"),
-                color=alt.Color(
-                    "Series:N",
-                    scale=alt.Scale(range=["#168494", "#253F66", "#D49A37"]),
-                    legend=alt.Legend(orient="bottom"),
+    for row in frame:
+        row.update(
+            DisplayDate=date_label(row["Date"], p.language),
+            DisplayValue=p.n(row["Units"], 2),
+        )
+    st.markdown("#### " + t("Observed vs predicted demand"))
+    chart(
+        alt.Chart(pd.DataFrame(frame))
+        .mark_line(strokeWidth=2.5, point=True)
+        .encode(
+            x=alt.X(
+                "Date:T",
+                title=None,
+                axis=alt.Axis(format="%d/%m" if p.language == "es" else "%b %d"),
+            ),
+            y=alt.Y("Units:Q", title=t("Daily units"), axis=alt.Axis(format=",.0f")),
+            color=alt.Color(
+                "Series:N",
+                title=None,
+                scale=alt.Scale(
+                    range=[palette()["accent"], palette()["blue"], palette()["amber"]]
                 ),
-                tooltip=["Date:T", "Series", alt.Tooltip("Units:Q", format=",.2f")],
-            )
-        )
-        st.altair_chart(chart, width="stretch", height=300)
-    st.caption(
-        "WMAPE is a ratio of summed errors to summed actual units. Model predictions are compared separately, never added. Accuracy describes historical backtests."
+                legend=alt.Legend(orient="bottom"),
+            ),
+            tooltip=[
+                alt.Tooltip("DisplayDate:N", title=t("Date")),
+                alt.Tooltip("Series:N", title=t("Series")),
+                alt.Tooltip("DisplayValue:N", title=t("Units")),
+            ],
+        ),
+        285,
     )
-    with st.expander("Forecast scope & provenance"):
-        st.json(
-            {
-                "filters": result["result"]["filters"],
-                "provenance": result["result"]["provenance"],
-                "warnings": result["result"]["warnings"],
-            }
+    st.caption(
+        t(
+            "Accuracy describes historical backtests. Each model is compared separately; predictions are never added across models."
         )
+    )
+    with st.expander(t("Forecast scope & provenance")):
+        st.json(response)
 
 
-def answer_card(response):
-    answer = response["result"]
-    if response["live_provider_succeeded"]:
-        st.success(
-            f"Live local model · {answer['provider']} · {response['latency_ms'] / 1000:.2f}s"
+def example_questions(dataset, language):
+    p = Presentation(language)
+    period = dataset["lineage"]["observed_period"]
+    demand = (
+        p.t("How many units did CA_1 sell during April 2016?")
+        if dataset["mode"] == "real"
+        else p.t(
+            "Show units for {store} from {start} to {end}",
+            store=dataset["stores"][0],
+            start=period["start"],
+            end=period["end"],
         )
-    elif answer["provider"].startswith("deterministic_fallback"):
-        st.warning(
-            f"Deterministic fallback · {answer['provider_diagnostic'].get('category', 'provider unavailable')}. This was not a live LLM answer."
-        )
-    else:
-        st.caption(
-            f"{answer['provider']} · {answer['status']} · {response['latency_ms'] / 1000:.2f}s"
-        )
-    st.markdown(answer["answer"])
-    with st.expander("Sources, scope & provider diagnostics"):
-        st.json(
-            {
-                "dataset": response["dataset"],
-                "selected_tool": answer["tool"],
-                "grounding_validated": answer["grounding_validated"],
-                "provider_diagnostic": answer["provider_diagnostic"],
-                "latency_ms": response["latency_ms"],
-            }
-        )
+    )
+    return [
+        demand,
+        p.t("Compare LightGBM and rolling mean WMAPE on the test period"),
+        p.t("What does revenue_proxy mean?"),
+        p.t("How old is the data?"),
+    ]
 
 
 def assistant(client, health):
-    dataset = health["dataset"]
-    st.subheader("Ask RetailPulse")
-    st.caption("One clear question. Approved tools. Verifiable answers.")
-    options = ["ollama", "deterministic"]
+    p = present()
+    st.subheader(t("Ask RetailPulse"))
+    st.caption(t("One clear question. Approved tools. Verifiable answers."))
     provider = st.radio(
-        "Answer provider",
-        options,
-        index=1 if health["provider"]["default_mode"] == "deterministic" else 0,
-        format_func=lambda p: (
-            "Ollama · local model" if p == "ollama" else "Deterministic · offline"
+        t("Answer provider"),
+        ["ollama", "deterministic"],
+        index=1
+        if (st.session_state.get("provider") or health["provider"]["default_mode"])
+        == "deterministic"
+        else 0,
+        format_func=lambda mode: p.t(
+            "Ollama · local model" if mode == "ollama" else "Deterministic · offline"
         ),
         horizontal=True,
+        key="provider_" + p.language,
     )
+    st.session_state["provider"] = provider
     if provider == "ollama" and not health["provider"]["available"]:
         st.warning(
-            "Ollama is unavailable. Start the local service or choose deterministic mode. Any fallback is explicitly disclosed."
+            t(
+                "Ollama is unavailable. Start the local service or choose deterministic mode. Any fallback is explicitly disclosed."
+            )
         )
-    lineage = dataset["lineage"]
-    examples = [
-        "How many units did CA_1 sell during April 2016?"
-        if dataset["mode"] == "real"
-        else f"Show units for {dataset['stores'][0]} from {lineage['observed_period']['start']} to {lineage['observed_period']['end']}",
-        "Compare LightGBM and rolling mean WMAPE on the test period",
-        "What does revenue_proxy mean?",
-    ]
     pending = None
-    for column, title, question in zip(
-        st.columns(3),
-        ("Explore store demand", "Compare forecast models", "Explain revenue proxy"),
-        examples,
+    for col, title, question in zip(
+        st.columns(4),
+        (
+            "Explore store demand",
+            "Compare forecast models",
+            "Explain revenue proxy",
+            "Check data freshness",
+        ),
+        example_questions(health["dataset"], present().language),
         strict=True,
     ):
-        if column.button(title, width="stretch"):
+        if col.button(t(title), width="stretch", key="example_" + title):
             pending = question
     st.caption(
-        "Each question is independent. Displayed chat history is not passed to the assistant; conversational follow-ups are not supported."
+        t(
+            "Each question is independent. Chat history is not sent to the assistant. Spanish support is limited to the suggested forms and explicit store/month or ISO date ranges."
+        )
     )
     history = st.session_state.setdefault("rp_chat", [])
     for exchange in history:
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar=":material/person:"):
             st.write(exchange["question"])
-        with st.chat_message("assistant"):
-            answer_card(exchange["response"])
+        with st.chat_message("assistant", avatar=":material/analytics:"):
+            answer_card(exchange["response"], present().language)
     pending = (
         st.chat_input(
-            "Ask about historical units, metrics or forecast accuracy", max_chars=1000
+            t("Ask about historical units, metrics or forecast accuracy"),
+            max_chars=1000,
+            key="question",
         )
         or pending
     )
     if pending:
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar=":material/person:"):
             st.write(pending)
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar=":material/analytics:"):
             with st.spinner(
-                "Checking scope and consulting approved tools. A cold local model may take up to 30 seconds."
+                t(
+                    "Consulting approved tools. A cold local model may take up to 30 seconds."
+                )
             ):
                 response = client.request(
                     "/assistant/query", body={"question": pending, "provider": provider}
                 )
-            answer_card(response)
+            answer_card(response, present().language)
         history.append({"question": pending, "response": response})
         del history[:-8]
 
 
 def architecture(dataset):
-    st.subheader("Trace every answer back to its source")
+    st.subheader(t("Trace every answer back to its source"))
     st.caption(
-        "A local analytical product, from raw observations to a grounded business answer."
+        t(
+            "A local analytical product, from observations to a grounded business answer."
+        )
     )
-    for column, title, description in zip(
-        st.columns(4),
-        ("01 · Bronze", "02 · Silver", "03 · Gold / DuckDB", "04 · Decisions"),
+    blocks = []
+    for number, title, label, description in zip(
+        ("01", "02", "03", "04"),
+        ("M5 → Bronze", "Silver", "Gold / DuckDB", "Forecasting / MLflow"),
+        ("Source data", "Validated data", "Business metrics", "Models & decisions"),
         (
             "M5 CSV inputs, content hashes and immutable ingestion provenance.",
             "Validated daily sales, calendar and prices; explicit missing data.",
-            "Canonical KPIs and read-only analytical tools. Every response carries source lineage.",
-            "Forecasting / MLflow → Power BI, FastAPI, Streamlit and the grounded assistant.",
+            "Canonical KPIs and read-only analytical tools, with source lineage.",
+            "Frozen forecasting / MLflow → Power BI, FastAPI, Streamlit and the grounded assistant.",
         ),
         strict=True,
     ):
-        with column.container(border=True):
-            st.markdown(f"**{title}**")
-            st.write(description)
+        blocks.append(
+            f'<article class="rp-stage"><small>{number} / {escape(t(label))}</small><h4>{escape(title)}</h4><p>{escape(t(description))}</p></article>'
+        )
     st.markdown(
-        "**M5 → Bronze → Silver → Gold/DuckDB → Forecasting/MLflow → Power BI / FastAPI / Streamlit / Grounded AI Assistant**"
+        '<div class="rp-pipeline">' + "".join(blocks) + "</div>", unsafe_allow_html=True
     )
     left, right = st.columns(2)
     with left:
-        st.markdown("#### Built to be checked")
+        st.markdown("#### " + t("Built to be checked"))
         st.write(
-            "Synthetic regression fixtures run without Kaggle or Ollama. Real-data acceptance separately reconciles API results with Gold. Frozen model artifacts and source hashes are preserved."
+            t(
+                "Synthetic tests run without Kaggle or Ollama. Real acceptance reconciles API results with Gold. Frozen artifacts and source hashes are preserved."
+            )
         )
         st.link_button(
-            "Explore the metric catalog",
+            t("Explore the metric catalog"),
             "https://github.com/sjimenezch001/retailpulse-ai/blob/main/docs/metric_catalog.md",
         )
-        st.link_button("Open the API documentation", API + "/docs")
+        st.link_button(t("Open the API documentation"), API + "/docs")
     with right:
-        st.markdown("#### Know the limits")
+        st.markdown("#### " + t("Know the limits"))
         st.write(
-            "Historical observations are not current sales. M5 has no inventory data. Revenue is a proxy; spikes are heuristic. No AWS deployment or operational inventory analytics is claimed."
+            t(
+                "Historical data is not current sales. M5 has no inventory data. Revenue is a proxy; spikes are heuristic. No AWS deployment is claimed."
+            )
         )
         st.link_button(
-            "Read the model card",
+            t("Read the model card"),
             "https://github.com/sjimenezch001/retailpulse-ai/blob/main/docs/model_card.md",
         )
         guide = ROOT / "docs/web_demo.md"
         if guide.is_file():
             st.download_button(
-                "Download the demo guide",
+                t("Download the demo guide"),
                 guide.read_text(encoding="utf-8"),
                 file_name="RetailPulse-demo-guide.md",
                 mime="text/markdown",
             )
-    with st.expander("Dataset lineage"):
+    st.caption(t("Documentation is maintained in English."))
+    with st.expander(t("Dataset lineage")):
         st.json(dataset)
 
 
+def date_filters(dataset):
+    """Locale-controlled date input avoids browser-locale calendar text."""
+    lang = present().language
+    period = dataset["lineage"]["observed_period"]
+    canonical = st.session_state.setdefault(
+        "sales_dates",
+        (date.fromisoformat(period["start"]), date.fromisoformat(period["end"])),
+    )
+    fmt = "%d/%m/%Y" if lang == "es" else "%m/%d/%Y"
+    if st.session_state.get("date_language") != lang:
+        st.session_state["date_start"] = canonical[0].strftime(fmt)
+        st.session_state["date_end"] = canonical[1].strftime(fmt)
+        st.session_state["date_language"] = lang
+    help_text = t(
+        "Use {format}.", format="DD/MM/YYYY" if lang == "es" else "MM/DD/YYYY"
+    )
+    start = st.text_input(t("Start date"), key="date_start", help=help_text)
+    end = st.text_input(t("End date"), key="date_end", help=help_text)
+    try:
+        dates = (
+            datetime.strptime(start, fmt).date(),
+            datetime.strptime(end, fmt).date(),
+        )
+        if (
+            not date.fromisoformat(period["start"])
+            <= dates[0]
+            <= dates[1]
+            <= date.fromisoformat(period["end"])
+        ):
+            raise ValueError
+    except ValueError:
+        st.warning(t("Use valid, ordered dates within the observed period."))
+        return None
+    st.session_state["sales_dates"] = dates
+    return dates
+
+
 def main():
-    st.set_page_config(
-        page_title="RetailPulse AI · Retail demand intelligence",
-        page_icon="◈",
-        layout="wide",
-    )
-    st.markdown(
-        """<style>
-    .block-container{padding-top:2rem;max-width:1480px}h1,h2,h3{letter-spacing:-.035em}
-    [data-testid="stMetricValue"]{font-size:1.55rem;font-weight:650}
-    [data-testid="stMetricLabel"]{font-size:.8rem;color:#53647b}
-    [data-baseweb="tab-list"]{gap:1.25rem;margin:1.2rem 0;border-bottom:1px solid #dce4ee}
-    [data-baseweb="tab"]{font-size:1rem;padding:0.8rem 0.3rem}
-    .eyebrow{color:#168494;letter-spacing:.15em;font-size:.75rem;font-weight:750}
-    .intro{color:#60718b;font-size:1.06rem;margin-top:-.7rem}
-    @media(max-width:900px){[data-testid="stMetricValue"]{font-size:1.15rem}.block-container{padding:1rem}}
-    </style><div class="eyebrow">RETAILPULSE AI / DEMAND INTELLIGENCE</div>""",
-        unsafe_allow_html=True,
-    )
-    st.title("See demand. Understand the evidence.")
-    st.markdown(
-        '<p class="intro">Retail analytics, honest forecasts and answers you can trace.</p>',
-        unsafe_allow_html=True,
-    )
+    st.session_state.setdefault("language", "en")
+    st.session_state.setdefault("theme", "light")
+    st.set_page_config(page_title="RetailPulse AI", page_icon="◈", layout="wide")
+    brand, language, theme = st.columns([6, 1.4, 1.2])
+    with language:
+        st.selectbox(
+            "Language / Idioma",
+            ["en", "es"],
+            format_func=lambda lang: "English" if lang == "en" else "Español",
+            key="language",
+        )
+    with theme:
+        p = present()
+        chosen_theme = st.selectbox(
+            t("Theme"),
+            ["light", "dark"],
+            index=["light", "dark"].index(st.session_state["theme"]),
+            format_func=lambda value: p.t(value.title()),
+            key="theme_" + p.language,
+        )
+        st.session_state["theme"] = chosen_theme
+    st.markdown(css(st.session_state["theme"]), unsafe_allow_html=True)
+    with brand:
+        st.markdown(
+            '<div class="rp-eyebrow">RETAILPULSE AI / '
+            + escape(t("DEMAND INTELLIGENCE"))
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+    st.title(t("See demand. Understand the evidence."))
+    st.caption(t("Retail analytics, honest forecasts and answers you can trace."))
     client = ApiClient(API)
     try:
         health = client.request("/health")
-    except ApiClientError as exc:
-        st.error(str(exc))
+    except ApiClientError:
+        st.error(
+            t("The local API is unavailable or timed out. Start the demo and retry.")
+        )
         st.code("python -m retailpulse demo", language="powershell")
         return
     dataset = health["dataset"]
     if not dataset:
-        st.warning(health["message"])
+        st.warning(
+            t(
+                "The real dataset is unavailable. Choose explicit synthetic mode for the portable demo."
+                if health["mode"] == "real"
+                else "The synthetic snapshot is unavailable. Check the local demo files and restart."
+            )
+        )
         st.code(
             "python -m retailpulse demo --mode synthetic --provider deterministic",
             language="powershell",
         )
         return
     if st.session_state.get("rp_version") != dataset["dataset_version"]:
-        for key in ("rp_chat", "sales_dates", "store", "department"):
+        for key in ("rp_chat", "sales_dates", "date_language", "store", "department"):
             st.session_state.pop(key, None)
         st.session_state["rp_version"] = dataset["dataset_version"]
     if dataset["mode"] == "synthetic":
         st.warning(
-            "SYNTHETIC PORTFOLIO DEMO · All observations and comparison series are illustrative. No real M5 data or trained-model performance."
+            t(
+                "SYNTHETIC PORTFOLIO DEMO · All observations and comparison series are illustrative. No real M5 data or trained-model performance."
+            )
         )
     else:
-        st.caption("REAL M5 · HISTORICAL PILOT · Local and read-only")
+        st.caption(t("REAL M5 · HISTORICAL PILOT · Local and read-only"))
     provenance(dataset)
-    period = dataset["lineage"]["observed_period"]
-    first, last = date.fromisoformat(period["start"]), date.fromisoformat(period["end"])
     with st.sidebar:
-        st.markdown("### Your analysis scope")
-        st.caption(dataset["label"])
-        dates = st.date_input(
-            "Sales date range",
-            value=(first, last),
-            min_value=first,
-            max_value=last,
-            key="sales_dates",
-        )
+        st.markdown("### " + t("Your analysis scope"))
+        st.caption(t(dataset["label"]))
+        dates = date_filters(dataset)
         store = st.selectbox(
-            "Store",
+            t("Store"),
             [None, *dataset["stores"]],
-            format_func=lambda s: s or "All stores",
+            format_func=lambda s: s or p.t("All stores"),
             key="store",
+            placeholder=t("All stores"),
         )
         department = st.selectbox(
-            "Department",
+            t("Department"),
             [None, *dataset["departments"]],
-            format_func=lambda s: s or "All departments",
+            format_func=lambda s: s or p.t("All departments"),
             key="department",
+            placeholder=t("All departments"),
         )
         st.divider()
-        st.markdown("**Snapshot freshness**")
-        st.write(f"{dataset['lineage']['data_freshness']:,} days")
-        st.caption(
-            f"Measured at {dataset['lineage']['as_of_date']}; not pipeline latency."
+        st.markdown("**" + t("Snapshot freshness") + "**")
+        st.write(
+            t("{value} days", value=present().n(dataset["lineage"]["data_freshness"]))
         )
-        st.caption("No current sales or inventory claims.")
-    if len(dates) != 2:
-        st.info("Choose both dates to complete the analysis range.")
+        st.caption(
+            t(
+                "Measured at {date}; not pipeline latency.",
+                date=date_label(dataset["lineage"]["as_of_date"], present().language),
+            )
+        )
+        st.caption(t("No current sales or inventory claims."))
+    if dates is None:
         return
     scope = {"start_date": str(dates[0]), "end_date": str(dates[1])}
     if store:
         scope["store"] = store
     if department:
         scope["department"] = department
-    tabs = st.tabs(["Overview", "Forecast", "Ask RetailPulse", "Architecture"])
+    tabs = st.tabs(
+        [
+            t(name)
+            for name in ("Overview", "Forecast", "Ask RetailPulse", "Architecture")
+        ],
+        key="navigation",
+    )
     for tab, function, args in zip(
         tabs,
         (overview, forecast, assistant, architecture),
@@ -494,10 +643,15 @@ def main():
         with tab:
             try:
                 function(*args)
-            except ApiClientError as exc:
-                st.error(str(exc))
+            except ApiClientError:
+                st.error(
+                    t(
+                        "The request could not be completed. Check the filters or retry shortly."
+                    )
+                )
     st.caption(
-        "RetailPulse AI · Historical evidence, reproducible results · Portfolio demo"
+        "RetailPulse AI · "
+        + t("Historical evidence · Reproducible results · Local portfolio demo")
     )
 
 
