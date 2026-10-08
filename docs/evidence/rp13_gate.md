@@ -1,6 +1,12 @@
 # RP-13 portfolio packaging gate
 
-Date: 2026-10-08. Branch: `feat/rp-13-portfolio`.
+Updated: 2026-10-08. Current localization branch: `docs/rp13-demo-localization`,
+created from clean synchronized main `b6622e3` after a fetch and exact local/remote
+comparison. The owner approved the English recording. See the
+[dated localization update](#demo-localization--2026-10-08) for current media status.
+The packaging and privacy sections below retain their historical revision context.
+
+Initial packaging date: 2026-10-08. Branch: `feat/rp-13-portfolio`.
 Base: clean synchronized main `593dc5034b629beb11045e73b5a8bc0f34317b09`,
 verified against the public GitHub main commit before branching.
 The unpublished packaging commits were reconstructed from this published base
@@ -12,8 +18,9 @@ runtime configuration remain identical; replacement commits have no remote CI re
 | --- | --- |
 | RP-13 PACKAGING | PASS |
 | CLEAN-ENVIRONMENT REPRODUCTION | PASS — isolated automated reproduction, with terminal limitations below |
-| GENUINE DEMO VIDEO | COMPLETE — 147.517067 seconds measured; 150-second script |
-| INDEPENDENT HUMAN QUICK START | PENDING |
+| GENUINE ENGLISH DEMO VIDEO | COMPLETE / OWNER APPROVED — original 147.517067 seconds preserved |
+| SPANISH / PORTUGUESE EXPORTS | COMPLETE / TECHNICALLY INSPECTED — 149.813500 / 147.425333 seconds; owner review not claimed |
+| INDEPENDENT HUMAN QUICK START | PENDING — deferred by owner |
 | RELEASE v1.0.0 | PREPARED / NOT PUBLISHED |
 | RP-13 FULL GATE | PENDING |
 
@@ -139,7 +146,9 @@ This recording uses **explicit deterministic offline mode**, with **zero Ollama
 calls**, no model warm-up and no audio or synthesized voice. The visible answer
 latency is an offline request measurement, not LLM inference or video duration.
 Earlier RP-09 live-model evidence remains separately labeled. The MP4 has not
-been committed, uploaded or published; owner review and hosting approval remain.
+been committed, uploaded or published. Owner review was pending at initial capture;
+the owner has now approved its content and presentation. Public hosting remains
+unauthorized; see the dated localization update.
 
 ## Initial packaging validation and preservation
 
@@ -221,9 +230,12 @@ was changed. The earlier clean installation and video were not rerun or modified
 
 ## Remaining owner decisions
 
-1. Have another person complete the quick start, including physical Ctrl+C, and
-   record revision, OS, Python, commands and outcomes with their consent.
-2. Review the video and portfolio wording, and choose the missing code license.
+1. Independent human quick start remains **PENDING, deferred by the owner**.
+   When resumed, record revision, OS, Python, commands, physical Ctrl+C and outcomes
+   with the tester's consent.
+2. The existing English video's content and presentation are owner-approved.
+   Owner review of the new localized exports is not claimed. Review remaining
+   portfolio wording and choose the missing code license.
    No root LICENSE or project license metadata currently grants code permissions;
    competition-data rights are separate.
 3. Authorize a future PR/push, obtain candidate CI, and approve coordinated version,
@@ -234,3 +246,103 @@ See [draft notes](../release_notes_v1.0.0.md) and the
 [release checklist](../release_checklist.md). These open checkpoints keep
 **RP-13 FULL GATE: PENDING**. Neither a published release nor independent human
 acceptance is implied by packaging success.
+
+## Demo localization — 2026-10-08
+
+The owner approved the existing English video and deferred independent human
+quick-start verification, which remains **PENDING**. A new branch,
+`docs/rp13-demo-localization`, was created from verified clean, synchronized main
+`b6622e3`; no merged feature branch was reused. Documentation remains in English
+except the intentionally localized public captions. Private preparation material
+was neither restored nor linked.
+
+| Export | Actual duration | Bytes | Format | Decoded samples |
+| --- | --- | --- | --- | --- |
+| Original English, preserved | 147.517067 s | 1,874,308 | MP4/AVC, 1600 × 1120, silent | Existing source inspected |
+| Spanish UI / Spanish captions | 149.813500 s | 10,789,833 | MP4/AVC, 1600 × 1120, silent | 1,499 of 1,499 |
+| English UI / Brazilian Portuguese captions | 147.425333 s | 10,813,947 | MP4/AVC, 1600 × 1120, silent | 1,474 of 1,474 |
+
+The new videos are ignored local files at `artifacts/rp13/retailpulse-demo-es.mp4`
+and `artifacts/rp13/retailpulse-demo-pt-BR.mp4`. Tracked deliverables are
+[Spanish SRT](../demo_captions.es.srt), [Brazilian Portuguese SRT](../demo_captions.pt-BR.srt)
+and the [validation record](rp13/localization.json). The original English MP4 and
+English SRT were preserved byte-for-byte, including their original timing.
+
+Spanish was captured from the functioning existing UI on isolated ports 8017/8517,
+using Gold read-only and an explicitly deterministic provider. The supported Spanish
+April 2016 question was typed into the app; the genuine result shows **25.307**,
+CA_1, its period, Gold source, grounding and
+`deterministic:explicit_offline_mode`. The visible **0.18 s** is this offline
+request's actual displayed duration, not a model latency claim. No Ollama inference,
+model warm-up, training, raw-data build or new evaluation occurred. Browser renders
+and interactions were recorded directly; no translated answer was inserted into an
+image. Both owned capture attempts shut down their own servers; the final shutdown
+returned zero, reaped eight descendants and released both ports. No user demo was
+interrupted.
+
+The first capture succeeded in the app but its recording harness expected a
+browser-visible API response, whereas Streamlit calls the API server-side. The
+local harness was corrected to verify the rendered result and the walkthrough
+was captured again. No product code or regression test was changed. Existing UI
+limitations remain visible: the initial selected "All stores" / "All departments"
+chips retain English until interaction, after which they display Spanish. Technical
+names and existing Spanish model display labels were not edited.
+
+No caption-free original English recording was available. The Portuguese export
+copies only its application area, coordinates (0, 0, 1600, 1000), and replaces the
+separate bottom 120-pixel caption band. Spanish uses fresh caption-free footage.
+Neither export covers application content or stacks localized text over English
+captions. Portuguese is a caption language only; the UI remains English. There is
+no audio, narration or voice cloning. Local Chrome tools were used without paid
+services, cloud deployment or external model/browser downloads.
+
+Complete final MP4 sample streams were demuxed and decoded with Chrome WebCodecs,
+including a final decoder flush: zero errors and zero unprocessed samples. Each
+frame's band matched its expected localized cue; all 14 cues appeared once in
+order in each export. An initial real-time Portuguese playback observer dropped
+30 presentation frames while the Spanish encoder was running; it was not accepted
+as complete validation. The subsequent full sample-by-sample software decoding
+processed all 1,474 frames successfully. That playback observation is retained in
+the local audit, rather than represented as a zero-drop playback run.
+
+All six story scenes and all 28 caption bands were visually inspected from decoded
+final exports. Text fits inside the separate band; historical-data, partial
+`revenue_proxy`, deterministic-provider and scope notices remain visible. Figures
+reconcile to the existing aggregates and frozen metrics: 4,530,250; 1,477,827;
+25,307; WMAPE 74.825958% / 79.482353%; RMSE 2.431177 / 2.361194. Localized
+punctuation changes no value. The Windows/Linux/Docker caption describes prior
+recorded CI evidence, not a new remote run for this branch.
+
+Each new UTF-8 SRT is timed from its own final export's observed caption transitions,
+with less than 1 ms rounding. Spanish ends at 149.813 s; Portuguese at 147.425 s.
+No cue extends beyond its video. These companion SRTs should not be enabled as an
+extra overlay over the already burned-in band. Video timing is variable, about
+10 encoded frames per second; these are screen walkthroughs without audio.
+
+| Localization repository verification | Actual result |
+| --- | --- |
+| `python scripts/tasks.py verify` | PASS; 254 tests, zero failures, 2 existing warnings, 357.23 seconds |
+| Combined line/branch coverage | 88.15303430%; unchanged minimum 85% |
+| Ruff / scoped mypy / pip check | PASS / PASS (four modules) / PASS |
+| `python scripts/tasks.py security` | PASS; all 123 pinned packages, zero skips or known vulnerabilities |
+| Secret scan | PASS; all detectors active, 148 unchanged exact reviewed entries, zero unreviewed findings |
+| Internal Markdown links, images and anchors | 215 checked; zero errors |
+| `git diff --check` | PASS |
+| Preservation after all tests | 48 SHA-256 comparisons unchanged: Gold, all 45 frozen artifacts, original MP4 and English SRT; frozen file set unchanged |
+
+Only documentation and the two new caption tracks changed. Application behavior,
+metrics, dependencies, tests, coverage configuration and scanner exceptions remain
+unchanged. The two existing warnings concern Starlette/HTTPX and MLflow/SQLAlchemy.
+A fresh process-scoped pytest base directory avoided the earlier Windows temporary
+directory permission issue. Pytest interpreted Windows path backslashes through
+its options parser; the generated directory remained inside this workspace and
+was moved into ignored task evidence after the suite finished. No user directory
+or permissions were changed. The local helper now spells that path with forward
+slashes. This was temporary test-output placement, not a test failure or bypass.
+The independent human quick start and remote CI were not rerun.
+
+Production and technical inspection are complete. Independent human quick start
+remains **PENDING, deferred by the owner**. New localized owner approval is not
+claimed. Public video hosting, code license, coordinated version change and
+release publication still require separate authorization. No push, merge, upload,
+tag, release, license/version change or AWS work was performed.

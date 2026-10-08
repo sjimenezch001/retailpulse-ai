@@ -40,9 +40,18 @@ into images. All show real browser/Desktop renders and aggregate historical data
 | Overview, dark / Spanish | [Open screenshot](evidence/rp10_ui/overview_dark_es.png) | Same report; session language and theme validation |
 | Power BI Executive Overview | [Open screenshot](<evidence/rp08/Executive Overview.png>) | [Desktop, save/reopen and DAX checks](evidence/rp08_gate.md) |
 
-The [150-second script](web_demo.md#150-second-product-walkthrough),
-[English captions](demo_captions.en.srt) and [recording status](evidence/rp13_gate.md)
-remain distinct deliverables. Screenshots alone do not establish a completed video.
+The [150-second script](web_demo.md#150-second-product-walkthrough) and
+[English captions](demo_captions.en.srt) accompany the completed local English
+recording, whose content and presentation the owner approved on 2026-10-08.
+Its original bytes are preserved. [Spanish captions](demo_captions.es.srt) now
+accompany a genuine Spanish-interface recording; [Brazilian Portuguese captions](demo_captions.pt-BR.srt)
+accompany a separate export of the English walkthrough. Both were fully decoded
+and inspected across all six scenes and 14 caption cues per export; see
+[localization evidence](evidence/rp13/localization.json) and
+[recording status](evidence/rp13_gate.md#demo-localization--2026-10-08).
+The videos remain local and ignored. This does not establish independent human
+quick-start verification, which is PENDING and deferred by the owner, or authorize
+public hosting, a license, a version change or a release.
 
 ## Scope of the proof
 
