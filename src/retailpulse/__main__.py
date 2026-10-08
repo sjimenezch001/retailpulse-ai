@@ -31,8 +31,19 @@ def main():
     model = commands.add_parser("model", help="Compare LightGBM on validation, freeze and evaluate once")
     model.add_argument("--validation-only", action="store_true", help="Freeze selection without reading test actuals")
     commands.add_parser("export-bi", help="Export reconciled, local Power BI datasets from Gold")
+    ask = commands.add_parser("ask", help="Ask a grounded historical retail question")
+    ask.add_argument("question")
+    ask.add_argument("--json", dest="json_output", action="store_true")
+    evaluate = commands.add_parser("agent-eval", help="Evaluate golden questions against local Gold")
+    for command in (ask, evaluate):
+        command.add_argument("--provider", choices=["auto", "deterministic", "ollama"], default="auto")
+        command.add_argument("--ollama-model", help="Use an already installed local model; never downloads one")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command in ("ask", "agent-eval"):
+        from retailpulse.agent.cli import run
+
+        raise SystemExit(run(args, settings, root))
     if args.command == "export-bi":
         import json
 
