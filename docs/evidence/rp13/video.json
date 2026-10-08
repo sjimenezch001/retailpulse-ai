@@ -1,0 +1,65 @@
+{
+  "result": "COMPLETE",
+  "file": "artifacts/rp13/retailpulse-demo-150s.mp4",
+  "target_seconds": 150,
+  "bytes": 1874308,
+  "mime": "video/mp4;codecs=avc1",
+  "dimensions": [
+    1600,
+    1120
+  ],
+  "browser": "154.0.8037.98",
+  "capture_method": "Continuous live Playwright browser screenshots into Chrome Canvas MediaRecorder; no fabricated app content",
+  "caption_source": "docs/demo_captions.en.srt",
+  "frame_captures": 401,
+  "mode": "real historical M5",
+  "provider": "deterministic:explicit_offline_mode",
+  "ollama_calls": 0,
+  "model_warmup": false,
+  "audio": false,
+  "actions": [
+    {
+      "action": "architecture",
+      "completed_at_seconds": 20.312
+    },
+    {
+      "action": "overview",
+      "completed_at_seconds": 47.187
+    },
+    {
+      "action": "filter",
+      "completed_at_seconds": 58.703
+    },
+    {
+      "action": "reset",
+      "completed_at_seconds": 71.328
+    },
+    {
+      "action": "forecast",
+      "completed_at_seconds": 82.187
+    },
+    {
+      "action": "assistant",
+      "completed_at_seconds": 110.703
+    },
+    {
+      "action": "architecture",
+      "completed_at_seconds": 136.312
+    }
+  ],
+  "page_errors": [],
+  "duration": 147.517067,
+  "width": 1600,
+  "height": 1120,
+  "checked_playback_seconds": [
+    30,
+    61,
+    90,
+    119,
+    144
+  ],
+  "duration_note": "150-second script and capture schedule; measured encoded duration is 147.517067 seconds.",
+  "external_publication": false,
+  "tracked_in_git": false,
+  "review": "Decoded playback checked at 30, 61, 90, 119 and 144 seconds; source/provider labels and English captions preserved."
+}

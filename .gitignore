@@ -47,3 +47,7 @@ dashboards/powerbi/local.config.json
 /data/sample/*
 !/data/sample/README.md
 !/data/sample/provenance.json
+
+# Personal interview preparation is maintained outside the public repository.
+/docs/interview_questions.md
+/docs/interview_story.md

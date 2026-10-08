@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-08",
+  "scope": "Historical packaging validation before privacy reconstruction; replacement-candidate validation pending.",
+  "verification": {
+    "command": "python scripts/tasks.py verify",
+    "result": "PASS",
+    "tests_passed": 254,
+    "tests_failed": 0,
+    "warnings": 2,
+    "pytest_seconds": 409.94,
+    "ruff": "PASS",
+    "mypy": "PASS; four scoped modules",
+    "pip_check": "PASS",
+    "git_diff_check": "PASS",
+    "coverage": {
+      "covered_lines": 2717,
+      "num_statements": 3018,
+      "percent_covered": 88.15303430079156,
+      "percent_covered_display": "88.15",
+      "missing_lines": 301,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.02650762094102,
+      "percent_statements_covered_display": "90.03",
+      "num_branches": 772,
+      "num_partial_branches": 96,
+      "covered_branches": 624,
+      "missing_branches": 148,
+      "percent_branches_covered": 80.82901554404145,
+      "percent_branches_covered_display": "80.83"
+    },
+    "minimum_combined_coverage": 85
+  },
+  "security": {
+    "command": "python scripts/tasks.py security",
+    "result": "PASS",
+    "audited_packages": 123,
+    "known_vulnerabilities": 0,
+    "skipped_packages": 0,
+    "secrets": {
+      "scanner": "detect-secrets",
+      "version": "1.5.0",
+      "scope": "All tracked files plus non-ignored untracked files; current tree, not Git history",
+      "files_scanned": 319,
+      "reviewed_false_positives": 148,
+      "baseline_fingerprint_metadata": 244,
+      "unreviewed_findings": [],
+      "result": "PASS"
+    },
+    "includes_final_documentation_and_evidence": true,
+    "network_note": "A restricted-network audit attempt failed; the complete audit was rerun successfully with network access. No partial audit was accepted."
+  },
+  "build": {
+    "command": "python scripts/tasks.py build",
+    "result": "PASS",
+    "version": "0.1.0",
+    "formats": [
+      "wheel",
+      "sdist"
+    ],
+    "archives_inspected": true,
+    "synthetic_csv_files_per_archive": 6,
+    "real_data_or_models_in_archives": false
+  },
+  "preservation": {
+    "result": "PASS",
+    "gold_files": 1,
+    "frozen_model_artifacts": 45,
+    "sha256_compared": 46,
+    "changed_files": [],
+    "file_set_unchanged": true
+  },
+  "documentation": {
+    "internal_links_checked": 224,
+    "errors": []
+  }
+}

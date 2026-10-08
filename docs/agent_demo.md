@@ -74,8 +74,10 @@ store/department/item filters and grouping by day/store/department/horizon/
 demand level. Requests exceeding 100 output groups ask for a narrower scope.
 
 The assistant is stateless and supports conservative English patterns.
-Spanish, conversational follow-ups, arbitrary rankings, inventory advice
-and arbitrary query generation are not implemented. Ambiguous `sales`
+The CLI grammar remains English. The web API additionally supports the bounded
+Spanish forms described in [the web guide](web_demo.md); conversational follow-ups,
+arbitrary rankings, inventory advice and arbitrary query generation are not
+implemented. Ambiguous `sales`
 requires choosing units or a revenue measure. Unsupported extra conditions
 are not silently discarded.
 

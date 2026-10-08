@@ -1,93 +1,115 @@
-# Target architecture
+# Implemented architecture
 
-Public CSV → Python → Bronze/Silver/Gold → DuckDB → Power BI
+RetailPulse AI is a local Python application. pandas and PyArrow prepare the data;
+DuckDB owns analytical definitions. Power BI, approved assistant tools and the web
+demo consume those definitions. LightGBM and local MLflow/SQLite implement the
+frozen forecasting experiment. RP-00 through RP-11 are implemented; RP-12 AWS is
+optional and deferred. No Spark, PostgreSQL, MinIO or cloud deployment is implied.
 
-Python prepares public data in raw, cleaned and analytical layers. DuckDB
-provides the canonical business metrics and queries. RP-08 implements Power BI
-as a local consumer through deterministic, reconciled CSV imports.
+## Build time and serving time
 
-RP-01 established the repository, environment and standards. RP-02 through
-RP-06 now provide local source inspection, Parquet Bronze snapshots, pandas
-Silver transformations, DuckDB Gold marts and chronological forecasting
-baselines. These stages are now validated on the real M5 pilot (3 stores ×
-2 departments), with 3,575,322 daily rows and 4,530,250 reconciled units.
-Synthetic regression fixtures remain independent of the real dataset.
+```mermaid
+flowchart TB
+  subgraph BUILD[Explicit local build operations]
+    M5[M5 CSVs / local only] --> P[Profile / contracts / hashes]
+    P --> B[Bronze / immutable Parquet runs]
+    B --> S[Silver / pandas transformations and quality checks]
+    S --> G[Gold / DuckDB marts and dimensions]
+    G --> F[Fixed-origin baselines and LightGBM]
+    F --> ML[MLflow / local SQLite and ignored artifacts]
+    F -->|validated frozen forecasts| G
+    G --> X[Reconciled BI export / local CSVs]
+    X --> BI[Power BI / PBIP import model]
+  end
+  subgraph SERVE[Read-only analytical serving]
+    G --> T[Approved Gold tools / parameterized SQL]
+    Q[Question] --> R[Bounded router / validated scope]
+    R --> O[Optional Ollama / structured confirmation]
+    R --> A[Assistant orchestrator]
+    O -->|exact scope equality required| A
+    A --> T
+    D[Approved local metric documents] --> A
+    T --> API[FastAPI / typed responses and safe errors]
+    A --> API
+    API --> UI[Streamlit / deterministic presentation]
+  end
+  SYN[Packaged synthetic CSVs / checksum verified] --> SG[Separate disposable synthetic DuckDB]
+  SG -->|explicit synthetic mode only| T
+```
 
-Bronze → Silver identity links and checksums make source changes traceable.
-Failed quality checks prevent publication. Gold owns metric definitions for
-BI, agent and API consumers; baseline outputs share its forecast schema.
+Build commands may publish data and frozen results. Starting the demo does not
+run these commands. It queries existing real Gold read-only, or loads a separate
+synthetic package snapshot when explicitly requested. Missing real Gold never
+triggers synthetic substitution. See [source acquisition](data_source.md),
+[modeling protocol](modeling.md) and [web modes](web_demo.md).
 
-RP-07 adds reusable past-only features, a global LightGBM model and local
-MLflow/SQLite experiment tracking. Validation selects and freezes the design
-before the one-time test evaluation. ML and baseline forecasts coexist in Gold;
-real observations, model files and tracking artifacts remain local and ignored.
-See the [model card](model_card.md) and [gate evidence](evidence/rp07_gate.md).
+## Compact data and model map
 
-RP-08 adds `export-bi`: read-only Gold views produce daily store/department
-summaries, observed-week product summaries, backtest observations and shared
-dimensions. SQL checks run before export publication. Hashes, row counts and
-lineage are recorded in a local manifest; exports stay under ignored artifacts.
-Power Query's built-in CSV connector avoids a third-party DuckDB driver.
+```mermaid
+flowchart LR
+  DS[dim_store / store_id] --> SALES[mart_sales_daily / date + store_id + item_id]
+  DP[dim_product / item_id] --> SALES
+  DS --> FC[fact_forecast / model + split + origin + target + store + item]
+  DP --> FC
+  FC --> EV[forecast_evaluation / model + split + segment type + segment]
+  RUN[Pipeline and model-run metadata] -. lineage .-> SALES
+  RUN -. frozen provenance .-> FC
+```
 
-The versioned PBIP contains three native PBIR pages and a portable TMDL import
-model. Its 14 relationships filter from dimensions toward facts. Facts never
-join each other; daily and weekly grains use separate time dimensions. Explicit
-DAX derives weighted forecast metrics from additive error components. An
-intentionally disconnected model-comparison dimension replaces only the model
-selector during baseline comparisons. No model retraining occurs in BI.
+The diagram summarizes analytical grains, not every physical column. Sales facts
+are not directly joined to forecast facts in the BI model. Power BI uses separate
+daily and product-week facts and time dimensions, with dimension-to-fact filters.
+WMAPE is `sum(abs(actual - predicted)) / sum(actual)`; it is not an average of
+row percentages. RMSE derives from summed squared errors and observation counts.
+Missing-price revenue stays explicitly partial or unknown. The
+[metric catalog](metric_catalog.md), [dictionary](data_dictionary.md),
+[Gold SQL](../sql/gold) and [BI model guide](../dashboards/powerbi/dashboard_spec.md)
+are the detailed contracts.
 
-Desktop rendering, native interactions, 16 SQL-backed DAX checks, genuine
-screenshots and a saved/reopened local PBIX passed. The configured local
-project, caches and data-filled PBIX remain ignored. See the
-[dashboard specification](../dashboards/powerbi/dashboard_spec.md) and
-[RP-08 gate](evidence/rp08_gate.md).
+## Forecasting boundary
 
-RP-09 adds a reusable `Assistant.ask` core and local `ask` / `agent-eval`
-commands. Its path is English question → validated typed plan → one approved
-tool → deterministic response with provenance. `get_kpi` and `get_forecast`
-use fixed aggregate SQL templates against read-only Gold. Values are bound
-parameters; external DuckDB access is disabled. Response rows, query time,
-threads and memory are bounded. `search_metric_docs` quotes a fixed local
-corpus with actual file and line references.
+Validation selects among three predeclared candidates. The design and final model
+are frozen before the one-time test evaluation. All targets at an origin use only
+history available at that origin; recursive horizons reuse predictions, not
+held-out actuals. Historical LightGBM output and baseline forecasts coexist without
+replacing each other. The [model card](model_card.md) records improved WMAPE/MAE
+alongside worse RMSE. No future operational LightGBM service or replenishment
+policy is implemented. Native models and MLflow data stay local and ignored.
 
-An optional Ollama adapter proposes a strict typed tool selection over
-loopback HTTP. The proposal must match the application's validated scope.
-Provider text never supplies numerical answers, SQL or tool results.
-Deterministic routing remains available without a model or network access.
-Ollama 0.40.0 with `qwen2.5:1.5b` passed live validation: 22 genuine model
-selections, 14 preflight outcomes and zero fallbacks across 36 golden cases.
-Safe provider diagnostics distinguish connectivity, API/generation, strict
-validation and timeout failures. Preflight does not claim model usage, and
-explicit Ollama evaluation cannot count fallback as live success.
-Runtime traces contain metadata only and stay in ignored `artifacts/agent/`;
-public evidence contains aggregate findings, never real M5 row-level samples.
+## Assistant and API boundary
 
-The core has no CLI or HTTP dependency. RP-09 introduced no API endpoints,
-cloud services or new training. Early CI checks lint and tests with repository
-fixtures; this does not complete RP-11.
-See the [assistant safety contract](agent_safety.md) and [RP-09 gate](evidence/rp09_gate.md).
+The deterministic router establishes supported intent and validates scope first.
+Optional loopback-only Ollama confirms a closed structured selection that must
+match that scope exactly. It does not create SQL, calculate the answer or expand
+the supported grammar. The only tools are `get_kpi`, `get_forecast` and
+`search_metric_docs`. Fixed SQL templates bind validated values as parameters.
+DuckDB is read-only, external access and extension loading are disabled, and
+time, memory and result sizes are bounded. Document retrieval cites a fixed local
+corpus. Tools retrieve the figures; deterministic CLI/UI rendering presents them.
 
-RP-10 reuses that core behind local FastAPI routes: `/health`, `/metrics/summary`,
-`/forecast` and `/assistant/query`. Closed Pydantic schemas reject extra fields,
-SQL, paths and unsupported tool arguments. Read-only Gold tools retain their
-existing memory, time and output limits. The API adds bounded request bodies,
-query length, concurrency, sanitized errors and version-aware caching. Dataset
-identity and lineage accompany every analytical response. Ollama success and
-deterministic fallback remain distinct in both contracts and presentation.
+Preflight refusals and clarifications do not call the model. A validated selection
+reports `ollama:qwen2.5:1.5b`; fallback is labeled separately and cannot count as
+successful live validation. Questions are stateless. RP-10 adds bounded Spanish
+normalization at the API boundary; it is not general multilingual conversation.
+See [assistant safety](agent_safety.md), [orchestrator](../src/retailpulse/agent/orchestrator.py)
+and [provider validation](../src/retailpulse/agent/provider.py).
 
-Streamlit consumes only the API and renders Overview, Forecast, Ask RetailPulse
-and Architecture. It does not compute replacement business metrics. The
-forecast screen compares historical frozen models separately; the assistant
-has explicitly stateless questions. The process-owning `demo` launcher starts
-both services on loopback and stops them on Ctrl+C.
+FastAPI exposes `/health`, `/ready`, `/metrics/summary`, `/forecast` and
+`/assistant/query`. Streamlit consumes the API; it does not calculate replacement
+business metrics. The launcher owns its two servers and binds them to loopback.
+Language and theme choices are session-local. Neither the application nor its
+synthetic-only non-root container is an authenticated public production service.
 
-M5 → Bronze → Silver → Gold/DuckDB → Forecasting/MLflow → Power BI / FastAPI /
-Streamlit / Grounded AI Assistant.
+## Engineering and evidence
 
-Real mode uses existing local Gold. Explicit synthetic mode loads small
-distribution-safe package snapshots into a separate ignored serving database.
-Synthetic identifiers, metadata, document retrieval and UI labeling stay
-isolated. Missing real Gold produces a degraded state, never synthetic figures
-under a real label. Neither mode retrains models or changes real Gold. AWS,
-RP-11 and RP-13 remain outside this stage. See the [web demo](web_demo.md),
-[API examples](api_examples.md) and [RP-10 evidence](evidence/rp10_gate.md).
+Checksum-protected CSVs have explicit Git byte-preservation rules. The scanner
+runs in UTF-8 on both platforms with exact reviewed exceptions. Regression,
+coverage, dependency and secret checks fail closed. The
+[RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08) links successful
+Windows/Linux/Docker runs and the active main ruleset. Those remote results apply
+to the recorded commits, not unpublished portfolio changes. Structured logs
+contain allowlisted operational metadata, not raw questions or provider bodies.
+
+Use the [portfolio evidence index](portfolio_evidence.md) for genuine screenshots,
+measured results and the distinction between historical real data, simulated
+portable forecasts and actual live-model validation.

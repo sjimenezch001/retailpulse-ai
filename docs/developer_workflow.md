@@ -77,7 +77,9 @@ files live in a disposable tmpfs. No mounts expose host datasets. Shutdown remov
 only the named project's containers; never use global prune commands. Real mode
 is rejected by the container launcher. Ollama remains optional and is not included.
 
-Docker was not installed during local RP-11 acceptance. Static inspection is not
-a build or startup test. The existing CI workflow has an actual image build,
-health wait, API/UI smoke test, non-root check and unconditional project cleanup;
-those results remain pending until an authorized remote run.
+Docker was not installed during local RP-11 acceptance. Genuine image build,
+health wait, API/UI smoke test, non-root check and cleanup subsequently passed
+in both the corrected PR and post-merge CI. See the dated
+[RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08).
+These results apply to the recorded revisions; local portfolio commits still
+require their own authorized remote checks.

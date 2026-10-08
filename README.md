@@ -1,191 +1,142 @@
 # RetailPulse AI
 
-Retail demand analytics platform. It turns historical sales, calendar data and
-prices into verifiable business metrics for comparing stores and departments,
-reducing fragmented analysis and inconsistent business definitions.
+[![Validation](https://github.com/sjimenezch001/retailpulse-ai/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/sjimenezch001/retailpulse-ai/actions/workflows/validate.yml)
+[Resumo em português](README.pt-BR.md)
 
-**Status: RP-11 local hardening implemented; container build and remote acceptance PENDING.**
-RP-10 remains validated, including real browser and Ollama acceptance.
-FastAPI and Streamlit expose analytics endpoints and four portfolio tabs, with
-separate real Gold and explicitly synthetic portable modes. See the
-[web demo guide](docs/web_demo.md) and [RP-10 gate](docs/evidence/rp10_gate.md).
-The UI includes session-persistent English/Spanish and light/dark selectors,
-structured grounded answer cards and a restrained neutral visual design.
+**Retail demand analytics with traceable figures and honest forecast comparisons.**
+A personal portfolio project for commercial managers, BI analysts and planners who
+need consistent answers about store demand, forecast error and data provenance.
+It connects historical sales to one analytical source, then exposes it through
+Power BI, a local web application and a bounded assistant.
 
-RP-09 engineering and full gate passed, including live Ollama validation.
-RP-00–RP-08 remain validated. The local grounded assistant passes all 36
-golden questions against synthetic and real M5 Gold. The strict live run with
-Ollama 0.40.0 / `qwen2.5:1.5b` passed with 22 validated model calls, 14
-preflight outcomes and zero fallback cases.
-The frozen LightGBM model scores 74.825958% test WMAPE versus 79.482353% for
-rolling mean; RMSE is worse (2.431177 versus 2.361194). Selection used validation
-only. RP-00 and RP-01 are complete. Full inputs, forecasts, model files and
-MLflow artifacts remain local and Git-ignored. RP-08 adds three native Power BI
-pages, a reconciled serving layer and a validated local PBIX. The PBIX was saved
-and reopened in Desktop; data-filled binaries and CSV exports remain ignored.
-See the [dashboard gate and screenshots](docs/evidence/rp08_gate.md).
+![Genuine real-M5 Overview: observed units, price coverage, historical scope and source limitations](docs/evidence/rp10_ui/overview_light_en.png)
 
-Stack: Python 3.12, pandas, PyArrow, DuckDB, Pydantic and PyYAML.
-Modeling: LightGBM and local MLflow tracking with SQLite.
-BI: Power BI Desktop, native PBIR reports and a TMDL import model.
-Assistant: approved read-only Gold tools, deterministic document retrieval and
-an optional loopback-only Ollama adapter; no additional dependencies.
-Web demo: FastAPI, Uvicorn, Streamlit, HTTPX and Altair, bound to localhost.
-Development: pytest/coverage, Ruff, scoped strict mypy, pip-audit and detect-secrets.
-Packaging: setuptools and pip; a synthetic-only non-root Docker definition.
-See [developer tasks](docs/developer_workflow.md), [security](docs/security.md),
-[observability](docs/observability.md) and the [RP-11 gate](docs/evidence/rp11_gate.md).
+Actual browser capture from the [validated bilingual UI](docs/evidence/rp10_ui_gate.md).
+This is historical M5 data, not a live customer deployment.
 
-## Repository structure
+## What it demonstrates
 
-```text
-config/local.yaml      Relative paths and the derived real M5 pilot
-data/contracts/        Inspected source manifest with hashes and profiles
-data/sample/           Local-only M5 samples; tracked guidance and provenance
-notebooks/             Thin profiling notebook
-sql/{silver,gold,bi,checks,queries}/
-src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/, agent/, api/
-app/streamlit_app.py    Four-tab portfolio UI; consumes only the local API
-src/retailpulse/api/synthetic/  Distribution-safe portable snapshots
-tests/                 Synthetic fixtures, unit, integration and SQL checks
-docs/                  Source, metrics, dictionary, baselines and gate evidence
-traces/sample.json     Redacted illustrative assistant trace; runtime traces are ignored
-dashboards/powerbi/     Portable PBIP/PBIR/TMDL, measures and reproducible build tools
-scripts/verify.py      Local checks using the invoking Python environment
-.github/workflows/     Windows/Linux checks and synthetic container acceptance
-pyproject.toml         Metadata, dependencies and tool configuration
-requirements.txt       Exact versions from the validated environment
-.env.example           Template without credentials
+- Reproducible Bronze/Silver/Gold processing, quality gates and canonical SQL metrics.
+- Fixed-origin forecasting, validation-only model selection and frozen backtests.
+- Three Power BI pages and a FastAPI/Streamlit demo with English/Spanish and light/dark themes.
+- Grounded answers with explicit period, filters, source, provider and limitations.
+
+## Measured results
+
+| Evidence | Result and boundary |
+| --- | --- |
+| [Historical M5 pilot](docs/evidence/rp09_real_acceptance.json) | **4,530,250 observed units**, across three stores and two departments; observations end 2016-05-22. |
+| [Frozen test metrics](docs/model_card.md#final-one-time-test) | LightGBM **74.825958% WMAPE**, rolling mean **79.482353%**. MAE improves; RMSE worsens (**2.431177 vs 2.361194**). No measured revenue uplift. |
+| [Actual local Ollama evaluation](docs/evidence/rp09_live_evaluation.json) | **36 expected outcomes passed**: **22 validated model calls**, **14 preflight outcomes**, **zero fallback**. A curated evaluation, not universal accuracy. |
+| [Corrected RP-11 verification](docs/evidence/rp11/ci_corrections.json) | **254 passing tests**, **88.15%** combined line/branch coverage, **85%** enforced minimum. |
+| [Post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078) | Windows, Linux and genuine Docker build/runtime checks passed at `593dc50`. New local portfolio commits are not claimed remotely validated. |
+
+The [claim-to-evidence index](docs/portfolio_evidence.md) links the measurements,
+screenshots and caveats. [Current packaging acceptance](docs/evidence/rp13_gate.md)
+separates completed checks from human and release work still pending.
+
+## Actual architecture
+
+```mermaid
+flowchart LR
+  M5[M5 CSVs] --> B[Bronze / Parquet]
+  B --> S[Silver / pandas]
+  S --> G[Gold / DuckDB]
+  G --> F[Forecasting / local MLflow]
+  F -->|frozen results| G
+  G --> BI[Power BI]
+  G --> T[Approved read-only tools]
+  T --> API[FastAPI]
+  API --> UI[Streamlit]
+  R[Bounded router + optional Ollama confirmation] --> T
 ```
 
-Raw and processed data, real M5 samples and generated artifacts are excluded from Git.
-Real row-level samples are generated locally and are not distributed in the repository.
-Synthetic source fixtures are under `tests/fixtures/`; derived portable snapshots
-are packaged under `src/retailpulse/api/synthetic/`.
+The router establishes approved scope; optional local Ollama confirms the structured
+selection. Tools retrieve figures and deterministic presentation renders the answer.
+This is not unrestricted text-to-SQL or general-purpose conversation.
+[Architecture and data grains](docs/architecture.md) distinguish pipeline writes
+from read-only serving. Spark, PostgreSQL, MinIO and AWS are not deployed.
 
-## Quick Start — Windows PowerShell
+## Portable quick start
 
-From the repository root, use Python 3.12 (validated with 3.12.10).
-Reuse the existing `.venv`; only create one if absent with `py -3.12 -m venv .venv`.
+Prerequisites: Git, **Python 3.12**, and internet for installing pinned packages.
+The first demo needs **no Kaggle data, Ollama, model training or Docker**.
+
+Windows PowerShell:
 
 ```powershell
+git clone https://github.com/sjimenezch001/retailpulse-ai.git
+cd retailpulse-ai
+py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe scripts/tasks.py setup
-.\.venv\Scripts\python.exe scripts/tasks.py verify
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe -m pip check
-```
-
-Alternatively, `.\.venv\Scripts\python.exe scripts/verify.py` runs all local
-checks. Tests require no real dataset, network access or credentials.
-`pyproject.toml` is the primary configuration; `requirements.txt` pins runtime
-and development dependencies. The project uses an editable `src/` installation.
-
-## Local portfolio demo
-
-```powershell
-# Existing real Gold and local Ollama:
-.\.venv\Scripts\python.exe -m retailpulse demo
-# Portable demo without Kaggle or Ollama:
 .\.venv\Scripts\python.exe -m retailpulse demo --mode synthetic --provider deterministic
 ```
 
-Open <http://127.0.0.1:8501>; API docs are at <http://127.0.0.1:8000/docs>.
-Press Ctrl+C to stop both servers. After activating the environment, the startup
-command is `python -m retailpulse demo`. Missing real Gold is reported explicitly;
-synthetic data is never silently substituted. See the [150-second demo script,
-mode details and screenshots](docs/web_demo.md).
+Linux/macOS environment commands, after cloning:
 
-## Real-data pipeline
-
-Follow [source acquisition instructions](docs/data_source.md) to obtain the three
-official M5 CSVs and extract them into `data/raw/m5/`. Do not copy synthetic
-fixtures there. Then run the stages in order:
-
-```powershell
-.\.venv\Scripts\python.exe -m retailpulse profile --select-pilot --sample
-.\.venv\Scripts\python.exe -m retailpulse bronze
-.\.venv\Scripts\python.exe -m retailpulse silver
-.\.venv\Scripts\python.exe -m retailpulse gold
-.\.venv\Scripts\python.exe -m retailpulse baseline
-.\.venv\Scripts\python.exe -m retailpulse model --validation-only
-.\.venv\Scripts\python.exe -m retailpulse model
-.\.venv\Scripts\python.exe -m retailpulse query 01_sales_trend
-.\.venv\Scripts\python.exe -m retailpulse query 03_forecast_errors
+```bash
+python3.12 -m venv .venv
+.venv/bin/python scripts/tasks.py setup
+.venv/bin/python -m retailpulse demo --mode synthetic --provider deterministic
 ```
 
-Profiling derived `CA_1`, `CA_2`, `CA_3` and `FOODS_1`, `FOODS_2` from the
-real source identifiers. This pilot contains 614 items, 1,842 series and
-3,575,322 daily rows. Missing inputs still produce a pending manifest and stop
-downstream stages; tests remain independent of the local real data.
-Configuration paths are relative to the repository root. Use
-`--config config/local.yaml` before the subcommand to select configuration.
-For reproducible freshness, use `gold --as-of YYYY-MM-DD` with a date no earlier
-than the latest sales date. Baselines default to 28-day validation/test holdouts
-and a 28-day future horizon, with visible training boundaries.
-The model command compares three candidates on validation, freezes the winner,
-and evaluates test once. Reruns reuse verified artifacts and preserve baseline
-outputs. See the [modeling protocol](docs/modeling.md) for the immutable plan,
-past-only features and interrupted-evaluation handling.
+Open [Streamlit](http://127.0.0.1:8501) or [API docs](http://127.0.0.1:8000/docs).
+Press **Ctrl+C** to stop both servers. Use `--api-port 8013 --ui-port 8513` if the
+defaults are occupied. In Ask RetailPulse, ask: **How many units did SYN_A sell
+during all observed dates?** Expected: **378 synthetic units**, explicitly offline.
+The portable dataset and its simulated forecast comparison are not real model
+performance evidence. [Mode details and troubleshooting](docs/web_demo.md).
 
-Read the [metric catalog](docs/metric_catalog.md), [data dictionary](docs/data_dictionary.md),
-[baseline protocol](docs/baselines.md) and [sprint report](docs/evidence/DATA_BACKBONE_SPRINT_REPORT.md).
-The [model card](docs/model_card.md) and [RP-07 gate](docs/evidence/rp07_gate.md)
-record candidate selection, the final test, segment regressions and MLflow runs.
-`revenue_proxy` is a proxy, not audited revenue; M5 provides no real inventory.
-Early CI is a guardrail, not completion of RP-11.
+These commands are checked in an [isolated automated reproduction](docs/evidence/rp13_gate.md#clean-environment-reproduction).
+Independent verification by another person remains pending. The badge follows
+published `main`; portfolio changes remain local until reviewed and authorized.
 
-## Local Power BI dashboard
+## Real-data mode and entry points
 
-With the existing RP-07 Gold database, export the BI data and configure an
-ignored local project without rerunning earlier stages:
+With existing local Gold, run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m retailpulse export-bi
-.\.venv\Scripts\python.exe dashboards/powerbi/prepare_desktop.py
+.\.venv\Scripts\python.exe -m retailpulse demo --mode real --provider deterministic
 ```
 
-Open `artifacts/powerbi/project/RetailPulse.pbip` in Power BI Desktop and refresh.
-The pages are **Executive Overview**, **Store & Product Diagnostics** and
-**Forecast Performance**. The import uses 11,646 daily summaries, 512,076
-product-week summaries and 412,608 historical forecast observations. Gold
-remains the canonical metric source. WMAPE uses a ratio of totals, partial
-revenue is labeled, and the model's RMSE regression remains visible.
+For a fresh real-data build, follow [M5 acquisition and license boundaries](docs/data_source.md)
+and the [ordered build commands](docs/web_demo.md#real-data-build-and-entry-points).
+Real inputs, populated databases and frozen model binaries are not distributed.
+Missing Gold is reported explicitly; it never silently becomes synthetic data.
 
-Follow the [build guide](dashboards/powerbi/BUILD_GUIDE.md),
-[dashboard specification](dashboards/powerbi/dashboard_spec.md) and
-[DAX measure contract](dashboards/powerbi/measures.md). The local
-`dashboards/powerbi/RetailPulse.pbix` contains real data and is not distributed.
-No Power BI sign-in or cloud publication is required.
+| Entry point | Guide |
+| --- | --- |
+| Power BI Desktop | [Export and prepare the local PBIP](dashboards/powerbi/BUILD_GUIDE.md); data-filled PBIX stays local |
+| FastAPI | [Requests and contracts](docs/api_examples.md); `/health`, `/ready`, `/metrics/summary`, `/forecast`, `/assistant/query` |
+| Assistant CLI / optional Ollama | [Examples and verified live-model activation](docs/agent_demo.md); existing `qwen2.5:1.5b` only when installed |
+| Product demo | [150-second walkthrough and captions](docs/web_demo.md#150-second-product-walkthrough) |
 
-## Local grounded assistant
-
-Use the existing Gold snapshot without rerunning the pipeline or models:
+## Engineering quality
 
 ```powershell
-.\.venv\Scripts\python.exe -m retailpulse ask "How many units did CA_1 sell during April 2016?"
-.\.venv\Scripts\python.exe -m retailpulse ask "Compare LightGBM and rolling mean WMAPE on the test period"
-.\.venv\Scripts\python.exe -m retailpulse ask "What does revenue_proxy mean?"
-.\.venv\Scripts\python.exe -m retailpulse agent-eval
+.\.venv\Scripts\python.exe scripts/tasks.py verify
+.\.venv\Scripts\python.exe scripts/tasks.py security
+.\.venv\Scripts\python.exe scripts/tasks.py build
 ```
 
-The approved tools are `get_kpi`, `get_forecast` and `search_metric_docs`.
-Every numerical answer includes its filters, period and Gold provenance.
-The first example returns **25,307 units** for April 2016 in `CA_1`.
-Questions about current sales, inventory or causation receive explicit
-limitations. English routing supports documented question patterns and asks
-for clarification when scope is ambiguous.
+Verification includes Ruff, scoped strict mypy, synthetic regressions, coverage and
+dependency compatibility. Security scans fail on unknown findings. Approved tools
+use parameterized SQL, read-only DuckDB, disabled external access and bounded
+resources. [Security and active main ruleset](docs/security.md),
+[observability](docs/observability.md), [Docker workflow](docs/developer_workflow.md#portable-container).
+Docker was validated in GitHub Actions; Docker Desktop is not required locally.
 
-`--provider deterministic` disables the Ollama probe. By default the assistant
-checks the local endpoint and falls back explicitly if no installed model can
-be used. It never downloads models. `ask --json` exposes the typed result.
-Explicit `--provider ollama --ollama-model qwen2.5:1.5b` requires a live
-selection for routed requests; fallback returns a nonzero exit code. Safe
-provider diagnostics distinguish connectivity, timeout, generation and
-validation failures. Cold loading uses a bounded 30-second chat timeout.
-Runtime traces and evaluation outputs stay under ignored `artifacts/agent/`.
-See the [demo and activation guide](docs/agent_demo.md),
-[safety contract](docs/agent_safety.md) and [RP-09 evidence](docs/evidence/rp09_gate.md).
-The reusable core is ready for a future API adapter; RP-10 has not started.
+## Limitations and next steps
 
-See the [product brief](docs/product_brief.md), [scope](docs/scope.md) and
-[target architecture](docs/architecture.md).
+Historical sales are not current demand or inventory; zero sales do not prove
+stockouts. `revenue_proxy` is not audited revenue, missing prices remain missing,
+and spikes do not establish causes. Forecast gains on this pilot do not prove
+business revenue impact. The local app has no public-service authentication;
+the assistant is stateless with bounded English and Spanish patterns.
+
+RP-00 through RP-11 are implemented. **RP-12 AWS is optional and deferred**.
+RP-13 prepares the portfolio; independent human quick-start verification and
+release approval remain explicit checkpoints. See the [release checklist](docs/release_checklist.md)
+and [draft v1.0.0 notes](docs/release_notes_v1.0.0.md). Package version remains
+`0.1.0`; no release or tag is published by this work. No code license is declared
+yet: an owner decision is required. M5 competition-data permissions are separate.
