@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "browser": "154.0.8037.98",
+  "page_errors": [],
+  "same_session_language_and_theme_switches": "PASS",
+  "independent_session_defaults": "PASS",
+  "compact_horizontal_overflow": false,
+  "live_spanish_question": "ollama:qwen2.5:1.5b",
+  "answer_units": 25307,
+  "answer_after_language_switch_units": 25307,
+  "screenshots": [
+    "architecture_dark_en.png",
+    "assistant_dark_en.png",
+    "assistant_light_es.png",
+    "forecast_dark_es.png",
+    "overview_compact_dark_en.png",
+    "overview_dark_es.png",
+    "overview_light_en.png"
+  ]
+}

@@ -51,6 +51,33 @@ distributed.
 
 ## What to show
 
+The header provides session-persistent **English / Español** and **Light / Dark**
+selectors. The visual refinement uses neutral light/charcoal surfaces, restrained
+chart colors and local Segoe UI Variable / Segoe UI system fonts, inspired by
+the typography and restrained presentation of [ElevenLabs](https://elevenlabs.io/).
+No remote fonts, paid UI packages or external model services are loaded.
+Dates use MM/DD/YYYY in English and DD/MM/YYYY in Spanish; explicit date fields
+validate against the observed period. Numeric display uses the selected locale,
+including chart axes and tooltips, without changing the underlying values.
+
+Assistant cards now render the existing typed result: a short business sentence,
+prominent value, period, filters, source and grounding status. Provider identity
+and duration are secondary, while complete provenance and diagnostics remain
+inside the details expander. Forecast comparisons and documentation have their
+own structured views. Reviewed documentation translations are keyed to exact
+source excerpts; unknown quotations retain their original English with an
+explicit label, preserving genuine citations.
+
+Spanish question support is deliberately bounded. The API recognizes four
+intent families: store units for an explicit month/year or ISO interval,
+LightGBM test WMAPE or comparison with rolling mean, the revenue_proxy definition,
+and global data freshness. Full-string allowlist matches normalize into the
+existing RP-09 router; extra conditions are never silently discarded. Unsupported
+Spanish asks for clarification. English inputs and contracts are unchanged.
+Example questions are localized in the UI. This is not unrestricted multilingual
+conversation support. Theme/language choices do not rewrite configuration files
+or affect another browser session.
+
 - **Overview:** units, price coverage, partial known-price revenue, spike flags,
   exact snapshot freshness, daily trend and store/department comparisons. Date,
   store and department filters use API results. Daily chart spans at most 90 days;
