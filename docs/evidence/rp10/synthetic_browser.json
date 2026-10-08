@@ -1,0 +1,12 @@
+{
+  "mode": "synthetic",
+  "tabs": 4,
+  "store_filter": "SYN_A",
+  "units_before": "1,386",
+  "units_after": "378",
+  "forecast_comparison": "passed",
+  "assistant": "deterministic",
+  "browser": "154.0.8037.98",
+  "page_errors": [],
+  "result": "PASS"
+}

@@ -1,0 +1,12 @@
+{
+  "mode": "real",
+  "tabs": 4,
+  "store_filter": "CA_1",
+  "units_before": "4,530,250",
+  "units_after": "1,477,827",
+  "forecast_comparison": "passed",
+  "assistant": "ollama",
+  "browser": "154.0.8037.98",
+  "page_errors": [],
+  "result": "PASS"
+}

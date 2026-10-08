@@ -1,0 +1,13 @@
+{
+  "interrupt": "Ctrl+C in each launcher terminal",
+  "launched_processes_checked": 12,
+  "remaining_owned_processes": 0,
+  "ports_after_shutdown": {
+    "8000": "closed",
+    "8501": "closed",
+    "8001": "closed",
+    "8502": "closed"
+  },
+  "protected_files_unchanged": 46,
+  "result": "PASS"
+}

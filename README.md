@@ -4,7 +4,12 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-09 engineering PASS; full gate PASS, including live Ollama validation.**
+**Status: RP-10 engineering PASS; full gate PASS, including real browser and Ollama validation.**
+FastAPI and Streamlit expose four endpoints and four portfolio tabs, with
+separate real Gold and explicitly synthetic portable modes. See the
+[web demo guide](docs/web_demo.md) and [RP-10 gate](docs/evidence/rp10_gate.md).
+
+RP-09 engineering and full gate passed, including live Ollama validation.
 RP-00–RP-08 remain validated. The local grounded assistant passes all 36
 golden questions against synthetic and real M5 Gold. The strict live run with
 Ollama 0.40.0 / `qwen2.5:1.5b` passed with 22 validated model calls, 14
@@ -22,6 +27,7 @@ Modeling: LightGBM and local MLflow tracking with SQLite.
 BI: Power BI Desktop, native PBIR reports and a TMDL import model.
 Assistant: approved read-only Gold tools, deterministic document retrieval and
 an optional loopback-only Ollama adapter; no additional dependencies.
+Web demo: FastAPI, Uvicorn, Streamlit, HTTPX and Altair, bound to localhost.
 Development: pytest and Ruff. Packaging: setuptools and pip.
 
 ## Repository structure
@@ -32,8 +38,9 @@ data/contracts/        Inspected source manifest with hashes and profiles
 data/sample/           Local-only M5 samples; tracked guidance and provenance
 notebooks/             Thin profiling notebook
 sql/{silver,gold,bi,checks,queries}/
-src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/, agent/
-                       api/ reserved for a later stage
+src/retailpulse/        data/, ingestion/, transforms/, quality/, features/, models/, bi/, agent/, api/
+app/streamlit_app.py    Four-tab portfolio UI; consumes only the local API
+src/retailpulse/api/synthetic/  Distribution-safe portable snapshots
 tests/                 Synthetic fixtures, unit, integration and SQL checks
 docs/                  Source, metrics, dictionary, baselines and gate evidence
 traces/sample.json     Redacted illustrative assistant trace; runtime traces are ignored
@@ -47,7 +54,8 @@ requirements.txt       Exact versions from the validated environment
 
 Raw and processed data, real M5 samples and generated artifacts are excluded from Git.
 Real row-level samples are generated locally and are not distributed in the repository.
-The synthetic fixtures are stored only under `tests/fixtures/`.
+Synthetic source fixtures are under `tests/fixtures/`; derived portable snapshots
+are packaged under `src/retailpulse/api/synthetic/`.
 
 ## Quick Start — Windows PowerShell
 
@@ -66,6 +74,21 @@ Alternatively, `.\.venv\Scripts\python.exe scripts/verify.py` runs all local
 checks. Tests require no real dataset, network access or credentials.
 `pyproject.toml` is the primary configuration; `requirements.txt` pins runtime
 and development dependencies. The project uses an editable `src/` installation.
+
+## Local portfolio demo
+
+```powershell
+# Existing real Gold and local Ollama:
+.\.venv\Scripts\python.exe -m retailpulse demo
+# Portable demo without Kaggle or Ollama:
+.\.venv\Scripts\python.exe -m retailpulse demo --mode synthetic --provider deterministic
+```
+
+Open <http://127.0.0.1:8501>; API docs are at <http://127.0.0.1:8000/docs>.
+Press Ctrl+C to stop both servers. After activating the environment, the startup
+command is `python -m retailpulse demo`. Missing real Gold is reported explicitly;
+synthetic data is never silently substituted. See the [150-second demo script,
+mode details and screenshots](docs/web_demo.md).
 
 ## Real-data pipeline
 
