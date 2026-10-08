@@ -15,7 +15,7 @@ Synthetic regression fixtures remain independent of the real dataset.
 
 Bronze → Silver identity links and checksums make source changes traceable.
 Failed quality checks prevent publication. Gold owns metric definitions for
-BI and agent consumers and the future API; baseline outputs share its forecast schema.
+BI, agent and API consumers; baseline outputs share its forecast schema.
 
 RP-07 adds reusable past-only features, a global LightGBM model and local
 MLflow/SQLite experiment tracking. Validation selects and freezes the design
@@ -62,8 +62,32 @@ explicit Ollama evaluation cannot count fallback as live success.
 Runtime traces contain metadata only and stay in ignored `artifacts/agent/`;
 public evidence contains aggregate findings, never real M5 row-level samples.
 
-The core has no CLI or HTTP dependency and can be reused by RP-10 without
-rewriting tool contracts. No API endpoints, cloud services or new training
-were introduced. API and AWS remain future stages. Early CI checks lint and
-tests with repository fixtures; this does not complete RP-11.
+The core has no CLI or HTTP dependency. RP-09 introduced no API endpoints,
+cloud services or new training. Early CI checks lint and tests with repository
+fixtures; this does not complete RP-11.
 See the [assistant safety contract](agent_safety.md) and [RP-09 gate](evidence/rp09_gate.md).
+
+RP-10 reuses that core behind local FastAPI routes: `/health`, `/metrics/summary`,
+`/forecast` and `/assistant/query`. Closed Pydantic schemas reject extra fields,
+SQL, paths and unsupported tool arguments. Read-only Gold tools retain their
+existing memory, time and output limits. The API adds bounded request bodies,
+query length, concurrency, sanitized errors and version-aware caching. Dataset
+identity and lineage accompany every analytical response. Ollama success and
+deterministic fallback remain distinct in both contracts and presentation.
+
+Streamlit consumes only the API and renders Overview, Forecast, Ask RetailPulse
+and Architecture. It does not compute replacement business metrics. The
+forecast screen compares historical frozen models separately; the assistant
+has explicitly stateless questions. The process-owning `demo` launcher starts
+both services on loopback and stops them on Ctrl+C.
+
+M5 → Bronze → Silver → Gold/DuckDB → Forecasting/MLflow → Power BI / FastAPI /
+Streamlit / Grounded AI Assistant.
+
+Real mode uses existing local Gold. Explicit synthetic mode loads small
+distribution-safe package snapshots into a separate ignored serving database.
+Synthetic identifiers, metadata, document retrieval and UI labeling stay
+isolated. Missing real Gold produces a degraded state, never synthetic figures
+under a real label. Neither mode retrains models or changes real Gold. AWS,
+RP-11 and RP-13 remain outside this stage. See the [web demo](web_demo.md),
+[API examples](api_examples.md) and [RP-10 evidence](evidence/rp10_gate.md).

@@ -1,0 +1,219 @@
+{
+  "checked_at": "2026-10-08T02:56:45.193978+00:00",
+  "requests": {
+    "health": {
+      "http_status": 200,
+      "seconds": 0.13
+    },
+    "summary": {
+      "http_status": 200,
+      "seconds": 0.193
+    },
+    "april_ca1": {
+      "http_status": 200,
+      "seconds": 0.867
+    },
+    "forecast": {
+      "http_status": 200,
+      "seconds": 0.115
+    },
+    "deterministic": {
+      "http_status": 200,
+      "seconds": 0.205,
+      "provider": "deterministic:explicit_offline_mode",
+      "request_id": "d11a8728-6bae-4d08-87ab-3b3be73ad73c",
+      "diagnostic": {
+        "status": "not_requested",
+        "stage": null,
+        "category": null,
+        "http_status": null,
+        "elapsed_ms": 0.0,
+        "load_ms": null,
+        "total_ms": null,
+        "prompt_tokens": null,
+        "generated_tokens": null,
+        "validation_errors": 0,
+        "changed_fields": []
+      },
+      "units": 25307,
+      "grounding_validated": true
+    },
+    "ollama": {
+      "http_status": 200,
+      "seconds": 8.947,
+      "provider": "ollama:qwen2.5:1.5b",
+      "request_id": "e44a7dd0-4719-44ac-a55d-f6e33a10b699",
+      "diagnostic": {
+        "status": "succeeded",
+        "stage": "complete",
+        "category": null,
+        "http_status": null,
+        "elapsed_ms": 8625.0,
+        "load_ms": 11.7721,
+        "total_ms": 8574.9213,
+        "prompt_tokens": 229,
+        "generated_tokens": 111,
+        "validation_errors": 0,
+        "changed_fields": []
+      },
+      "units": 25307,
+      "grounding_validated": true
+    }
+  },
+  "invalid_query_http_status": 422,
+  "result": "PASS",
+  "dataset": {
+    "mode": "real",
+    "label": "Real M5 historical pilot",
+    "dataset_version": "real:20f4dae75fff8e79204e:28370029f7dd8c91d9f2",
+    "generation_timestamp": "2026-10-07T21:33:38.610052+00:00",
+    "lineage": {
+      "source_table": "pipeline_metadata",
+      "gold_run_id": "20f4dae75fff8e79204e",
+      "source_ingestion_ts": "2026-10-07T21:29:04.505820+00:00",
+      "generated_at": "2026-10-07T21:33:38.610052+00:00",
+      "observed_period": {
+        "start": "2011-01-29",
+        "end": "2016-05-22"
+      },
+      "as_of_date": "2026-10-07",
+      "data_freshness": 3790
+    },
+    "stores": [
+      "CA_1",
+      "CA_2",
+      "CA_3"
+    ],
+    "departments": [
+      "FOODS_1",
+      "FOODS_2"
+    ],
+    "forecast_windows": [
+      {
+        "model": "last_value",
+        "split": "future",
+        "start": "2016-05-23",
+        "end": "2016-06-19",
+        "max_horizon": 28
+      },
+      {
+        "model": "last_value",
+        "split": "test",
+        "start": "2016-04-25",
+        "end": "2016-05-22",
+        "max_horizon": 28
+      },
+      {
+        "model": "last_value",
+        "split": "validation",
+        "start": "2016-03-28",
+        "end": "2016-04-24",
+        "max_horizon": 28
+      },
+      {
+        "model": "lightgbm_global_v1",
+        "split": "test",
+        "start": "2016-04-25",
+        "end": "2016-05-22",
+        "max_horizon": 28
+      },
+      {
+        "model": "lightgbm_global_v1",
+        "split": "validation",
+        "start": "2016-03-28",
+        "end": "2016-04-24",
+        "max_horizon": 28
+      },
+      {
+        "model": "rolling_mean",
+        "split": "future",
+        "start": "2016-05-23",
+        "end": "2016-06-19",
+        "max_horizon": 28
+      },
+      {
+        "model": "rolling_mean",
+        "split": "test",
+        "start": "2016-04-25",
+        "end": "2016-05-22",
+        "max_horizon": 28
+      },
+      {
+        "model": "rolling_mean",
+        "split": "validation",
+        "start": "2016-03-28",
+        "end": "2016-04-24",
+        "max_horizon": 28
+      },
+      {
+        "model": "seasonal_naive_7",
+        "split": "future",
+        "start": "2016-05-23",
+        "end": "2016-06-19",
+        "max_horizon": 28
+      },
+      {
+        "model": "seasonal_naive_7",
+        "split": "test",
+        "start": "2016-04-25",
+        "end": "2016-05-22",
+        "max_horizon": 28
+      },
+      {
+        "model": "seasonal_naive_7",
+        "split": "validation",
+        "start": "2016-03-28",
+        "end": "2016-04-24",
+        "max_horizon": 28
+      }
+    ]
+  },
+  "metrics": {
+    "units": 4530250,
+    "price_coverage": 0.726631055888113,
+    "known_revenue_proxy": 13500903.560069311,
+    "revenue_proxy": null,
+    "demand_spike_flag": 380925
+  },
+  "missing_price_observations": 977382,
+  "forecast_metrics": [
+    {
+      "model": "lightgbm_global_v1",
+      "split": "test",
+      "segment": "all",
+      "period": {
+        "start": "2016-04-25",
+        "end": "2016-05-22"
+      },
+      "forecast_origin_start": "2016-04-24",
+      "forecast_origin_end": "2016-04-24",
+      "observations": 51576,
+      "predicted_units": 47294.57717298705,
+      "actual_units": 87423.0,
+      "WMAPE": 0.7482595835083141,
+      "MAE": 1.268324367322928,
+      "RMSE": 2.4311766199741,
+      "wmape_zero_denominator": false
+    },
+    {
+      "model": "rolling_mean",
+      "split": "test",
+      "segment": "all",
+      "period": {
+        "start": "2016-04-25",
+        "end": "2016-05-22"
+      },
+      "forecast_origin_start": "2016-04-24",
+      "forecast_origin_end": "2016-04-24",
+      "observations": 51576,
+      "predicted_units": 77507.99999999636,
+      "actual_units": 87423.0,
+      "WMAPE": 0.7948235263358311,
+      "MAE": 1.3472517671563782,
+      "RMSE": 2.3611939984033627,
+      "wmape_zero_denominator": false
+    }
+  ],
+  "gold_sha256": "7228489a792fcf4e464014f729313c8731180621df378e31567894cccba7e620",
+  "frozen_files_unchanged": 45
+}
