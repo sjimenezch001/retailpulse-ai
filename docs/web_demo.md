@@ -155,6 +155,37 @@ any warm-up used with the existing Ollama model. Preserve the measured response
 latency and provider label; edited video duration is not inference latency. A
 fallback cannot be represented as successful live-model validation.
 
+## Localized recordings — 2026-10-08
+
+The owner reviewed and approved the existing English video's content and
+presentation. Its MP4 and English SRT remain byte-for-byte unchanged. The same
+six-part story now has two local exports:
+
+| Version | Actual duration | Caption track | Ignored local video |
+| --- | --- | --- | --- |
+| Spanish UI and Spanish captions | 149.813500 s | [Spanish SRT](demo_captions.es.srt) | `artifacts/rp13/retailpulse-demo-es.mp4` |
+| English UI and Brazilian Portuguese captions | 147.425333 s | [Brazilian Portuguese SRT](demo_captions.pt-BR.srt) | `artifacts/rp13/retailpulse-demo-pt-BR.mp4` |
+
+Spanish was recorded from the functioning app with its existing Spanish selector,
+a genuinely typed supported question and the 25,307-unit April 2016 answer.
+Portuguese reuses the approved English footage: only the separate 120-pixel
+caption band was reconstructed. Application content is not covered or translated
+in that version. No Portuguese application UI was added.
+
+Both exports are silent MP4/AVC, 1600 × 1120, with one burned-in caption language.
+Their UTF-8 SRT tracks match their own final encoded transitions and end within
+their measured durations. They are companion transcripts; enabling an additional
+subtitle overlay during playback would duplicate the existing caption band.
+The [localization evidence](evidence/rp13/localization.json) and
+[dated gate update](evidence/rp13_gate.md#demo-localization--2026-10-08) record full
+sample decoding, scene/caption inspection, numerical reconciliation and preservation.
+
+The provider remains explicitly deterministic. This work adds no Ollama evaluation,
+narration or synthesized voice. Independent human quick-start verification remains
+**PENDING, deferred by the owner**. The localized exports have technical inspection,
+not a new owner-review claim. Public hosting, license choice, version changes and
+release publication still require separate authorization.
+
 ## Validation and troubleshooting
 
 ```powershell

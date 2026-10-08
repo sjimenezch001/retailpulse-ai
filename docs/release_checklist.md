@@ -14,9 +14,14 @@ release, repository-setting change or social-media post. The current package is
 - [ ] Confirm the isolated clean-environment reproduction for the documented revision.
 - [ ] Have another person clone, install, launch, ask the synthetic example and stop
   the demo; record their date, OS, Python, revision, commands and outcome with consent.
-- [ ] Review the actual approximately 150-second recording (147.517067 seconds),
-  readable English captions and honest
-  provider/data labels. A script or screenshot gallery alone is not a finished video.
+  **PENDING — deferred by the owner on 2026-10-08.**
+- [x] Owner reviewed and approved the existing English recording's content and
+  presentation on 2026-10-08 (147.517067 seconds). Original MP4 and English captions
+  are preserved byte-for-byte.
+- [ ] Owner review of the new Spanish-interface and Portuguese-captioned exports.
+  Production and technical inspection are complete; see the
+  [localization update](evidence/rp13_gate.md#demo-localization--2026-10-08).
+  This review does not authorize public hosting or release publication.
 - [ ] Check documentation consistency, image/internal links and public links after
   publication is authorized. Confirm English and Portuguese claims agree.
 - [ ] Run final verification, complete dependency audit, all-detector secret scan

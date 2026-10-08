@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-08",
+  "branch": "docs/rp13-demo-localization",
+  "base": "b6622e3",
+  "base_clean_and_synchronized": true,
+  "english_owner_review": "APPROVED: content and presentation",
+  "localized_owner_review": "NOT CLAIMED",
+  "independent_human_quick_start": "PENDING: deferred by owner",
+  "provider": "deterministic:explicit_offline_mode",
+  "new_ollama_evaluation": false,
+  "audio_tracks": 0,
+  "public_hosting_license_version_release": "Separate authorization required",
+  "exports": {
+    "es": {
+      "video_local_ignored": "artifacts/rp13/retailpulse-demo-es.mp4",
+      "captions": "docs/demo_captions.es.srt",
+      "ui_language": "Spanish",
+      "duration_seconds": 149.8135,
+      "bytes": 10789833,
+      "width": 1600,
+      "height": 1120,
+      "codec": "AVC / H.264",
+      "container": "MP4",
+      "audio_tracks": 0,
+      "average_encoded_frames_per_second": 10.005773845481215,
+      "encoded_samples": 1499,
+      "decoded_frames": 1499,
+      "unprocessed_samples": 0,
+      "decode_errors": [],
+      "decoding_method": "WebCodecs VideoDecoder: every demuxed MP4 sample, software decoder, final flush",
+      "caption_cues": 14,
+      "caption_cues_beyond_video": 0,
+      "last_cue_end": 149.813,
+      "minimum_caption_pixel_match": 0.9994241835652696,
+      "max_srt_rounding_error_ms": 0.9330000000045402,
+      "visual_review": {
+        "story_scenes": 6,
+        "caption_bands": 14,
+        "readable": true,
+        "one_caption_language": true,
+        "historical_proxy_provider_notices_visible": true
+      }
+    },
+    "pt-BR": {
+      "video_local_ignored": "artifacts/rp13/retailpulse-demo-pt-BR.mp4",
+      "captions": "docs/demo_captions.pt-BR.srt",
+      "ui_language": "English",
+      "duration_seconds": 147.425333,
+      "bytes": 10813947,
+      "width": 1600,
+      "height": 1120,
+      "codec": "AVC / H.264",
+      "container": "MP4",
+      "audio_tracks": 0,
+      "average_encoded_frames_per_second": 9.998281638610917,
+      "encoded_samples": 1474,
+      "decoded_frames": 1474,
+      "unprocessed_samples": 0,
+      "decode_errors": [],
+      "decoding_method": "WebCodecs VideoDecoder: every demuxed MP4 sample, software decoder, final flush",
+      "caption_cues": 14,
+      "caption_cues_beyond_video": 0,
+      "last_cue_end": 147.425,
+      "minimum_caption_pixel_match": 0.9994332630318937,
+      "max_srt_rounding_error_ms": 0.9000000000014552,
+      "visual_review": {
+        "story_scenes": 6,
+        "caption_bands": 14,
+        "readable": true,
+        "one_caption_language": true,
+        "historical_proxy_provider_notices_visible": true
+      }
+    }
+  },
+  "spanish_capture": {
+    "genuine_existing_ui": true,
+    "question": "Supported Spanish store-units question for CA_1, April 2016; actually typed",
+    "answer_units": 25307,
+    "displayed_latency_seconds": 0.18,
+    "result_evidence": "Rendered Streamlit DOM and recorded frames; not a browser-side API response",
+    "api_port": 8017,
+    "ui_port": 8517,
+    "page_errors": 0,
+    "owned_shutdown_exit": 0,
+    "owned_descendants_reaped": 8,
+    "ports_closed": true,
+    "existing_ui_limitation": "Initial selected All stores / All departments chips retain English until interaction; other UI text is Spanish."
+  },
+  "portuguese_source": {
+    "original": "artifacts/rp13/retailpulse-demo-150s.mp4",
+    "original_duration_seconds": 147.517067,
+    "original_bytes": 1874308,
+    "caption_free_original_available": false,
+    "source_application_rectangle": [
+      0,
+      0,
+      1600,
+      1000
+    ],
+    "replaced_caption_band": [
+      0,
+      1000,
+      1600,
+      120
+    ],
+    "portuguese_ui_added": false
+  },
+  "initial_validation_observations": {
+    "capture_harness": "First recording harness expected a browser API event; corrected to verify the server-rendered result and recaptured. Product unchanged.",
+    "playback_observer": "Portuguese real-time presentation dropped 30 frames during concurrent encoding. Not counted as complete inspection; final offline decoding processed every sample."
+  },
+  "numeric_values_preserved": {
+    "full_pilot_units": 4530250,
+    "CA_1_units": 1477827,
+    "CA_1_April_2016_units": 25307,
+    "lightgbm_test_wmape_pct": 74.825958,
+    "rolling_mean_test_wmape_pct": 79.482353,
+    "lightgbm_rmse": 2.431177,
+    "rolling_mean_rmse": 2.361194,
+    "historical_test_count": 254,
+    "historical_coverage_pct": 88.15
+  },
+  "preservation": {
+    "result": "PASS",
+    "sha256_comparisons": 48,
+    "gold_unchanged": true,
+    "frozen_artifact_count": 45,
+    "frozen_hashes_and_file_set_unchanged": true,
+    "english_mp4_unchanged": true,
+    "english_srt_unchanged": true,
+    "comparison_performed_after_full_tests": true
+  },
+  "repository_verification": {
+    "verification": {
+      "task": "verify",
+      "exit_code": 0,
+      "duration_seconds": 370.25
+    },
+    "pytest": {
+      "passed": 254,
+      "failed": 0,
+      "warnings": 2,
+      "seconds": 357.23
+    },
+    "coverage_percent": 88.15303430079156,
+    "coverage_minimum": 85,
+    "ruff": "PASS",
+    "mypy": "PASS: four scoped modules",
+    "pip_check": "PASS",
+    "dependency_audit": {
+      "result": "PASS",
+      "packages": 123,
+      "skipped": 0,
+      "known_vulnerabilities": 0
+    },
+    "secret_scan": {
+      "result": "PASS",
+      "all_detectors_unchanged": true,
+      "reviewed_exceptions_unchanged": 148,
+      "unreviewed_findings": 0,
+      "scope": "Current tree; not Git history"
+    },
+    "internal_links": {
+      "internal_links_checked": 215,
+      "errors": []
+    },
+    "git_diff_check": "PASS",
+    "thresholds_scanners_dependencies_unchanged": true
+  },
+  "caption_consistency": {
+    "result": "PASS",
+    "languages": {
+      "es": {
+        "cues": 14,
+        "numerical_mismatches": 0,
+        "required_terms_preserved": true,
+        "encoding": "UTF-8",
+        "all_cues_synchronized": true,
+        "all_cues_within_duration": true
+      },
+      "pt-BR": {
+        "cues": 14,
+        "numerical_mismatches": 0,
+        "required_terms_preserved": true,
+        "encoding": "UTF-8",
+        "all_cues_synchronized": true,
+        "all_cues_within_duration": true
+      }
+    }
+  }
+}

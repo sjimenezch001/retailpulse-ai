@@ -1,0 +1,69 @@
+1
+00:00:00,000 --> 00:00:07,896
+RetailPulse AI: um portfólio pessoal de análise de demanda com rastreabilidade.
+Vendas históricas, sem implantação ativa em um cliente.
+
+2
+00:00:07,896 --> 00:00:18,098
+Gestores comerciais, analistas de BI e planejadores precisam de números consistentes
+para comparar lojas, investigar mudanças e avaliar erros de previsão.
+
+3
+00:00:18,098 --> 00:00:30,002
+Os dados do M5 passam por Bronze, Silver e Gold no DuckDB.
+Previsões congeladas, Power BI e a aplicação compartilham essa fonte.
+
+4
+00:00:30,002 --> 00:00:44,991
+A rastreabilidade vincula cada resultado à origem e ao período.
+A aplicação consulta dados autorizados; abrir a demo não treina modelos.
+
+5
+00:00:44,991 --> 00:00:57,302
+O piloto histórico real registra 4.530.250 unidades observadas.
+O período analisado e a data de corte permanecem visíveis.
+
+6
+00:00:57,302 --> 00:01:06,992
+O filtro CA_1 mostra 1.477.827 unidades históricas.
+O painel e a API usam as mesmas definições.
+
+7
+00:01:06,992 --> 00:01:17,799
+Preços ausentes continuam ausentes. revenue_proxy é uma estimativa parcial.
+Voltamos a todas as lojas para comparar os modelos do piloto completo.
+
+8
+00:01:17,799 --> 00:01:29,988
+WMAPE no teste congelado: LightGBM 74,825958%; rolling mean 79,482353%.
+A seleção usou apenas validação, antes da abertura desse conjunto de teste.
+
+9
+00:01:29,988 --> 00:01:42,797
+O MAE melhora, mas o RMSE piora: 2,431177 contra 2,361194.
+Esse resultado não comprova aumento de receita.
+
+10
+00:01:42,797 --> 00:01:52,795
+Pergunta: quantas unidades a CA_1 vendeu em abril de 2016?
+Esta gravação usa explicitamente o modo determinístico offline.
+
+11
+00:01:52,795 --> 00:02:02,800
+25.307 unidades, com o período, a loja e a fonte Gold.
+O valor vem de ferramentas autorizadas de somente leitura.
+
+12
+00:02:02,800 --> 00:02:14,091
+O roteador define o escopo; o Ollama é opcional e apenas o confirma.
+Esta resposta offline não conta como uma chamada ao modelo.
+
+13
+00:02:14,091 --> 00:02:21,002
+Evidências registradas: 254 testes e 88,15% de cobertura combinada.
+Os controles obrigatórios de Windows, Linux e Docker foram aprovados.
+
+14
+00:02:21,002 --> 00:02:27,425
+Dados históricos, sem estoque real nem implantação pública em produção.
+A validação humana e a publicação seguem pendentes; a etapa de AWS foi adiada.

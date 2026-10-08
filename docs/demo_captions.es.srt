@@ -1,0 +1,69 @@
+1
+00:00:00,000 --> 00:00:09,988
+RetailPulse AI: un proyecto personal de análisis de demanda con trazabilidad.
+Ventas históricas; no es una implementación activa para un cliente.
+
+2
+00:00:09,988 --> 00:00:21,488
+Gerentes comerciales, analistas de BI y planificadores necesitan cifras coherentes
+para comparar tiendas, investigar cambios y evaluar errores de pronóstico.
+
+3
+00:00:21,488 --> 00:00:32,985
+Los datos de M5 pasan por Bronze, Silver y Gold en DuckDB.
+Los pronósticos congelados, Power BI y la aplicación comparten esa fuente.
+
+4
+00:00:32,985 --> 00:00:46,785
+La trazabilidad vincula cada resultado con su origen y período.
+La aplicación consulta datos autorizados; abrirla no entrena modelos.
+
+5
+00:00:46,785 --> 00:00:58,994
+El piloto histórico real registra 4.530.250 unidades.
+El período observado y la fecha de corte permanecen visibles.
+
+6
+00:00:58,994 --> 00:01:08,087
+Al filtrar CA_1 se observan 1.477.827 unidades históricas.
+El panel y la API usan las mismas definiciones.
+
+7
+00:01:08,087 --> 00:01:22,988
+Los precios faltantes no se convierten en cero; revenue_proxy es parcial.
+Restablecemos todas las tiendas para comparar los modelos del piloto completo.
+
+8
+00:01:22,988 --> 00:01:32,982
+WMAPE en la prueba congelada: LightGBM 74,825958%; rolling mean 79,482353%.
+La selección usó solo validación, antes de abrir este conjunto de prueba.
+
+9
+00:01:32,982 --> 00:01:45,093
+El MAE mejora, pero el RMSE empeora: 2,431177 frente a 2,361194.
+Esto no demuestra un aumento de ingresos.
+
+10
+00:01:45,093 --> 00:01:55,287
+Pregunta: ¿Cuántas unidades vendió CA_1 durante abril de 2016?
+Esta grabación usa explícitamente el modo determinista sin conexión.
+
+11
+00:01:55,287 --> 00:02:04,983
+25.307 unidades, con el período, la tienda y la fuente Gold.
+El valor proviene de herramientas autorizadas de solo lectura.
+
+12
+00:02:04,983 --> 00:02:15,983
+El enrutador fija el alcance; Ollama es opcional y solo lo confirma.
+Esta respuesta sin conexión no cuenta como una llamada al modelo.
+
+13
+00:02:15,983 --> 00:02:22,985
+Evidencia registrada: 254 pruebas y 88,15% de cobertura combinada.
+Pasaron los controles obligatorios de Windows, Linux y Docker.
+
+14
+00:02:22,985 --> 00:02:29,813
+Datos históricos, sin existencias reales ni despliegue público en producción.
+La prueba humana y la publicación siguen pendientes; AWS está aplazado.
