@@ -81,3 +81,44 @@ jobs:
       - name: Stop this job's containers
         if: always()
         run: docker compose -p rp11-ci down --volumes --remove-orphans
+
+  aws-offline:
+    name: aws-offline
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      CHECKPOINT_DISABLE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements*.txt
+            cloud/aws/requirements.txt
+      - name: Install application test environment
+        run: python scripts/tasks.py setup
+      - name: Install isolated pinned SDK and checksum-verified Terraform
+        run: |
+          python -m pip install --ignore-installed --target artifacts/rp12/sdk -r cloud/aws/requirements.txt
+          python scripts/install_terraform.py
+      - name: Prepare synthetic references and deployment bundles offline
+        run: python scripts/aws_lab.py prepare
+      - name: Validate infrastructure with explicit mocks and network-blocked Python tests
+        run: python scripts/aws_lab.py validate
+      - name: Audit every isolated SDK dependency
+        run: python scripts/audit_aws_dependencies.py
+      - name: Publish offline validation receipts
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: aws-offline-reports
+          path: |
+            artifacts/rp12/validate_result.json
+            reports/aws_dependencies.json
+          retention-days: 14
+          if-no-files-found: warn

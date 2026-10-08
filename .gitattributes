@@ -2,3 +2,7 @@
 /src/retailpulse/api/synthetic/*.csv -text
 # Manifest bytes also participate in the portable database cache identity.
 /src/retailpulse/api/synthetic/manifest.json text eol=lf
+
+# Stable code/SQL identity for reproducible laboratory bundles across checkouts.
+/cloud/** text eol=lf
+/infra/aws/** text eol=lf
