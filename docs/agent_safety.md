@@ -98,7 +98,9 @@ Ollama is accessed only through explicit numeric loopback HTTP addresses.
 Proxy settings and redirects are disabled; requests have socket timeouts and
 an elapsed-time check between response reads. Responses are bounded to 64 KiB
 and generation to 600 tokens. Discovery uses a two-second socket timeout;
-chat uses ten seconds by default. A final blocking socket operation may take
+chat uses thirty seconds by default, also its maximum configured timeout.
+This accommodates the measured cold load of the existing local model.
+A final blocking socket operation may take
 its timeout before the elapsed-time check runs.
 
 The adapter uses [Ollama structured outputs](https://github.com/ollama/ollama/blob/main/docs/capabilities/structured-outputs.mdx)
@@ -107,8 +109,27 @@ the deterministic scope exactly. Missing, malformed, unsupported or altered
 proposals trigger an explicitly labeled fallback. No provider-generated
 answer text is displayed. The model therefore confirms supported intent; it
 does not expand the deterministic grammar or invent missing business scope.
-No model download, paid API, credentials or external service is required.
-Tests mock this protocol; they do not constitute live model validation.
+The prompt makes the confirmation role explicit: preserve all candidate
+arguments and copy documentation queries verbatim. The same full `Plan`
+schema, argument validation and exact equality check still apply; a changed
+scope is rejected rather than repaired or accepted. No model download, paid
+API, credentials or external service is required. Unit tests mock the
+protocol; real-model runs are recorded separately in the RP-09 gate.
+
+Diagnostics distinguish connection refusal, other connectivity errors,
+timeouts, HTTP status errors, invalid API JSON, incomplete/truncated model
+generation, invalid generated JSON, schema validation and scope mismatch.
+Only allowlisted categories, numeric timing/token metadata, validation error
+counts and application-owned changed-field names are exposed. HTTP bodies,
+headers, URLs, prompts, generated content and exception messages are not
+included. `Answer` and local traces carry `provider_diagnostic`.
+
+Inputs rejected by preflight report `deterministic:preflight` and no model
+attempt, even when Ollama is configured. A successful model selection alone
+reports `ollama:<model>`. Explicit `--provider ollama` returns a nonzero CLI
+exit code on fallback. Its golden evaluation requires genuine validated
+selections for routed cases and reports preflight refusals separately.
+Fallback may preserve functional correctness, but cannot pass live validation.
 
 ## Answers, errors and traces
 
@@ -121,8 +142,8 @@ and full precision retained in `ask --json`.
 
 Local JSONL traces live under ignored `artifacts/agent/`. They contain a
 request UUID, UTC time, tool/intent, successful validated numerical filters,
-duration, source/run ID, outcome, error category, provider and grounding
-status. They omit raw questions, doc search text, credentials and results.
+duration, source/run ID, outcome, error category, provider diagnostics and
+grounding status. They omit raw questions, doc search text, credentials and results.
 When execution fails before returning a result, filters remain empty.
 Trace-write errors fail closed with `trace_unavailable`. Operators may rotate
 these local files; automatic retention management is not implemented.

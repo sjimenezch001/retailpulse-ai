@@ -25,8 +25,10 @@ Append `--provider deterministic` for offline execution without a provider
 probe. Append `--json` to `ask` for the typed result. Configuration selection
 uses `--config config/local.yaml` before the command. `ask` exits zero for
 answered, clarification and refusal outcomes; inspect `status` to distinguish
-them. It exits nonzero for unavailable/error outcomes. `agent-eval` exits
-nonzero for any failed expected outcome or missing inputs.
+them. It exits nonzero for unavailable/error outcomes. Explicit
+`--provider ollama` also exits nonzero when a routed request falls back.
+`agent-eval` exits nonzero for failed expected outcomes or missing inputs;
+in explicit Ollama mode it additionally requires genuine model selections.
 
 ## Measured real M5 results
 
@@ -79,29 +81,33 @@ are not silently discarded.
 
 ## Ollama status and activation
 
-On the validated machine, Ollama was absent from PATH and its standard local
-installation path; the loopback model inventory did not respond. No model
-was downloaded or executed. Default answers therefore identify
-`deterministic_fallback:ollama_or_selected_model_unavailable`. Adapter tests
-use mocks. **Live local LLM validation is pending.**
-
-To complete it later, install/start Ollama and use an already installed model
-shown by `ollama list`. If no suitable model exists, obtain the user's approval
-for the download before installing one. This project performs no downloads.
-Replace `INSTALLED_MODEL_NAME` with the exact installed model name:
+The original engineering run had no installed model. The follow-up validates
+the existing **Ollama 0.40.0 / qwen2.5:1.5b** installation. Ensure the Ollama
+application or `ollama serve` is running on loopback before using it. The
+assistant does not start the service or download models automatically.
+No model download was needed for this validation.
 
 ```powershell
 ollama list
-.\.venv\Scripts\python.exe -m retailpulse ask "How many units did CA_1 sell during April 2016?" --provider ollama --ollama-model INSTALLED_MODEL_NAME
-.\.venv\Scripts\python.exe -m retailpulse agent-eval --provider ollama --ollama-model INSTALLED_MODEL_NAME
+.\.venv\Scripts\python.exe -m retailpulse ask "How many units did CA_1 sell during April 2016?" --provider ollama --ollama-model qwen2.5:1.5b
+.\.venv\Scripts\python.exe -m retailpulse agent-eval --provider ollama --ollama-model qwen2.5:1.5b
 ```
 
-Confirm supported answers actually report `ollama:INSTALLED_MODEL_NAME`,
-and inspect each evaluation record's provider. Refused inputs are rejected
-before any model call. An all-passing run that used fallback is valid
-engineering evidence but does not complete live LLM validation. Record the
-actual model, successful selections, grounded results and latency separately.
-The adapter cannot change validated scope or supply figures.
+Successful model selections report `ollama:qwen2.5:1.5b`. Preflight refusals
+report `deterministic:preflight` and do not count as model calls. A selection
+may also reach a tool that refuses unsupported future predictions or filters.
+The live evaluation lists required/validated calls, fallback cases, preflight
+cases and latency separately. `functional_passing` can remain high when
+fallback is correct, while `passing` and `live_llm_validated` fail.
+
+The default chat timeout is 30 seconds. A measured cold-model call took
+14.594 seconds, including 7.115 seconds loading, and correctly returned
+25,307 units. Safe `provider_diagnostic` metadata distinguishes connection
+refusal, HTTP/API problems, generation failures, schema/scope rejection and
+timeout. It never displays raw provider error bodies or generated content.
+See the [diagnosis](evidence/rp09_live_ollama.md) and
+[final gate](evidence/rp09_gate.md) for actual run counts and latency.
+The adapter still cannot change validated scope or supply figures.
 
 ## Reproducible evaluation
 
