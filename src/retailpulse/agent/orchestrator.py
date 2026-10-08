@@ -12,6 +12,7 @@ from retailpulse.agent.contracts import (
     DocsResult,
     ForecastResult,
     KpiResult,
+    ProviderDiagnostic,
     Trace,
 )
 from retailpulse.agent.errors import AgentError
@@ -49,14 +50,16 @@ def render(result):
 
 
 class Assistant:
-    def __init__(self, tools, docs, *, provider=None, provider_status="deterministic", trace_path: Path | None = None):
+    def __init__(self, tools, docs, *, provider=None, provider_status="deterministic", discovery_diagnostic=None, trace_path: Path | None = None):
         self.tools, self.docs, self.provider = tools, docs, provider
         self.provider_status, self.trace_path = provider_status, trace_path
+        self.discovery_diagnostic = discovery_diagnostic
 
     def ask(self, question: str) -> Answer:
         started, request_id = perf_counter(), str(uuid4())
         plan, result, error, selected = None, None, None, None
-        provider = self.provider_status
+        provider = "deterministic:preflight" if self.provider or self.discovery_diagnostic else self.provider_status
+        diagnostic = ProviderDiagnostic(status="not_attempted" if self.provider or self.discovery_diagnostic else "not_requested")
         try:
             plan = route(question, self.tools.observed_period)
             if self.provider:
@@ -70,9 +73,14 @@ class Assistant:
                         raise ProviderError("scope_mismatch")
                     plan = verified
                     provider = "ollama:" + self.provider.model
-                except (ProviderError, ValidationError, AttributeError, TypeError):
+                    diagnostic = getattr(self.provider, "last_diagnostic", ProviderDiagnostic(status="succeeded", stage="complete"))
+                except (ProviderError, ValidationError, AttributeError, TypeError) as exc:
                     plan = route(question, self.tools.observed_period)
                     provider = "deterministic_fallback:provider_rejected_or_unavailable"
+                    diagnostic = exc.diagnostic if isinstance(exc, ProviderError) else ProviderError("schema_validation").diagnostic
+            elif self.discovery_diagnostic:
+                provider = self.provider_status
+                diagnostic = self.discovery_diagnostic
             selected = plan.call.tool
             if selected == "get_kpi":
                 result = self.tools.get_kpi(plan.call.arguments)
@@ -91,12 +99,14 @@ class Assistant:
         except ValidationError:
             error = "invalid_arguments"
             answer = Answer(request_id=request_id, status="clarification", answer="The requested filters or dates are invalid. Use approved identifiers and an ordered ISO date interval.", provider=provider, tool=selected, error_category=error)
+        answer = answer.model_copy(update={"provider_diagnostic": diagnostic})
         source = getattr(result, "provenance", None)
         trace = Trace(request_id=request_id, time=datetime.now(UTC), intent_category=selected or error or "clarification",
                       tool=selected, validated_filters=(result.filters.model_dump(mode="json", exclude_none=True) if source else {}),
                       duration_ms=round((perf_counter()-started)*1000, 3), source=source.source_table if source else None,
                       gold_run_id=source.gold_run_id if source else None, outcome=answer.status,
-                      error_category=answer.error_category, grounding_validated=answer.grounding_validated, provider=provider)
+                      error_category=answer.error_category, grounding_validated=answer.grounding_validated, provider=provider,
+                      provider_diagnostic=diagnostic)
         if self.trace_path:
             try:
                 self.trace_path.parent.mkdir(parents=True, exist_ok=True)
@@ -104,5 +114,5 @@ class Assistant:
                     stream.write(trace.model_dump_json() + "\n")
             except OSError:
                 # Do not return an untraced success when local observability is unavailable.
-                return Answer(request_id=request_id, status="error", answer="The local trace could not be recorded. Check the configured trace directory.", provider=provider, error_category="trace_unavailable")
+                return Answer(request_id=request_id, status="error", answer="The local trace could not be recorded. Check the configured trace directory.", provider=provider, error_category="trace_unavailable", provider_diagnostic=diagnostic)
         return answer

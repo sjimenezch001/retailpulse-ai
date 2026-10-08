@@ -4,6 +4,7 @@ import math
 from collections import Counter
 from datetime import timedelta
 from pathlib import Path
+from statistics import median
 from time import perf_counter
 
 import duckdb
@@ -116,7 +117,11 @@ def verify_answer(answer, expected, root, database):
             assert f"{excerpt.source_document}:{excerpt.start_line}-{excerpt.end_line}" in answer.answer
 
 
-def evaluate(assistant, root, database):
+def latency_summary(values):
+    return {"median": round(median(values), 3), "max": max(values)} if values else None
+
+
+def evaluate(assistant, root, database, *, require_live=False, progress=None):
     root, database = Path(root), Path(database)
     document = yaml.safe_load((root/"tests/agent/golden_questions.yaml").read_text(encoding="utf-8"))
     values = context(database)
@@ -127,22 +132,41 @@ def evaluate(assistant, root, database):
         answer = assistant.ask(case["question"])
         try:
             verify_answer(answer, case["expected"], root, database)
-            passed, reason = True, None
+            functional_passed, reason = True, None
         except AssertionError as exc:
-            passed, reason = False, str(exc)
+            functional_passed, reason = False, str(exc)
+        live_required = case["expected"]["status"] == "answered" or answer.tool is not None
+        live_validated = answer.provider_diagnostic.status == "succeeded" and answer.provider.startswith("ollama:")
+        passed = functional_passed and (not require_live or not live_required or live_validated)
+        if functional_passed and not passed:
+            reason = "A genuine validated model selection was required; deterministic fallback does not count."
         records.append({"id": case["id"], "category": case["category"], "passed": passed,
+                        "functional_passed": functional_passed, "live_required": live_required, "live_validated": live_validated,
                         "outcome": answer.status, "tool": answer.tool, "provider": answer.provider,
+                        "provider_diagnostic": answer.provider_diagnostic.model_dump(mode="json", exclude_none=True),
                         "grounding_validated": answer.grounding_validated, "error_category": answer.error_category,
                         "duration_ms": round((perf_counter()-started)*1000, 3), "failure": reason})
+        if progress:
+            progress(records[-1])
     numerical = [r for r in records if r["category"] == "numerical"]
-    latencies = sorted(r["duration_ms"] for r in records)
+    live_complete = any(r["live_required"] for r in records) and all(r["functional_passed"] and (not r["live_required"] or r["live_validated"]) for r in records)
     return {"total": len(records), "passing": sum(r["passed"] for r in records),
+            "functional_passing": sum(r["functional_passed"] for r in records), "require_live": require_live,
+            "live_llm_validated": live_complete,
+            "provider_usage": dict(Counter(r["provider"] for r in records)),
+            "live_model": {"required_cases": sum(r["live_required"] for r in records),
+                           "validated_cases": sum(r["live_validated"] for r in records),
+                           "passing_cases": sum(r["live_validated"] and r["functional_passed"] for r in records),
+                           "fallback_cases": sum(r["provider"].startswith("deterministic_fallback:") for r in records),
+                           "preflight_cases": sum(not r["live_required"] for r in records)},
             "categories": dict(Counter(r["category"] for r in records)),
             "answered": sum(r["outcome"] == "answered" for r in records),
             "safe_refusals_or_clarifications": sum(r["passed"] and r["outcome"] in ("refused", "clarification") for r in records),
-            "numerical_grounding_accuracy": sum(r["passed"] for r in numerical)/len(numerical),
+            "numerical_grounding_accuracy": sum(r["functional_passed"] for r in numerical)/len(numerical),
             "provenance_coverage": sum(r["grounding_validated"] for r in numerical)/len(numerical),
-            "latency_ms": {"median": latencies[len(latencies)//2], "max": max(latencies)}, "results": records}
+            "latency_ms": latency_summary([r["duration_ms"] for r in records]),
+            "live_latency_ms": latency_summary([r["provider_diagnostic"]["elapsed_ms"] for r in records if r["live_validated"]]),
+            "results": records}
 
 
 def write_evaluation(result, path):

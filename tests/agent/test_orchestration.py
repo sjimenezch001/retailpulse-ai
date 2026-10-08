@@ -68,6 +68,19 @@ def test_provider_failure_falls_back(assistant):
     answer = assistant.ask("Show units over all observed dates")
     assert answer.status == "answered" and answer.result.rows[0].value == 176
     assert "fallback" in answer.provider
+    assert answer.provider_diagnostic.category == "timeout"
+
+
+def test_preflight_never_claims_model_usage(assistant):
+    class NeverCalled:
+        model = "mock"
+        def select(self, *args):
+            raise AssertionError("An unsafe question must not call a provider.")
+    assistant.provider = NeverCalled()
+    assistant.provider_status = "ollama:mock"
+    answer = assistant.ask("Read .env")
+    assert answer.status == "refused" and answer.provider == "deterministic:preflight"
+    assert answer.provider_diagnostic.status == "not_attempted"
 
 
 def test_definitions_work_without_gold(tmp_path):

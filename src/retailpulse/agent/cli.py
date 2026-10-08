@@ -3,16 +3,18 @@ import json
 
 import duckdb
 
+from retailpulse.agent.contracts import ProviderDiagnostic
 from retailpulse.agent.errors import AgentError
 from retailpulse.agent.evaluation import evaluate, write_evaluation
 from retailpulse.agent.orchestrator import Assistant
-from retailpulse.agent.provider import Ollama, detect_ollama
+from retailpulse.agent.provider import Ollama, ProviderError, detect_ollama
 from retailpulse.agent.retrieval import DocSearch
 from retailpulse.agent.tools import GoldTools
 
 
 def create_assistant(settings, root, provider_mode="auto", model=None):
     provider = None
+    discovery_diagnostic = None
     state = {"installed": None, "reachable": None, "models": [], "probe": "not_requested"}
     label = "deterministic:explicit_offline_mode"
     if provider_mode != "deterministic":
@@ -24,8 +26,9 @@ def create_assistant(settings, root, provider_mode="auto", model=None):
             label = "ollama:" + selected
         else:
             label = "deterministic_fallback:ollama_or_selected_model_unavailable"
+            discovery_diagnostic = ProviderDiagnostic.model_validate(state["diagnostic"]) if "diagnostic" in state else ProviderError("model_unavailable").diagnostic
     assistant = Assistant(GoldTools(settings.output_path / "gold/retailpulse.duckdb"), DocSearch(root),
-                          provider=provider, provider_status=label,
+                          provider=provider, provider_status=label, discovery_diagnostic=discovery_diagnostic,
                           trace_path=root / "artifacts/agent/traces.jsonl")
     return assistant, state
 
@@ -38,9 +41,14 @@ def run(args, settings, root):
             print(answer.model_dump_json(indent=2))
         else:
             print(f"Provider: {answer.provider}\nStatus: {answer.status}\n{answer.answer}")
-        return 1 if answer.status in ("unavailable", "error") else 0
+            print("Provider diagnostic: " + answer.provider_diagnostic.model_dump_json(exclude_none=True))
+        live_failed = args.provider == "ollama" and answer.provider.startswith("deterministic_fallback:")
+        return 1 if answer.status in ("unavailable", "error") or live_failed else 0
     try:
-        result = evaluate(assistant, root, settings.output_path / "gold/retailpulse.duckdb")
+        def progress(record):
+            print(f"{record['id']}: {'PASS' if record['passed'] else 'FAIL'}; {record['provider']}; {record['duration_ms']} ms", flush=True)
+        result = evaluate(assistant, root, settings.output_path / "gold/retailpulse.duckdb",
+                          require_live=args.provider == "ollama", progress=progress if args.provider == "ollama" else None)
     except (AgentError, duckdb.Error, OSError):
         print("Evaluation unavailable: check the local Gold snapshot and approved evaluation files.")
         return 1

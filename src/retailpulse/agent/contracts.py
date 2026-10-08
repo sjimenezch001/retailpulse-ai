@@ -188,6 +188,21 @@ class DocsResult(Contract):
     warnings: list[str]
 
 
+class ProviderDiagnostic(Contract):
+    """Safe operational metadata; never prompts, response text or exception messages."""
+    status: Literal["not_requested", "not_attempted", "succeeded", "failed"] = "not_requested"
+    stage: Literal["discovery", "transport", "api_response", "generation", "validation", "scope", "complete"] | None = None
+    category: str | None = None
+    http_status: int | None = None
+    elapsed_ms: float = 0
+    load_ms: float | None = None
+    total_ms: float | None = None
+    prompt_tokens: int | None = None
+    generated_tokens: int | None = None
+    validation_errors: int = 0
+    changed_fields: list[str] = Field(default_factory=list)
+
+
 class Answer(Contract):
     request_id: str
     status: Literal["answered", "clarification", "refused", "unavailable", "error"]
@@ -197,6 +212,7 @@ class Answer(Contract):
     result: KpiResult | ForecastResult | DocsResult | None = None
     error_category: str | None = None
     grounding_validated: bool = False
+    provider_diagnostic: ProviderDiagnostic = Field(default_factory=ProviderDiagnostic)
 
 
 class Trace(Contract):
@@ -212,3 +228,4 @@ class Trace(Contract):
     error_category: str | None
     grounding_validated: bool
     provider: str
+    provider_diagnostic: ProviderDiagnostic = Field(default_factory=ProviderDiagnostic)
