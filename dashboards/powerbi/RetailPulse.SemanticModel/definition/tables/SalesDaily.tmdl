@@ -1,0 +1,74 @@
+table SalesDaily
+	isHidden
+	lineageTag: 19d665cd-421e-5e95-9379-38857cae7fd5
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: 53ba02cb-dde7-500f-b34b-4e88c9f44dc9
+		summarizeBy: none
+		sourceColumn: date
+
+	column Store
+		dataType: string
+		lineageTag: c359d5a8-baf9-548f-80f1-cbd8e45fe01a
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column Department
+		dataType: string
+		lineageTag: 6d95e51f-8c96-5821-9b1b-ec9b528eb288
+		summarizeBy: none
+		sourceColumn: dept_id
+
+	column Units
+		dataType: int64
+		lineageTag: adb104a5-e55b-5f39-a25a-c816a3dc4f0d
+		summarizeBy: none
+		sourceColumn: units
+
+	column 'Known Revenue'
+		dataType: double
+		lineageTag: 0c87e887-9b08-51ed-aa12-fb8bece635cb
+		summarizeBy: none
+		sourceColumn: known_revenue_proxy
+
+	column Observations
+		dataType: int64
+		lineageTag: 752caed3-246d-5625-9b51-762ac7778473
+		summarizeBy: none
+		sourceColumn: observation_count
+
+	column 'Priced Observations'
+		dataType: int64
+		lineageTag: fb2c61a6-fb23-502e-910f-5d6d30e275e4
+		summarizeBy: none
+		sourceColumn: priced_count
+
+	column Rolling7
+		dataType: double
+		lineageTag: 0fb11267-23d9-57e1-b48d-a79f9e4e830e
+		summarizeBy: none
+		sourceColumn: rolling_7d_units
+
+	column Rolling28
+		dataType: double
+		lineageTag: edd0eda8-c251-5888-b39a-ecd891abacde
+		summarizeBy: none
+		sourceColumn: rolling_28d_units
+
+	column Spikes
+		dataType: int64
+		lineageTag: 64999ef8-e318-5f42-8090-b5755b8cc645
+		summarizeBy: none
+		sourceColumn: spike_count
+
+	partition SalesDaily = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/sales_daily.csv"), [Delimiter=",", Columns=10, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"date", type date}, {"store_id", type text}, {"dept_id", type text}, {"units", Int64.Type}, {"known_revenue_proxy", type number}, {"observation_count", Int64.Type}, {"priced_count", Int64.Type}, {"rolling_7d_units", type number}, {"rolling_28d_units", type number}, {"spike_count", Int64.Type}}, "en-US")
+				in Typed

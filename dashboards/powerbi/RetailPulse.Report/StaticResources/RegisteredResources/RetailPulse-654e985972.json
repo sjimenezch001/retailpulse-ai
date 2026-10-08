@@ -1,0 +1,89 @@
+{
+  "name": "RetailPulse-654e985972.json",
+  "dataColors": [
+    "#007F82",
+    "#8193A3",
+    "#C5892F",
+    "#536CB2"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#162B3B",
+  "tableAccent": "#007F82",
+  "good": "#007F82",
+  "neutral": "#C5892F",
+  "bad": "#B54B45",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 28,
+      "color": "#162B3B"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#162B3B"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#162B3B"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 11,
+      "color": "#526574"
+    }
+  },
+  "visualStyles": {
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "autoSizeColumnWidth": true,
+            "columnAdjustment": "growToFit",
+            "backColor": {
+              "solid": {
+                "color": "#F3F5F7"
+              }
+            }
+          }
+        ],
+        "values": [
+          {
+            "backColorPrimary": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "backColorSecondary": {
+              "solid": {
+                "color": "#F5F8FA"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "cardVisual": {
+      "*": {
+        "value": [
+          {
+            "bold": true,
+            "$id": "default"
+          }
+        ],
+        "label": [
+          {
+            "show": true,
+            "$id": "default"
+          }
+        ],
+        "cardCalloutArea": [
+          {
+            "paddingUniform": 0
+          }
+        ]
+      }
+    }
+  }
+}

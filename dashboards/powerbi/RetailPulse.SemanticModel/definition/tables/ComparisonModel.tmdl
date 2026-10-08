@@ -1,0 +1,25 @@
+table ComparisonModel
+	lineageTag: 5d807780-8174-567c-8e44-a99fafe815a7
+
+	column ModelKey
+		dataType: string
+		isHidden
+		lineageTag: d948079b-f9ab-5685-9dab-4de89c85c460
+		summarizeBy: none
+		sourceColumn: model
+
+	column Model
+		dataType: string
+		lineageTag: 8f8476d6-cb16-54da-94e4-960bf709afdf
+		summarizeBy: none
+		sourceColumn: model_name
+
+	partition ComparisonModel = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/model.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"model", type text}, {"model_name", type text}}, "en-US")
+				in Typed

@@ -1,0 +1,18 @@
+table Split
+	lineageTag: 612c84d8-6c10-5ef2-9e00-8d13788d0f71
+
+	column Split
+		dataType: string
+		lineageTag: 7401096a-795f-5291-926a-9d4ffb1772aa
+		summarizeBy: none
+		sourceColumn: split
+
+	partition Split = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/split.csv"), [Delimiter=",", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"split", type text}}, "en-US")
+				in Typed

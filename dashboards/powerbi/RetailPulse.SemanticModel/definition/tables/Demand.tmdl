@@ -1,0 +1,18 @@
+table Demand
+	lineageTag: ecef4dca-a3d0-59df-840a-14958341c137
+
+	column 'Demand Level'
+		dataType: string
+		lineageTag: 066ea992-eb89-5f2b-9739-22843edc2113
+		summarizeBy: none
+		sourceColumn: demand_level
+
+	partition Demand = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/demand_level.csv"), [Delimiter=",", Columns=1, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"demand_level", type text}}, "en-US")
+				in Typed

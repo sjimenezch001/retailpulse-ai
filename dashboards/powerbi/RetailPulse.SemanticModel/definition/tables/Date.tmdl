@@ -1,0 +1,50 @@
+table Date
+	lineageTag: dd1babd2-12ca-5565-aa1a-be80c7775846
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-MM-dd
+		lineageTag: 577c8fd2-a7d2-5f0c-be84-b188d01c4ab2
+		summarizeBy: none
+		sourceColumn: date
+
+	column Year
+		dataType: int64
+		lineageTag: a91d993c-cb05-549e-8299-3a938d7b1b7f
+		summarizeBy: none
+		sourceColumn: year
+
+	column Month
+		dataType: int64
+		lineageTag: 71b5d811-7bb3-599f-8e18-170173b7a0a4
+		summarizeBy: none
+		sourceColumn: month
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: 73e1a3e4-bcef-5412-92b1-775ce15ac1cd
+		summarizeBy: none
+		sourceColumn: year_month
+
+	column Weekday
+		dataType: string
+		lineageTag: 4b2f98d3-7d0d-5cff-b753-6068dd2896db
+		summarizeBy: none
+		sourceColumn: weekday
+
+	column 'Event Context'
+		dataType: string
+		lineageTag: 1c3ea634-d4df-571e-a325-212b99567355
+		summarizeBy: none
+		sourceColumn: event_context
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/date.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"date", type date}, {"year", Int64.Type}, {"month", Int64.Type}, {"year_month", type text}, {"weekday", type text}, {"event_context", type text}}, "en-US")
+				in Typed

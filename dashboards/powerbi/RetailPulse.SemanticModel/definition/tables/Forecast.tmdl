@@ -1,0 +1,99 @@
+table Forecast
+	isHidden
+	lineageTag: a4464375-6645-579e-96c3-6fb2df77aa3e
+
+	column 'Forecast Origin'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: dee5a1e5-5937-5e3b-8de9-72538dd1e76c
+		summarizeBy: none
+		sourceColumn: forecast_origin
+
+	column 'Target Date'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: da91f47a-101d-5842-809d-f32da7cfc5c1
+		summarizeBy: none
+		sourceColumn: target_date
+
+	column Store
+		dataType: string
+		lineageTag: 52ed2b81-3029-5666-b4aa-270c20ae5152
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column Product
+		dataType: string
+		lineageTag: 137d4d2d-fbcd-5fea-8ed2-0d3d38467d4c
+		summarizeBy: none
+		sourceColumn: item_id
+
+	column ModelKey
+		dataType: string
+		lineageTag: 78949656-eccc-5292-a299-87b2a4572bde
+		summarizeBy: none
+		sourceColumn: model
+
+	column Split
+		dataType: string
+		lineageTag: 1dfbe1c2-0c08-506c-a11d-efaf2c0225bb
+		summarizeBy: none
+		sourceColumn: split
+
+	column Horizon
+		dataType: int64
+		lineageTag: fefc4607-6c55-5eb7-badb-5504a2d6d516
+		summarizeBy: none
+		sourceColumn: horizon
+
+	column 'Demand Level'
+		dataType: string
+		lineageTag: eb04ea19-2866-5c29-9b6a-ecaa28e429a4
+		summarizeBy: none
+		sourceColumn: demand_level
+
+	column 'Predicted Units'
+		dataType: double
+		lineageTag: cdd25394-4614-592f-aaba-b30e7e4228d3
+		summarizeBy: none
+		sourceColumn: predicted_units
+
+	column 'Actual Units'
+		dataType: double
+		lineageTag: 0ac6e2a9-5f93-573f-a6c2-ab8ab78f4720
+		summarizeBy: none
+		sourceColumn: actual_units
+
+	column 'Absolute Error'
+		dataType: double
+		lineageTag: 128125a6-b71b-50cb-808e-2d8e93ae47de
+		summarizeBy: none
+		sourceColumn: absolute_error
+
+	column 'Squared Error'
+		dataType: double
+		lineageTag: 4bb38c24-0cfe-5b9b-85a8-5657ac3a7c8e
+		summarizeBy: none
+		sourceColumn: squared_error
+
+	column 'Signed Error'
+		dataType: double
+		lineageTag: b32a20c4-3391-565a-a642-cbe21632bb32
+		summarizeBy: none
+		sourceColumn: signed_error
+
+	column source_run_id
+		dataType: string
+		lineageTag: 08acab4a-490d-5ec5-b0be-c1f27c5fffed
+		summarizeBy: none
+		sourceColumn: source_run_id
+
+	partition Forecast = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "/forecast.csv"), [Delimiter=",", Columns=14, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Nulls = Table.ReplaceValue(Headers, "", null, Replacer.ReplaceValue, Table.ColumnNames(Headers)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"forecast_origin", type date}, {"target_date", type date}, {"store_id", type text}, {"item_id", type text}, {"model", type text}, {"split", type text}, {"horizon", Int64.Type}, {"demand_level", type text}, {"predicted_units", type number}, {"actual_units", type number}, {"absolute_error", type number}, {"squared_error", type number}, {"signed_error", type number}, {"source_run_id", type text}}, "en-US")
+				in Typed
