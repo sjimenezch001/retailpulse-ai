@@ -30,8 +30,17 @@ def main():
     baseline.add_argument("--future-horizon", type=int, default=28)
     model = commands.add_parser("model", help="Compare LightGBM on validation, freeze and evaluate once")
     model.add_argument("--validation-only", action="store_true", help="Freeze selection without reading test actuals")
+    commands.add_parser("export-bi", help="Export reconciled, local Power BI datasets from Gold")
     args = parser.parse_args()
     settings, root = load_config(args.config)
+    if args.command == "export-bi":
+        import json
+
+        from retailpulse.bi.export import export_bi
+
+        result = export_bi(settings.output_path, root / "artifacts/powerbi/data", root / "sql")
+        print(json.dumps({"source_run_id": result["source_run_id"], "reconciliation": result["reconciliation"],
+                          "rows": {name: table["rows"] for name, table in result["tables"].items()}}, indent=2))
     if args.command == "model":
         import json
 
