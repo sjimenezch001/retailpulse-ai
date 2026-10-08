@@ -1,0 +1,54 @@
+{
+  "result": "PASS",
+  "candidate": "ab1722b",
+  "reachable_commits_checked": 30,
+  "outgoing_commits": [
+    "ab1722b"
+  ],
+  "private_paths_in_reachable_trees": false,
+  "original_private_blobs_reachable": false,
+  "original_private_commits_are_ancestors": false,
+  "replacement_messages_reviewed": true,
+  "new_private_content_copied_elsewhere": false,
+  "content_check": "28-token overlap check on newly introduced public passages plus public diff review; exact private blobs excluded from all reachable objects",
+  "public_tree_changes_within_reviewed_allowlist": true,
+  "runtime_tests_dependencies_synthetic_data_unchanged": true,
+  "main_unchanged": true,
+  "private_copies_sha256_match": true,
+  "gold_files_unchanged": 1,
+  "frozen_model_artifacts_unchanged": 45,
+  "demo_mp4_unchanged": true,
+  "protected_hashes_compared": 47,
+  "narrow_ignore_rules_verified": true,
+  "video_ignored": true,
+  "scope": "Public candidate audited after local reconstruction; final evidence-only follow-up is checked again locally before completion.",
+  "remote_preflight": {
+    "published_base": "593dc50",
+    "advertised_refs_checked": 11,
+    "rp13_branch_published": false,
+    "original_packaging_commits_published": false,
+    "github_response": "No commit found for both original packaging commits",
+    "published_history_unchanged": true
+  },
+  "backup_integrity": {
+    "external_document_copies_sha256_match": true,
+    "bundle_verified": true,
+    "bundle_recovery_fetch_and_strict_fsck": "PASS",
+    "original_document_blobs_verified": true,
+    "no_backup_branch_or_tag_created": true
+  },
+  "archive_inspection": [
+    {
+      "archive": "retailpulse_ai-0.1.0-py3-none-any.whl",
+      "private_documents_absent": true,
+      "excluded_data_and_media_absent": true,
+      "synthetic_csvs": 6
+    },
+    {
+      "archive": "retailpulse_ai-0.1.0.tar.gz",
+      "private_documents_absent": true,
+      "excluded_data_and_media_absent": true,
+      "synthetic_csvs": 6
+    }
+  ]
+}

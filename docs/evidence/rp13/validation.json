@@ -1,13 +1,13 @@
 {
   "date": "2026-10-08",
-  "scope": "Historical packaging validation before privacy reconstruction; replacement-candidate validation pending.",
+  "scope": "Full verification, dependency/security scan and build on the reconstructed public candidate. Follow-up changes only update public acceptance evidence; no remote CI claimed.",
   "verification": {
     "command": "python scripts/tasks.py verify",
     "result": "PASS",
     "tests_passed": 254,
     "tests_failed": 0,
     "warnings": 2,
-    "pytest_seconds": 409.94,
+    "pytest_seconds": 210.3,
     "ruff": "PASS",
     "mypy": "PASS; four scoped modules",
     "pip_check": "PASS",
@@ -28,7 +28,9 @@
       "percent_branches_covered": 80.82901554404145,
       "percent_branches_covered_display": "80.83"
     },
-    "minimum_combined_coverage": 85
+    "minimum_combined_coverage": 85,
+    "task_seconds": 218.5,
+    "temporary_directory": "Fresh ignored directory under artifacts/rp13, supplied through process-scoped PYTEST_ADDOPTS --basetemp; no tests skipped or modified."
   },
   "security": {
     "command": "python scripts/tasks.py security",
@@ -40,14 +42,14 @@
       "scanner": "detect-secrets",
       "version": "1.5.0",
       "scope": "All tracked files plus non-ignored untracked files; current tree, not Git history",
-      "files_scanned": 319,
+      "files_scanned": 318,
       "reviewed_false_positives": 148,
       "baseline_fingerprint_metadata": 244,
       "unreviewed_findings": [],
       "result": "PASS"
     },
     "includes_final_documentation_and_evidence": true,
-    "network_note": "A restricted-network audit attempt failed; the complete audit was rerun successfully with network access. No partial audit was accepted."
+    "note": "Full security task passed on the reconstructed candidate; the additional all-detector secret scan also passed over the final public evidence changes."
   },
   "build": {
     "command": "python scripts/tasks.py build",
@@ -59,18 +61,44 @@
     ],
     "archives_inspected": true,
     "synthetic_csv_files_per_archive": 6,
-    "real_data_or_models_in_archives": false
+    "real_data_or_models_in_archives": false,
+    "archive_inspection": [
+      {
+        "archive": "retailpulse_ai-0.1.0-py3-none-any.whl",
+        "private_documents_absent": true,
+        "excluded_data_and_media_absent": true,
+        "synthetic_csvs": 6
+      },
+      {
+        "archive": "retailpulse_ai-0.1.0.tar.gz",
+        "private_documents_absent": true,
+        "excluded_data_and_media_absent": true,
+        "synthetic_csvs": 6
+      }
+    ]
   },
   "preservation": {
     "result": "PASS",
     "gold_files": 1,
     "frozen_model_artifacts": 45,
-    "sha256_compared": 46,
+    "sha256_compared": 47,
     "changed_files": [],
-    "file_set_unchanged": true
+    "file_set_unchanged": true,
+    "demo_mp4_unchanged": true
   },
   "documentation": {
-    "internal_links_checked": 224,
+    "internal_links_checked": 203,
     "errors": []
+  },
+  "tested_revision": "ab1722b",
+  "initial_environment_attempt": {
+    "result": "FAIL",
+    "cause": "Windows denied access to a pre-existing default pytest temporary directory",
+    "tests_passed": 100,
+    "setup_errors": 154,
+    "pytest_seconds": 223.82,
+    "initial_combined_coverage": 35.989445910290236,
+    "resolution": "Fresh ignored temporary directory; existing permissions, tests and thresholds unchanged. Complete task rerun.",
+    "diagnostic_tests_passed": 3
   }
 }

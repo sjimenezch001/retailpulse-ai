@@ -10,7 +10,7 @@ runtime configuration remain identical; replacement commits have no remote CI re
 
 | Gate | Current status |
 | --- | --- |
-| RP-13 PACKAGING | PENDING privacy-cleanup validation |
+| RP-13 PACKAGING | PASS |
 | CLEAN-ENVIRONMENT REPRODUCTION | PASS — isolated automated reproduction, with terminal limitations below |
 | GENUINE DEMO VIDEO | COMPLETE — 147.517067 seconds measured; 150-second script |
 | INDEPENDENT HUMAN QUICK START | PENDING |
@@ -144,8 +144,8 @@ been committed, uploaded or published; owner review and hosting approval remain.
 ## Initial packaging validation and preservation
 
 The table below preserves the initial packaging run before privacy separation.
-The [validation summary](rp13/validation.json) will record the reconstructed
-candidate after its required checks complete. Historical browser/installation
+The [validation summary](rp13/validation.json) records the new checks on the
+reconstructed candidate; the table here preserves the earlier run. Historical browser/installation
 evidence is not represented as a new execution.
 
 | Command or check | Result |
@@ -185,15 +185,47 @@ Recovery details remain private. No backup branch or tag was created.
 
 Only unpublished local RP-13 commits are rebuilt. Narrow root-anchored ignore
 rules protect the two personal document paths; public walkthroughs, captions and
-technical evidence remain. Outgoing-history, preservation and replacement-candidate
-validation checks are pending completion.
+technical evidence remain. The [privacy audit](rp13/privacy_separation.json) verifies
+all reachable trees and objects, removal of original private-containing ancestors,
+replacement messages and the limited public-tree differences. No new personal
+practice content was copied into public files. Gold, all 45 frozen artifacts and
+the ignored demo MP4 retain their exact hashes. The rebuilt wheel and sdist
+exclude personal documents and local-only data/media.
+
+The reconstructed public candidate `ab1722b` passed the required
+checks below. The final follow-up commit only records public evidence and receives
+another complete secret/link/whitespace check. Both replacement commit messages
+and outgoing ancestry are checked again after committing. No remote CI result is
+claimed for either unpublished replacement commit.
+
+| Cleanup validation | Actual result |
+| --- | --- |
+| `python scripts/tasks.py verify` | PASS; 254 tests, 2 existing warnings, 210.30 seconds |
+| Combined coverage | 88.15303430%; unchanged minimum 85% |
+| Ruff / scoped mypy / pip check | PASS / PASS (four modules) / PASS |
+| `python scripts/tasks.py security` | PASS; 123 packages, zero skips or known vulnerabilities; all secret detectors active |
+| Final secret scan | PASS; 318 files, 148 unchanged exact reviewed entries; zero unreviewed findings |
+| `python scripts/tasks.py build` | PASS; wheel/sdist 0.1.0; private documents and local-only data/media absent |
+| Internal Markdown links and images | 203 checked; zero errors |
+| `git diff --check` | PASS |
+| Preservation | Gold, 45 frozen artifacts and MP4 unchanged; 47 SHA-256 comparisons |
+| Public/private history boundary | PASS; private paths/blobs absent from reachable history; original private-containing commits are not ancestors |
+
+The initial default-temp attempt failed with 100 tests passing and
+154 setup errors because Windows denied access to an existing pytest temporary
+directory. Three diagnostic tests and then the full task passed after setting
+process-scoped `PYTEST_ADDOPTS` to a fresh, ignored `--basetemp` under `artifacts/rp13/`.
+That initial failure is retained in the validation record. No application/test
+code, dependency, threshold, scanner detector or existing directory permission
+was changed. The earlier clean installation and video were not rerun or modified.
 
 ## Remaining owner decisions
 
 1. Have another person complete the quick start, including physical Ctrl+C, and
    record revision, OS, Python, commands and outcomes with their consent.
 2. Review the video and portfolio wording, and choose the missing code license.
-   No root LICENSE or project license metadata currently grants code permissions; competition-data rights are separate.
+   No root LICENSE or project license metadata currently grants code permissions;
+   competition-data rights are separate.
 3. Authorize a future PR/push, obtain candidate CI, and approve coordinated version,
    tag/release and optional video hosting steps. Verify final public links and
    repository pinning only after authorization.
