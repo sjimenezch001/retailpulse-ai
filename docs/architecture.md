@@ -54,8 +54,11 @@ An optional Ollama adapter proposes a strict typed tool selection over
 loopback HTTP. The proposal must match the application's validated scope.
 Provider text never supplies numerical answers, SQL or tool results.
 Deterministic routing remains available without a model or network access.
-The validated machine has no Ollama installation or responding model, so
-RP-09 engineering passes while live local LLM validation remains pending.
+Ollama 0.40.0 with `qwen2.5:1.5b` passed live validation: 22 genuine model
+selections, 14 preflight outcomes and zero fallbacks across 36 golden cases.
+Safe provider diagnostics distinguish connectivity, API/generation, strict
+validation and timeout failures. Preflight does not claim model usage, and
+explicit Ollama evaluation cannot count fallback as live success.
 Runtime traces contain metadata only and stay in ignored `artifacts/agent/`;
 public evidence contains aggregate findings, never real M5 row-level samples.
 

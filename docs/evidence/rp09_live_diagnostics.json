@@ -1,0 +1,107 @@
+{
+  "recorded_at": "2026-10-08T02:10:24.497264+00:00",
+  "model_identity": {
+    "server_version": "0.40.0",
+    "model": "qwen2.5:1.5b",
+    "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+    "size_bytes": 986061892,
+    "parameter_size": "1.5B",
+    "quantization_level": "Q4_K_M"
+  },
+  "gold_run_id": "20f4dae75fff8e79204e",
+  "gold_sha256": "7228489a792fcf4e464014f729313c8731180621df378e31567894cccba7e620",
+  "source_base_commit": "b8958d0",
+  "dataset": "real M5 pilot (local only)",
+  "latency_scope": "Case duration includes model selection, tool execution and independent reconciliation. live_latency_ms measures successful provider selection only; discovery is excluded.",
+  "connection_probe": {
+    "discovery": {
+      "installed": true,
+      "reachable": false,
+      "models": []
+    },
+    "model": "qwen2.5:1.5b",
+    "failure_category": "unavailable_or_timeout",
+    "cause_type": "URLError",
+    "http_status": null,
+    "os_error": 10061,
+    "duration_ms": 2061.345,
+    "accepted": false
+  },
+  "original_timeout": {
+    "accepted": false,
+    "category": "unavailable_or_timeout",
+    "cause_type": "TimeoutError",
+    "http_status": null,
+    "duration_ms": 10052.182
+  },
+  "original_prompt_30_second_probe": {
+    "done": true,
+    "done_reason": "stop",
+    "eval_count": 73,
+    "prompt_eval_count": 152,
+    "total_duration": 5245763800,
+    "load_duration": 16449200,
+    "content_characters": 205,
+    "scope_match": true,
+    "different_fields": [],
+    "accepted": true,
+    "duration_ms": 5306.175
+  },
+  "cold_acceptance": {
+    "validated_at": "2026-10-08T02:02:54.386833+00:00",
+    "ollama_version": "0.40.0",
+    "model": "qwen2.5:1.5b",
+    "value": 25307,
+    "provider": "ollama:qwen2.5:1.5b",
+    "provider_diagnostic": {
+      "status": "succeeded",
+      "stage": "complete",
+      "elapsed_ms": 14594.0,
+      "load_ms": 7115.4255,
+      "total_ms": 14502.3366,
+      "prompt_tokens": 152,
+      "generated_tokens": 73,
+      "validation_errors": 0,
+      "changed_fields": []
+    },
+    "independently_reconciled": true,
+    "duration_ms": 15825.009,
+    "cold_model_load_requested": true
+  },
+  "artifact_integrity": {
+    "gold_sha256": "7228489a792fcf4e464014f729313c8731180621df378e31567894cccba7e620",
+    "gold_unchanged": true,
+    "frozen_artifacts_checked": 45,
+    "frozen_artifacts_unchanged": true
+  },
+  "final_cli_smoke": {
+    "provider": "ollama:qwen2.5:1.5b",
+    "status": "answered",
+    "units": 25307,
+    "store": "CA_1",
+    "period": {
+      "start": "2016-04-01",
+      "end": "2016-04-30"
+    },
+    "exit_code": 0,
+    "provider_elapsed_ms": 11109.0,
+    "provider_load_ms": 18.4666,
+    "generated_tokens": 111,
+    "prompt_tokens": 229
+  },
+  "validation": {
+    "pytest_passed": 163,
+    "pytest_seconds": 88.97,
+    "ruff": "PASS",
+    "pip_check": "PASS",
+    "verify_script": "PASS",
+    "verify_script_test_count": 163,
+    "verify_script_test_seconds": 83.0,
+    "diff_check": "PASS",
+    "warnings": [
+      "existing MLflow/SQLAlchemy deprecation",
+      "non-failing pytest cache permission warning in verify script"
+    ]
+  },
+  "final_code_commit": "7497d1d9c30e2dd67a65081aa9a3509e68e7da03"
+}

@@ -4,10 +4,11 @@ Retail demand analytics platform. It turns historical sales, calendar data and
 prices into verifiable business metrics for comparing stores and departments,
 reducing fragmented analysis and inconsistent business definitions.
 
-**Status: RP-09 engineering PASS; full gate PENDING LIVE LLM VALIDATION.**
+**Status: RP-09 engineering PASS; full gate PASS, including live Ollama validation.**
 RP-00–RP-08 remain validated. The local grounded assistant passes all 36
-golden questions against synthetic and real M5 Gold. Ollama is not installed
-on the validated machine; responses use an explicit deterministic fallback.
+golden questions against synthetic and real M5 Gold. The strict live run with
+Ollama 0.40.0 / `qwen2.5:1.5b` passed with 22 validated model calls, 14
+preflight outcomes and zero fallback cases.
 The frozen LightGBM model scores 74.825958% test WMAPE versus 79.482353% for
 rolling mean; RMSE is worse (2.431177 versus 2.361194). Selection used validation
 only. RP-00 and RP-01 are complete. Full inputs, forecasts, model files and
@@ -149,6 +150,10 @@ for clarification when scope is ambiguous.
 `--provider deterministic` disables the Ollama probe. By default the assistant
 checks the local endpoint and falls back explicitly if no installed model can
 be used. It never downloads models. `ask --json` exposes the typed result.
+Explicit `--provider ollama --ollama-model qwen2.5:1.5b` requires a live
+selection for routed requests; fallback returns a nonzero exit code. Safe
+provider diagnostics distinguish connectivity, timeout, generation and
+validation failures. Cold loading uses a bounded 30-second chat timeout.
 Runtime traces and evaluation outputs stay under ignored `artifacts/agent/`.
 See the [demo and activation guide](docs/agent_demo.md),
 [safety contract](docs/agent_safety.md) and [RP-09 evidence](docs/evidence/rp09_gate.md).
