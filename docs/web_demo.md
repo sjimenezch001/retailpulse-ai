@@ -6,13 +6,13 @@ to the existing analytical core. It does not regenerate Gold or train a model.
 
 ## Install and launch (PowerShell)
 
-From the repository root, use Python 3.12.10 and the existing virtual environment.
-For a fresh clone, first create it with `py -3.12 -m venv .venv`.
+From a fresh clone, use Python 3.12 (validated with 3.12.10) and create a new
+virtual environment. The portable first run needs no M5, Ollama or training.
 
 ```powershell
+py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe scripts/tasks.py setup
-# Existing local Gold and the optional installed Ollama model:
-.\.venv\Scripts\python.exe -m retailpulse demo
+.\.venv\Scripts\python.exe -m retailpulse demo --mode synthetic --provider deterministic
 ```
 
 Open **http://127.0.0.1:8501**. The API is **http://127.0.0.1:8000**;
@@ -33,7 +33,7 @@ These commands need no real M5 download or model training:
 ```
 
 After activating `.\.venv\Scripts\Activate.ps1`, the equivalent one-command
-startup is `python -m retailpulse demo`.
+portable startup is `python -m retailpulse demo --mode synthetic --provider deterministic`.
 
 | Mode | Source and behavior |
 |---|---|
@@ -99,19 +99,61 @@ M5 ends on 2016-05-22. Known-price revenue is not audited commercial revenue;
 missing prices are not zero. Demand spikes are heuristic and do not prove causes
 or stockouts.
 
-## 150-second interview script
+## Real-data build and entry points
+
+Existing Gold needs only `python -m retailpulse demo --mode real --provider deterministic`
+from the activated environment. Use `--provider ollama` only when the optional
+local service/model is installed and running. No real pipeline command was run
+during RP-13 packaging.
+
+For a new local real-data environment, obtain the three CSVs following
+[source acquisition](data_source.md), accept the applicable competition terms,
+and place them under `data/raw/m5/`. Then, from an activated environment:
+
+```powershell
+python -m retailpulse profile --select-pilot --sample
+python -m retailpulse bronze
+python -m retailpulse silver
+python -m retailpulse gold --as-of 2026-10-07
+python -m retailpulse baseline
+python -m retailpulse model --validation-only
+python -m retailpulse model
+python -m retailpulse demo --mode real --provider deterministic
+```
+
+These are explicit build operations, not prerequisites for the synthetic demo.
+They create local data and models; do not rerun them to present an existing frozen
+installation. The [modeling protocol](modeling.md) explains frozen plan reuse.
+For Power BI, run `python -m retailpulse export-bi` and
+`python dashboards/powerbi/prepare_desktop.py`, then follow the
+[Desktop build guide](../dashboards/powerbi/BUILD_GUIDE.md). Data-filled PBIX remains
+local. [API examples](api_examples.md) and [assistant CLI](agent_demo.md) expose
+the same analytical definitions.
+
+## 150-second product walkthrough
 
 | Time | Action and narration |
 |---|---|
-| 0–20 s | Open Overview. “Retail teams need consistent demand definitions across stores. This product makes historical sales, forecasts and answers traceable to one analytical source.” Point out real or synthetic mode. |
-| 20–50 s | Show units, price coverage and the missing-price notice. Change the store filter, follow the trend, open provenance. Explain the exact snapshot date and historical freshness. |
-| 50–80 s | Open Forecast, test split, both models. “LightGBM improves WMAPE and MAE; rolling mean has lower RMSE. We retain that tradeoff rather than declaring an unconditional winner.” Show actuals and the two prediction series. |
-| 80–120 s | Open Ask RetailPulse and click Explore store demand. During the local-model spinner, explain the fixed tool allowlist and strict validation. Show 25,307 CA_1 units for April 2016, grounding and the actual provider. If offline, choose deterministic and say so explicitly. |
-| 120–150 s | Open Architecture. Trace M5 through Bronze/Silver/Gold to forecasting, BI and the application. Show lineage, mention synthetic regression tests, preserved model hashes and portable mode. End with historical-data and inventory limitations. |
+| 0–20 s | Overview, real historical mode: introduce the personal portfolio and commercial/BI/planning decisions. State that these are historical sales, not a customer deployment. |
+| 20–45 s | Architecture: trace M5 → Bronze → Silver → Gold/DuckDB, then frozen forecasting/MLflow, Power BI and approved tools → API/UI. Explain lineage and the read-only serving boundary. |
+| 45–80 s | Overview: show 4,530,250 observed units and source scope; select CA_1 to show 1,477,827, then reset All stores. Point out missing prices and partial revenue. |
+| 80–105 s | Forecast, full-pilot test, both models: WMAPE 74.825958% vs 79.482353%; MAE improves but RMSE worsens, 2.431177 vs 2.361194. This is a backtest, not measured revenue uplift. |
+| 105–135 s | Ask RetailPulse: use explicit deterministic mode and submit “How many units did CA_1 sell during April 2016?” Show 25,307, period, grounding, source and offline provider. Explain that the optional model confirms scope; tools supply figures. |
+| 135–150 s | Architecture/limitations: point to recorded Windows/Linux/Docker evidence, 254 tests and 88.15% coverage; close with historical-data, inventory, bounded-assistant and deferred-AWS limitations. |
 
-For a predictable presentation, check `/health` first and submit one warm-up
-question to load Ollama. Cold model loading may take much longer than a warm
-call. A fallback remains useful but is not live LLM validation.
+The shot list and [English SRT captions](demo_captions.en.srt) are the canonical
+150-second sequence. Captions describe genuine actions and preserve the actual
+provider. The [RP-13 gate](evidence/rp13_gate.md) records whether a finished video
+was produced, its measured duration and local ignored path. No personal voice is
+synthesized. A screenshot gallery is not a completed recording.
+
+The completed local recording uses deterministic mode, so no model warm-up or
+live-model claim is involved. Its measured encoded duration is 147.517067 seconds;
+the capture schedule and script span 150 seconds. For a separate live variant,
+first check `/health` and record
+any warm-up used with the existing Ollama model. Preserve the measured response
+latency and provider label; edited video duration is not inference latency. A
+fallback cannot be represented as successful live-model validation.
 
 ## Validation and troubleshooting
 

@@ -21,7 +21,8 @@ Configurable initial subset:
 - 3 stores
 - 2 departments
 
-The specific selection will be defined in configuration during RP-02; it will not be hardcoded.
+RP-02 derived CA_1, CA_2, CA_3 and FOODS_1, FOODS_2 from source identifiers.
+The selected pilot is recorded in configuration and provenance.
 
 ## Decisions supported
 

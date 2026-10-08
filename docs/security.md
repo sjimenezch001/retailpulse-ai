@@ -47,7 +47,11 @@ Unreadable files and links outside the repository fail the wrapper.
 
 The reviewed baseline contains exact path/type/fingerprint exceptions: 135 public
 hashes or Power BI identifiers, one deliberately invalid loopback credential test,
-and six synthetic CSV checksums verified against their contents. These are false
+six synthetic CSV checksums verified against their contents, and six individually
+recomputed real M5 source/Bronze provenance hashes: 148 reviewed entries in total.
+The CLI enforces UTF-8 because locale decoding previously caused a Windows scan
+to omit a document. See the [correction](evidence/rp11_gate.md#b-six-provenance-hashes-were-absent-from-the-reviewed-baseline).
+These are false
 positives with no credential severity. There are no pattern-wide entropy exclusions
 or disabled detectors. The baseline is scanned too; only its exact machine-readable
 fingerprint values count as metadata. New candidates fail until individually
@@ -67,18 +71,16 @@ No repository secrets or cloud accounts are passed. Every critical command fails
 the job on error; artifacts contain only coverage and sanitized scan/acceptance
 reports. No raw runtime logs are published.
 
-Branch protection is **not verified or configured by this local work**; no GitHub
-management CLI is installed. After the first authorized push/PR, a repository
-administrator should create an active ruleset for `main` in Settings → Rules →
-Rulesets, and configure:
+Read-only verification on **2026-10-08** confirmed the active
+[Protect main - require CI ruleset](https://github.com/sjimenezch001/retailpulse-ai/rules/24699291)
+for the default branch. It requires a pull request, linear history and strict
+up-to-date successful `validate (ubuntu-latest)`, `validate (windows-latest)` and
+`container` checks. Branch deletion and non-fast-forward updates are blocked.
 
-1. Require a pull request, one approval, dismissal of stale approvals, and resolved
-   review conversations.
-2. Require the branch to be up to date and these emitted status checks:
-   `validate (ubuntu-latest)`, `validate (windows-latest)`, and `container`.
-   Confirm their actual names after the first run before selecting them.
-3. Block force pushes and deletion; restrict bypass to explicitly authorized admins.
-4. Verify enforcement with a feature PR and record its check run URLs.
-
-No remote check or protection setting is labeled active based on configuration
-files alone. No PR, push, merge, RP-12 or RP-13 work is part of this stage.
+The actual configuration requires **zero approving reviews** and does not require
+stale-review dismissal, code-owner review, last-push approval or conversation
+resolution. Do not describe these stronger review policies as enabled. The public
+response did not enumerate bypass actors; it cannot substantiate a no-bypass claim.
+No protection setting was changed during this verification. The successful
+[PR and main runs](evidence/rp11_gate.md#verified-closure--2026-10-08) establish
+the recorded CI acceptance; they do not certify new unpublished commits.

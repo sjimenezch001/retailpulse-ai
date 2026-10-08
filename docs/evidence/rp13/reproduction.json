@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-08",
+  "scope": "Isolated automated reproduction on the available Windows machine; not independent human verification",
+  "installation": {
+    "python": "Python 3.12.10",
+    "host": "Windows",
+    "checkout": "artifacts/rp13/clean_checkout",
+    "new_virtualenv": true,
+    "isolated_user_profile": true,
+    "pip_cache_disabled": true,
+    "real_data_or_model_cache_copied": false,
+    "installation": "PASS",
+    "pip_check": "No broken requirements found.",
+    "installation_seconds": 602.203,
+    "launcher_note": "The isolated profile cannot discover the user-installed Python via py -3.12; used the same verified base Python executable with -m venv .venv, not the existing virtualenv.",
+    "revision_note": "Historical pre-reconstruction packaging candidate; original revision retained privately. Runtime files match published main 593dc50 and the reconstructed candidate.",
+    "repeated_after_privacy_reconstruction": false
+  },
+  "runtime": {
+    "result": "PASS",
+    "python_prefix_is_new_venv": true,
+    "mode": "synthetic",
+    "health_http": 200,
+    "ready_http": 200,
+    "readiness": "ready",
+    "ollama_discovery_available": true,
+    "real_gold_available": false,
+    "overview_units": 1386,
+    "forecast_models": 2,
+    "question": "How many units did SYN_A sell during all observed dates?",
+    "assistant_units": 378,
+    "provider": "deterministic:explicit_offline_mode",
+    "live_provider_succeeded": false,
+    "browser": "154.0.8037.98",
+    "browser_tabs_checked": 3,
+    "page_errors": [],
+    "screenshots": [
+      "clean_overview.png",
+      "clean_forecast.png",
+      "clean_assistant.png"
+    ]
+  },
+  "shutdown": {
+    "result": "PASS",
+    "method": "Python SIGINT/KeyboardInterrupt injected by an external harness into the unchanged CLI",
+    "physical_ctrl_c_verified": false,
+    "exit_code": 0,
+    "owned_children_reaped": 7,
+    "ports_closed": {
+      "8013": true,
+      "8513": true,
+      "8014": true,
+      "8514": true
+    },
+    "shutdown_seconds": 8.578
+  },
+  "limitations": [
+    "A fresh user profile cannot discover this per-user Python installation through py -3.12; the verified base Python 3.12.10 executable created the new venv.",
+    "The browser observer used native Windows OS profile paths for Chrome cryptography, with a fresh temporary browser profile. The application kept its isolated profile.",
+    "The installed host Ollama service was discoverable; requests used explicit deterministic mode, with no inference or copied model cache.",
+    "The automated PTY did not deliver keyboard Ctrl+C. Initial owned processes were cleaned up, then the unchanged CLI shutdown path was verified with a Python interrupt harness. Physical-keyboard verification remains pending.",
+    "Browser automation initially selected duplicate 378 labels. A scoped metric-card selector passed without changing application code."
+  ]
+}

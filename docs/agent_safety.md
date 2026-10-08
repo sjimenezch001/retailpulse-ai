@@ -3,7 +3,8 @@
 RP-09 adds three approved tools and a stateless local orchestrator. Business
 figures come from the existing Gold snapshot. No model generates SQL or
 numerical answer text. Existing transformations, forecast results and
-dependency versions are unchanged. RP-10 HTTP endpoints are out of scope.
+dependency versions were unchanged by RP-09. RP-10 now exposes this same core
+through local HTTP endpoints; see [API contracts](api_examples.md).
 
 ## Trust boundaries
 
@@ -141,14 +142,15 @@ Rendering uses returned values only, with six decimal places for display
 and full precision retained in `ask --json`.
 
 Local JSONL traces live under ignored `artifacts/agent/`. They contain a
-request UUID, UTC time, tool/intent, successful validated numerical filters,
+request UUID, UTC time, tool/intent, an empty validated-filters field,
 duration, source/run ID, outcome, error category, provider diagnostics and
 grounding status. They omit raw questions, doc search text, credentials and results.
-When execution fails before returning a result, filters remain empty.
+RP-11 removed filter values from runtime traces; typed API results still carry
+their validated scope. See [observability](observability.md).
 Trace-write errors fail closed with `trace_unavailable`. Operators may rotate
 these local files; automatic retention management is not implemented.
 `traces/sample.json` is an illustrative redacted record, not real M5 output.
 
 The core `Assistant.ask` returns typed objects without CLI or web dependencies.
-Future adapters can reuse it with application-owned paths and configuration.
-This stage adds no HTTP listener, authentication or deployment.
+The RP-10 API reuses it with application-owned paths and configuration.
+Authentication and public deployment remain outside this local demo.

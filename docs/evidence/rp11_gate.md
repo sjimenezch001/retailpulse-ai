@@ -4,14 +4,13 @@ Acceptance date: 2026-10-08, America/Sao_Paulo.
 Branch: `feat/rp-11-hardening`, created from the verified clean main revision
 `729ce9a2a7b245f35c7750af36eeb00e148798ae`.
 
-**RP-11 ENGINEERING: PENDING CORRECTED CI** — the original remote container job
-passed, including genuine image build/startup and API/UI checks. Windows validation
-and the Linux secret scan failed independently. Local corrective validation is
-documented below; the corrected revision still requires remote confirmation.
+**RP-11 ENGINEERING: PASS** — corrected Windows, Linux and genuine Docker checks
+passed remotely. See the dated closure below for exact revisions and run links.
 
-**RP-11 FULL GATE: PENDING REMOTE CI** — successful Windows/Linux checks on the
-corrected revision, required status checks and verification of branch protection
-remain outstanding. No push, merge, RP-12 or RP-13 work was performed in this fix.
+**RP-11 FULL GATE: PASS** — corrected PR and post-merge CI succeeded; the active
+main ruleset was verified read-only on 2026-10-08. Its actual zero-approval review
+policy is recorded explicitly. Historical failures and the original local-only
+limitations below remain preserved. This closure does not validate RP-13 commits.
 
 ## Initial local validation (before the CI corrections below)
 
@@ -121,7 +120,8 @@ the distinct causes documented below. Docker code was not changed by this fix.
 Follow [developer workflow](../developer_workflow.md) for local commands and
 [manual branch-protection instructions](../security.md#ci-and-manual-branch-protection).
 Branch protection is not claimed active. Outstanding acceptance requires an
-authorized future push/PR and successful required checks for the corrected revision.
+an authorized future push/PR and successful checks for that corrected revision
+at the time of the original report; the dated closure below resolves this item.
 The original container job provides genuine Docker evidence for `c3bd076` only.
 
 ## Protected data
@@ -236,4 +236,34 @@ The initial reports linked earlier remain historical evidence, including the
 incomplete Windows secret-scan result. Application behavior, pipeline logic,
 checksum enforcement, tool allowlists, database protections, dependency versions,
 Gold and frozen artifacts were preserved. Remote checks for this corrected
-revision remain pending; no push or merge was performed.
+revision were pending at the time of that local fix; no push or merge was performed
+by that correction task. The following closure records the subsequent remote work.
+
+## Verified closure — 2026-10-08
+
+RP-13 documentation review queried the public GitHub API read-only and confirmed:
+
+| Evidence | Observed state |
+| --- | --- |
+| [PR #11](https://github.com/sjimenezch001/retailpulse-ai/pull/11) | Merged at 2026-10-08 05:55:03 UTC; resulting main revision `593dc50` |
+| [Corrected PR run 37732985345](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37732985345) | Revision `bb2a0c9`, completed/success; Windows, Ubuntu and container each succeeded |
+| [Post-merge run 37734804078](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078) | Revision `593dc50`, completed/success; Windows, Ubuntu and container each succeeded |
+| [Ruleset 24699291](https://github.com/sjimenezch001/retailpulse-ai/rules/24699291) | Active, default branch, PR required, linear history, deletion/force-push blocked, strict up-to-date required checks |
+
+Required check names are exactly `validate (ubuntu-latest)`,
+`validate (windows-latest)` and `container`. Container success includes the existing
+actual Compose image build, startup, API/UI acceptance and non-root checks.
+This supersedes the historical Docker/remote-CI blockers; it is not a local Docker
+Desktop installation or a claim that the failed run succeeded.
+
+The ruleset requires **zero approvals**. Stale-review dismissal, code-owner review,
+last-push approval and conversation resolution are disabled. The public API did
+not enumerate bypass actors, so bypass absence is not claimed. The earlier
+one-approval recommendation was not the configuration actually adopted. The
+verified protection and successful required checks close RP-11 under that recorded
+policy. Settings were not modified or destructively tested during this review.
+
+The original failed run `37730846032`, its LF/CRLF and UTF-8 causes, all correction
+evidence and earlier local reports remain intact. RP-13 starts separately from
+the synchronized clean `593dc50` main revision. Its unpublished commits require
+their own checks before any future merge.

@@ -175,4 +175,6 @@ Artifacts: `artifacts/mlflow/artifacts/<run_id>/artifacts/` and
 windows, git revision and environment metadata are logged. Forecasts and
 models remain ignored; only aggregates and provenance are distributed.
 Gold serves 103,152 ML forecasts beside all 464,184 unchanged baseline
-forecasts. RP-08 has not started. See [gate evidence](evidence/rp07_gate.md).
+forecasts. Power BI and the local web demo now consume these frozen results;
+see [RP-08 evidence](evidence/rp08_gate.md), [RP-10 evidence](evidence/rp10_gate.md)
+and the original [model gate](evidence/rp07_gate.md).
