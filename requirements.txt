@@ -1,4 +1,4 @@
-# Generated from the validated RP-07 environment: Windows, Python 3.12.10.
+# Generated from the validated RP-10 environment (existing pins preserved): Windows, Python 3.12.10.
 # Runtime and development dependencies, including transitive dependencies.
 # Local editable project excluded; install separately with pip install -e ".[dev]".
 alembic==1.20.0
@@ -63,3 +63,26 @@ tzdata==2026.4
 urllib3==2.8.0
 uvicorn==0.54.0
 zipp==4.1.1
+
+# RP-10 web demo and optional browser acceptance tools.
+altair==6.3.0
+attrs==26.1.0
+greenlet==3.5.6
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.28.1
+itsdangerous==2.2.0
+jinja2==3.1.6
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+pillow==12.3.0
+playwright==1.63.0
+pydeck==0.9.3
+pyee==13.0.1
+python-multipart==0.0.32
+referencing==0.37.0
+rpds-py==2026.9.1
+streamlit==1.65.0
+toml==0.10.2
+watchdog==6.0.0
+websockets==17.2

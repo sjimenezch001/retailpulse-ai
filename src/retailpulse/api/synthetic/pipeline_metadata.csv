@@ -1,0 +1,2 @@
+gold_run_id,silver_run_id,bronze_run_id,first_sales_date,last_sales_date,as_of_date,source_ingestion_ts,generated_at,identity_json
+synthetic-web-v1,synthetic-silver-v1,synthetic-bronze-v1,2020-01-01,2020-02-11,2020-02-12,2020-02-12T00:00:00+00:00,2020-02-12T00:00:00+00:00,{}

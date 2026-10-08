@@ -1,0 +1,13 @@
+{
+  "mode": "synthetic",
+  "version": "synthetic-web-v1",
+  "source": "Repository-authored m5_synthetic fixtures only; simulated LightGBM comparison, no training.",
+  "tables": {
+    "mart_sales_daily": "\"item_id\" VARCHAR,\"store_id\" VARCHAR,\"dept_id\" VARCHAR,\"cat_id\" VARCHAR,\"state_id\" VARCHAR,\"pipeline_run_id\" VARCHAR,\"ingestion_ts\" VARCHAR,\"source_checksum\" VARCHAR,\"d\" VARCHAR,\"units\" BIGINT,\"date\" TIMESTAMP,\"wm_yr_wk\" BIGINT,\"sell_price\" DOUBLE,\"price_missing\" BOOLEAN,\"revenue_proxy\" DOUBLE,\"rolling_7d\" DOUBLE,\"rolling_28d\" DOUBLE,\"price_change_pct\" DOUBLE,\"demand_spike_flag\" BOOLEAN,\"data_freshness\" BIGINT",
+    "dim_store": "\"store_id\" VARCHAR,\"state_id\" VARCHAR",
+    "dim_product": "\"item_id\" VARCHAR,\"dept_id\" VARCHAR,\"cat_id\" VARCHAR",
+    "pipeline_metadata": "\"gold_run_id\" VARCHAR,\"silver_run_id\" VARCHAR,\"bronze_run_id\" VARCHAR,\"first_sales_date\" DATE,\"last_sales_date\" DATE,\"as_of_date\" DATE,\"source_ingestion_ts\" VARCHAR,\"generated_at\" VARCHAR,\"identity_json\" VARCHAR",
+    "fact_forecast": "\"forecast_origin\" DATE,\"target_date\" DATE,\"store_id\" VARCHAR,\"item_id\" VARCHAR,\"dept_id\" VARCHAR,\"model\" VARCHAR,\"split\" VARCHAR,\"horizon\" INTEGER,\"predicted_units\" DOUBLE,\"actual_units\" DOUBLE,\"demand_level\" VARCHAR,\"training_start\" DATE,\"training_end\" DATE,\"source_run_id\" VARCHAR",
+    "metric_definitions": "\"metric\" VARCHAR,\"grain\" VARCHAR,\"definition\" VARCHAR,\"filters\" VARCHAR"
+  }
+}
