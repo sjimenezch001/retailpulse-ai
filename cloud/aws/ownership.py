@@ -8,7 +8,7 @@ def require_tags(actual, settings):
         raise LabError("ownership_tags_mismatch")
 
 
-def validate_outputs(outputs, settings):
+def validate_outputs(outputs, settings, *, allow_deferred=False):
     expected = {
         "account": settings.account,
         "region": settings.region,
@@ -24,7 +24,18 @@ def validate_outputs(outputs, settings):
     if any(outputs.get(k) != v for k, v in expected.items()):
         raise LabError("terraform_inventory_mismatch")
     require_tags(outputs.get("tags", {}), settings)
-    endpoint = outputs.get("api_id") is not None
+    if (
+        outputs.get("owner_managed") != ["bucket", "glue_role", "glue_boundary"]
+        or outputs.get("glue_role_arn") != settings.glue_role_arn
+        or outputs.get("boundary_arn") != settings.glue_boundary_arn
+    ):
+        raise LabError("owner_foundation_inventory_mismatch")
+    if not allow_deferred and any(
+        outputs.get(name) is not None
+        for name in ("api_id", "lambda_role", "function", "endpoint")
+    ):
+        raise LabError("endpoint_deferred")
+    endpoint = outputs.get("api_id") is not None if allow_deferred else False
     if outputs.get("lambda_role") != (settings.name + "-metrics" if endpoint else None):
         raise LabError("terraform_lambda_role_mismatch")
     if outputs.get("function") != (settings.name + "-metrics" if endpoint else None):
@@ -76,7 +87,9 @@ def verify_bucket(s3, settings):
 
 def verify_resources(clients, settings, outputs):
     validate_outputs(outputs, settings)
-    verify_bucket(clients["s3"], settings)
+    from cloud.aws.foundations import verify_foundations
+
+    verify_foundations(clients, settings)
     for service, arn in (
         ("glue", settings.arn("glue", f"job/{settings.name}")),
         ("athena", settings.arn("athena", f"workgroup/{settings.name}")),
@@ -92,8 +105,16 @@ def verify_resources(clients, settings, outputs):
             tags = {t["Key"]: t["Value"] for t in result["Tags"]}
         require_tags(tags, settings)
     job = clients["glue"].get_job(JobName=settings.name)["Job"]
-    if job.get("SecurityConfiguration") != settings.name:
-        raise LabError("security_configuration_ownership")
+    if (
+        job.get("SecurityConfiguration")
+        or job.get("Role") != settings.glue_role_arn
+        or job.get("NumberOfWorkers") != 2
+        or job.get("WorkerType") != "G.1X"
+        or job.get("Timeout") != 5
+        or job.get("MaxRetries") != 0
+        or job.get("ExecutionProperty", {}).get("MaxConcurrentRuns") != 1
+    ):
+        raise LabError("job_security_or_execution_bounds")
     database = clients["glue"].get_database(
         CatalogId=settings.account, Name=settings.database
     )["Database"]
@@ -120,33 +141,11 @@ def verify_resources(clients, settings, outputs):
             != f"s3://{settings.bucket}/{settings.prefix('curated')}{name}/"
         ):
             raise LabError("catalog_location_ownership")
-    role_names = [outputs["glue_role"]]
-    if outputs["lambda_role"]:
-        role_names.append(outputs["lambda_role"])
-    for name in role_names:
-        role = clients["iam"].get_role(RoleName=name)["Role"]
-        if (
-            role["Arn"]
-            != f"arn:aws:iam::{settings.account}:role/retailpulse/{settings.environment}/{name}"
-        ):
-            raise LabError("role_identity_mismatch")
-        require_tags({t["Key"]: t["Value"] for t in role.get("Tags", [])}, settings)
     for name in outputs["log_groups"]:
         arn = settings.arn("logs", f"log-group:{name}")
         require_tags(
             clients["logs"].list_tags_for_resource(resourceArn=arn)["tags"], settings
         )
-    if outputs["api_id"]:
-        api = clients["apigatewayv2"].get_api(ApiId=outputs["api_id"])
-        if api["ApiEndpoint"] != outputs["endpoint"]:
-            raise LabError("api_endpoint_mismatch")
-        require_tags(api.get("Tags", {}), settings)
-        function = clients["lambda"].get_function(FunctionName=outputs["function"])
-        if function["Configuration"]["FunctionArn"] != settings.arn(
-            "lambda", f"function:{outputs['function']}"
-        ):
-            raise LabError("function_identity_mismatch")
-        require_tags(function.get("Tags", {}), settings)
     return {"verified": True, "lab_id": settings.lab_id, "resource_scope": outputs}
 
 
@@ -203,6 +202,9 @@ def stop_workloads(clients, settings, *, sleep):
 def empty_owned_bucket(s3, settings):
     """Verify owner, region and tags again before any destructive bucket call."""
     verify_bucket(s3, settings)
+    from cloud.aws.foundations import verify_bucket_security
+
+    verify_bucket_security(s3, settings)
     bucket = {"Bucket": settings.bucket, "ExpectedBucketOwner": settings.account}
     pages, versions, next_key, next_version = 0, [], None, None
     while True:
@@ -255,114 +257,84 @@ def empty_owned_bucket(s3, settings):
     }
 
 
+MANAGED_TYPES = frozenset(
+    {
+        "aws_glue_job",
+        "aws_glue_catalog_database",
+        "aws_glue_catalog_table",
+        "aws_athena_workgroup",
+        "aws_cloudwatch_log_group",
+    }
+)
+FOUNDATION_DATA_TYPES = frozenset(
+    {
+        "aws_s3_bucket",
+        "aws_s3_bucket_policy",
+        "aws_iam_role",
+        "aws_iam_policy",
+    }
+)
+
+
 def verify_state(state, settings, outputs):
-    """Reject foreign resource IDs in local state before Terraform can delete them."""
+    """Reject legacy managed foundations and foreign state before plan/destroy."""
     root = state.get("values", {}).get("root_module", {})
     if root.get("child_modules") or not root.get("resources"):
         raise LabError("unsupported_or_empty_state")
+    managed = 0
     for resource in root["resources"]:
-        kind, value = resource.get("type", ""), resource.get("values", {})
-        if resource.get("mode") != "managed":
-            raise LabError("unexpected_state_resource")
-        valid = False
-        if kind.startswith("aws_s3_bucket"):
-            valid = (
-                kind
-                in {
-                    "aws_s3_bucket",
-                    "aws_s3_bucket_public_access_block",
-                    "aws_s3_bucket_ownership_controls",
-                    "aws_s3_bucket_server_side_encryption_configuration",
-                    "aws_s3_bucket_versioning",
-                    "aws_s3_bucket_policy",
-                    "aws_s3_bucket_lifecycle_configuration",
-                }
-                and value.get("bucket") == settings.bucket
-            )
+        kind = resource.get("type", "")
+        value = resource.get("values", {})
+        if resource.get("mode") == "data":
+            if kind not in FOUNDATION_DATA_TYPES:
+                raise LabError("foreign_foundation_data")
             if kind == "aws_s3_bucket":
-                valid = valid and value.get("id") == settings.bucket
-        elif kind == "aws_iam_role":
-            valid = value.get("name") in {
-                name for name in (outputs["glue_role"], outputs["lambda_role"]) if name
-            } and (value.get("path") == f"/retailpulse/{settings.environment}/")
-        elif kind == "aws_iam_role_policy":
-            valid = (value.get("role"), value.get("name")) in {
-                (outputs["glue_role"], "bounded-etl"),
-                (outputs["lambda_role"], "read-one-metric"),
-            }
-        elif kind in {
-            "aws_glue_job",
-            "aws_glue_security_configuration",
-            "aws_athena_workgroup",
-        }:
-            valid = value.get("name") == settings.name
+                valid = (
+                    value.get("bucket") == settings.bucket
+                    and value.get("arn") == f"arn:aws:s3:::{settings.bucket}"
+                )
+            elif kind == "aws_s3_bucket_policy":
+                valid = value.get("bucket") == settings.bucket
+            elif kind == "aws_iam_role":
+                valid = value.get("arn") == settings.glue_role_arn
+            else:
+                valid = value.get("arn") == settings.glue_boundary_arn
+            if not valid:
+                raise LabError("foreign_foundation_data")
+            continue
+        if resource.get("mode") != "managed" or kind not in MANAGED_TYPES:
+            raise LabError("foreign_or_owner_managed_terraform_state")
+        managed += 1
+        valid = False
+        if kind in {"aws_glue_job", "aws_athena_workgroup"}:
+            valid = (
+                value.get("name") == settings.name and value.get("id") == settings.name
+            )
         elif kind == "aws_glue_catalog_database":
             valid = (
                 value.get("name") == settings.database
                 and value.get("catalog_id") == settings.account
+                and value.get("id") == f"{settings.account}:{settings.database}"
             )
         elif kind == "aws_glue_catalog_table":
             from cloud.aws.contracts import TABLES
 
+            name = value.get("name")
             valid = (
-                value.get("name") in {*TABLES, "store_units"}
+                name in {*TABLES, "store_units"}
                 and value.get("database_name") == settings.database
                 and value.get("catalog_id") == settings.account
+                and value.get("id") == f"{settings.account}:{settings.database}:{name}"
             )
         elif kind == "aws_cloudwatch_log_group":
-            valid = value.get("name") in outputs["log_groups"]
-        elif kind == "aws_lambda_function":
-            valid = (
-                outputs["function"] is not None
-                and value.get("function_name") == outputs["function"]
-            )
-        elif kind == "aws_lambda_permission":
-            valid = (
-                outputs["function"] is not None
-                and value.get("function_name") == outputs["function"]
-                and value.get("statement_id") == "ExactIamMetricRoute"
-            )
-        elif kind == "aws_apigatewayv2_api":
-            valid = (
-                outputs["api_id"] is not None and value.get("id") == outputs["api_id"]
-            )
-        elif kind in {
-            "aws_apigatewayv2_integration",
-            "aws_apigatewayv2_route",
-            "aws_apigatewayv2_stage",
-        }:
-            valid = (
-                outputs["api_id"] is not None
-                and value.get("api_id") == outputs["api_id"]
-            )
-            if kind == "aws_apigatewayv2_route":
-                valid = valid and value.get("route_key") == "GET /metrics/units"
-            if kind == "aws_apigatewayv2_stage":
-                valid = valid and value.get("name") == "$default"
-        expected_id = None
-        if kind.startswith("aws_s3_bucket"):
-            expected_id = settings.bucket
-        elif kind in {
-            "aws_iam_role",
-            "aws_glue_job",
-            "aws_glue_security_configuration",
-            "aws_athena_workgroup",
-            "aws_cloudwatch_log_group",
-        }:
-            expected_id = value.get("name")
-        elif kind == "aws_iam_role_policy":
-            expected_id = f"{value.get('role')}:{value.get('name')}"
-        elif kind == "aws_glue_catalog_database":
-            expected_id = f"{settings.account}:{settings.database}"
-        elif kind == "aws_glue_catalog_table":
-            expected_id = f"{settings.account}:{settings.database}:{value.get('name')}"
-        elif kind == "aws_lambda_function":
-            expected_id = outputs["function"]
-        if expected_id is not None and value.get("id") != expected_id:
-            valid = False
+            valid = value.get("name") in outputs["log_groups"] and value.get(
+                "id"
+            ) == value.get("name")
         if not valid:
             raise LabError("foreign_or_unexpected_terraform_state")
         tags = value.get("tags_all") or value.get("tags")
         if tags:
             require_tags(tags, settings)
+    if not managed:
+        raise LabError("unsupported_or_empty_state")
     return True

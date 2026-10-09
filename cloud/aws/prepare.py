@@ -21,7 +21,6 @@ PACKAGE_FILES = (
     "cloud/aws/__init__.py",
     "cloud/aws/contracts.py",
     "cloud/aws/settings.py",
-    "cloud/aws/lambda_handler.py",
 )
 SDK_DIRS = {"boto3", "botocore", "jmespath", "s3transfer", "dateutil", "urllib3"}
 
@@ -32,6 +31,8 @@ def code_digest(root):
             *Path(root, "cloud/aws").glob("*.py"),
             *Path(root, "cloud/aws/sql").glob("*.sql"),
             Path(root, "cloud/aws/requirements.txt"),
+            *Path(root, "infra/aws").glob("*.tf"),
+            *Path(root, "infra/aws").glob("*.tf.json"),
         ]
     )
     return digest(
@@ -119,7 +120,6 @@ def prepare(root):
     }
     entries["cloud/aws/trusted_manifest.json"] = canonical(trusted)
     entries.update(sdk_entries(root))
-    write_zip(out / "lambda.zip", entries)
     write_zip(out / "glue_bundle.zip", entries)
     (out / "glue_job.py").write_text(
         (root / "cloud/aws/glue_job.py").read_text(encoding="utf-8"),
@@ -156,7 +156,6 @@ def prepare(root):
         *(f"input/{name}" for name in sorted(blobs)),
         "glue_job.py",
         "glue_bundle.zip",
-        "lambda.zip",
     ]
     record = {
         "mode": "synthetic",
@@ -191,7 +190,6 @@ def load_prepared(root):
             *(f"input/{n}" for n in ["manifest.json", *(f"{t}.csv" for t in tables)]),
             "glue_job.py",
             "glue_bundle.zip",
-            "lambda.zip",
         }
         if set(record["files"]) != expected_files:
             raise LabError("prepared_file_allowlist")

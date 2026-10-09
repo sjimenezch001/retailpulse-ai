@@ -98,6 +98,9 @@ def outputs(settings):
         "workgroup": settings.name,
         "tags": settings.tags,
         "glue_role": settings.name + "-glue",
+        "glue_role_arn": settings.glue_role_arn,
+        "boundary_arn": settings.glue_boundary_arn,
+        "owner_managed": ["bucket", "glue_role", "glue_boundary"],
         "lambda_role": None,
         "function": None,
         "api_id": None,
@@ -127,6 +130,11 @@ def s3(settings):
             self.tags = settings.tags.copy()
             self.region = settings.region
             self.denied = False
+            from cloud.aws.policies import bucket_configuration, bucket_policy
+
+            self.security = bucket_configuration()
+            self.policy = bucket_policy(settings)
+            self.public = False
 
         def get_object(self, **args):
             if self.denied:
@@ -134,7 +142,11 @@ def s3(settings):
             if args["Key"] not in self.objects:
                 raise StubError("NoSuchKey")
             data = self.objects[args["Key"]]
-            return {"Body": io.BytesIO(data), "ContentLength": len(data)}
+            return {
+                "Body": io.BytesIO(data),
+                "ContentLength": len(data),
+                "ServerSideEncryption": "AES256",
+            }
 
         def put_object(self, **args):
             self.writes.append(args)
@@ -153,6 +165,29 @@ def s3(settings):
 
         def get_bucket_tagging(self, **args):
             return {"TagSet": [{"Key": k, "Value": v} for k, v in self.tags.items()]}
+
+        def get_public_access_block(self, **args):
+            return {
+                "PublicAccessBlockConfiguration": self.security["public_access_block"]
+            }
+
+        def get_bucket_encryption(self, **args):
+            return {"ServerSideEncryptionConfiguration": self.security["encryption"]}
+
+        def get_bucket_ownership_controls(self, **args):
+            return {"OwnershipControls": self.security["ownership"]}
+
+        def get_bucket_versioning(self, **args):
+            return self.security["versioning"]
+
+        def get_bucket_lifecycle_configuration(self, **args):
+            return self.security["lifecycle"]
+
+        def get_bucket_policy(self, **args):
+            return {"Policy": self.policy}
+
+        def get_bucket_policy_status(self, **args):
+            return {"PolicyStatus": {"IsPublic": self.public}}
 
         def list_object_versions(self, **args):
             return {"Versions": self.versions.copy(), "IsTruncated": False}
@@ -176,3 +211,37 @@ def s3(settings):
             return {}
 
     return S3()
+
+
+@pytest.fixture
+def foundations(s3, settings):
+    from types import SimpleNamespace
+
+    from cloud.aws.policies import execution_boundary, execution_policy, trust_policy
+
+    iam = SimpleNamespace(
+        role={
+            "Arn": settings.glue_role_arn,
+            "Path": "/",
+            "PermissionsBoundary": {
+                "PermissionsBoundaryArn": settings.glue_boundary_arn
+            },
+            "AssumeRolePolicyDocument": trust_policy(settings),
+            "Tags": [{"Key": k, "Value": v} for k, v in settings.tags.items()],
+        },
+        inline=execution_policy(settings),
+        boundary=execution_boundary(settings),
+        names=["bounded-etl"],
+        attached=[],
+    )
+    iam.get_role = lambda **kw: {"Role": iam.role}
+    iam.list_role_policies = lambda **kw: {"PolicyNames": iam.names}
+    iam.list_attached_role_policies = lambda **kw: {"AttachedPolicies": iam.attached}
+    iam.get_role_policy = lambda **kw: {"PolicyDocument": iam.inline}
+    iam.get_policy = lambda **kw: {
+        "Policy": {"Arn": settings.glue_boundary_arn, "DefaultVersionId": "v1"}
+    }
+    iam.get_policy_version = lambda **kw: {
+        "PolicyVersion": {"Document": iam.boundary, "IsDefaultVersion": True}
+    }
+    return {"s3": s3, "iam": iam}

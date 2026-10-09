@@ -29,7 +29,7 @@ def test_offline_preparation_is_repeatable_and_rejects_tampering(
     assert first == second and first["metric_reference"]["total_units"] == 1386
     assert first["spark_executed"] is False and first["aws_executed"] is False
     out = tmp_path / "artifacts/rp12/prepared"
-    with zipfile.ZipFile(out / "lambda.zip") as bundle:
+    with zipfile.ZipFile(out / "glue_bundle.zip") as bundle:
         assert "cloud/aws/trusted_manifest.json" in bundle.namelist()
         assert not any(
             name.endswith((".duckdb", ".pbix", ".mp4", ".csv"))

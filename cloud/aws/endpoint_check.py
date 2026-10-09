@@ -15,7 +15,8 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 def smoke_test(session, settings, outputs, expected, *, opener=None, signer=None):
-    validate_outputs(outputs, settings)
+    # Deferred helper retained for historical offline transport tests only.
+    validate_outputs(outputs, settings, allow_deferred=True)
     if not outputs["endpoint"]:
         raise LabError("endpoint_disabled")
     store = sorted(expected["stores"])[0]

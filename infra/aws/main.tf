@@ -1,82 +1,26 @@
 locals {
-  name        = "retailpulse-${var.environment}"
-  bucket      = "${local.name}-${var.account_id}-${var.aws_region}"
-  bucket_arn  = "arn:aws:s3:::${local.bucket}"
-  lab_id      = substr(sha256("${var.account_id}:${var.aws_region}:${var.environment}"), 0, 16)
-  database    = "rp_${replace(var.environment, "-", "_")}"
-  glue_role   = "${local.name}-glue"
-  lambda_role = "${local.name}-metrics"
-  role_path   = "/retailpulse/${var.environment}/"
-  glue_arn    = "arn:aws:iam::${var.account_id}:role${local.role_path}${local.glue_role}"
-  lambda_arn  = "arn:aws:iam::${var.account_id}:role${local.role_path}${local.lambda_role}"
-  log_prefix  = "/retailpulse/${var.environment}/glue"
-  tags = {
-    Project = "RetailPulseAI", Environment = var.environment, LabId = local.lab_id
-    Stage   = "RP12A", ExpiresOn = var.expires_on
+  name       = "retailpulse-${var.environment}"
+  bucket     = var.owner_bucket_name
+  bucket_arn = "arn:aws:s3:::${local.name}-${var.account_id}-${var.aws_region}"
+  lab_id     = substr(sha256("${var.account_id}:${var.aws_region}:${var.environment}"), 0, 16)
+  database   = "rp_${replace(var.environment, "-", "_")}"
+  glue_role  = "${local.name}-glue"
+  log_prefix = "/retailpulse/${var.environment}/glue"
+  log_names  = ["${local.log_prefix}/error", "${local.log_prefix}/output"]
+  identity_tags = {
+    Project = "RetailPulseAI", Environment = var.environment,
+    LabId   = local.lab_id, Stage = "RP12C"
   }
-  log_names = concat(
-    ["${local.log_prefix}/error", "${local.log_prefix}/output"],
-    var.enable_endpoint ? ["/aws/lambda/${local.lambda_role}", "/retailpulse/${var.environment}/api"] : []
-  )
-}
-resource "aws_s3_bucket" "lab" {
-  bucket        = local.bucket
-  force_destroy = false
-}
-resource "aws_s3_bucket_public_access_block" "lab" {
-  bucket                  = aws_s3_bucket.lab.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-resource "aws_s3_bucket_ownership_controls" "lab" {
-  bucket = aws_s3_bucket.lab.id
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
-resource "aws_s3_bucket_server_side_encryption_configuration" "lab" {
-  bucket = aws_s3_bucket.lab.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-resource "aws_s3_bucket_versioning" "lab" {
-  bucket = aws_s3_bucket.lab.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-resource "aws_s3_bucket_policy" "lab" {
-  bucket = aws_s3_bucket.lab.id
-  policy = jsonencode({
+  tags = merge(local.identity_tags, { ExpiresOn = var.expires_on })
+  glue_trust = {
     Version = "2012-10-17"
     Statement = [{
-      Sid       = "DenyInsecureTransport", Effect = "Deny", Principal = "*"
-      Action    = "s3:*", Resource = [local.bucket_arn, "${local.bucket_arn}/*"]
-      Condition = { Bool = { "aws:SecureTransport" = "false" } }
+      Effect = "Allow", Principal = { Service = "glue.amazonaws.com" }, Action = "sts:AssumeRole",
+      Condition = {
+        StringEquals = { "aws:SourceAccount" = var.account_id },
+        ArnLike      = { "aws:SourceArn" = "arn:aws:glue:${var.aws_region}:${var.account_id}:*" }
+      }
     }]
-  })
-}
-resource "aws_s3_bucket_lifecycle_configuration" "lab" {
-  bucket     = aws_s3_bucket.lab.id
-  depends_on = [aws_s3_bucket_versioning.lab]
-  rule {
-    id     = "temporary-results"
-    status = "Enabled"
-    filter { prefix = "results/" }
-    expiration { days = 1 }
-  }
-  rule {
-    id     = "bounded-lab-retention"
-    status = "Enabled"
-    filter {}
-    expiration { days = 7 }
-    noncurrent_version_expiration { noncurrent_days = 1 }
-    abort_incomplete_multipart_upload { days_after_initiation = 1 }
   }
 }
 resource "aws_cloudwatch_log_group" "lab" {
@@ -84,70 +28,9 @@ resource "aws_cloudwatch_log_group" "lab" {
   name              = each.value
   retention_in_days = 3
 }
-resource "aws_iam_role" "glue" {
-  name = local.glue_role
-  path = local.role_path
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow", Principal = { Service = "glue.amazonaws.com" }
-      Action = "sts:AssumeRole"
-      Condition = {
-        StringEquals = { "aws:SourceAccount" = var.account_id }
-        ArnLike      = { "aws:SourceArn" = "arn:aws:glue:${var.aws_region}:${var.account_id}:*" }
-      }
-    }]
-  })
-}
-resource "aws_iam_role_policy" "glue" {
-  name = "bounded-etl"
-  role = aws_iam_role.glue.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid      = "ReadApprovedInputAndCode", Effect = "Allow", Action = ["s3:GetObject"]
-        Resource = ["${local.bucket_arn}/input/${var.run_id}/*", "${local.bucket_arn}/scripts/${var.run_id}/*"]
-      },
-      {
-        Sid      = "OwnRunOnly", Effect = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"]
-        Resource = ["${local.bucket_arn}/curated/${var.run_id}/*", "${local.bucket_arn}/temporary/${var.run_id}/*"]
-      },
-      {
-        Sid      = "ListExactPrefixes", Effect = "Allow", Action = ["s3:ListBucket"]
-        Resource = [local.bucket_arn]
-        Condition = { StringLikeIfExists = { "s3:prefix" = [
-          "input/${var.run_id}/*", "scripts/${var.run_id}/*",
-          "curated/${var.run_id}/*", "temporary/${var.run_id}/*"
-        ] } }
-      },
-      {
-        Sid    = "BucketRegion", Effect = "Allow"
-        Action = ["s3:GetBucketLocation"], Resource = [local.bucket_arn]
-      },
-      {
-        Sid    = "ExistingLogGroupsOnly", Effect = "Allow"
-        Action = ["logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = [
-          "arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:${local.log_prefix}/error:*",
-          "arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:${local.log_prefix}/output:*"
-        ]
-      }
-    ]
-  })
-}
-resource "aws_glue_security_configuration" "lab" {
-  name = local.name
-  encryption_configuration {
-    s3_encryption { s3_encryption_mode = "SSE-S3" }
-    cloudwatch_encryption { cloudwatch_encryption_mode = "DISABLED" }
-    job_bookmarks_encryption { job_bookmarks_encryption_mode = "DISABLED" }
-  }
-}
 resource "aws_glue_job" "lab" {
   name                    = local.name
-  role_arn                = local.glue_arn
+  role_arn                = data.aws_iam_role.owner_glue.arn
   glue_version            = "5.0"
   worker_type             = "G.1X"
   number_of_workers       = 2
@@ -155,7 +38,6 @@ resource "aws_glue_job" "lab" {
   max_retries             = 0
   execution_class         = "STANDARD"
   job_run_queuing_enabled = false
-  security_configuration  = aws_glue_security_configuration.lab.name
   execution_property { max_concurrent_runs = 1 }
   command {
     name            = "glueetl"
@@ -177,7 +59,7 @@ resource "aws_glue_job" "lab" {
     "--enable-job-insights"          = "false"
     "--enable-observability-metrics" = "false"
   }
-  depends_on = [aws_iam_role_policy.glue, aws_cloudwatch_log_group.lab]
+  depends_on = [data.aws_s3_bucket_policy.owner, data.aws_iam_policy.owner_boundary, aws_cloudwatch_log_group.lab]
 }
 resource "aws_glue_catalog_database" "lab" {
   name       = local.database
