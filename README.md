@@ -150,3 +150,11 @@ See the [gate](docs/evidence/rp12_gate.md),
 [cost controls](docs/aws_cost_controls.md) and
 [disabled Redshift extension](docs/aws_redshift_extension.md).
 The local demo requires no AWS account, SDK, Terraform or Spark.
+
+### AWS laboratory candidate
+
+The [RP-12C gate](docs/evidence/rp12c_gate.md) tracks the smaller owner-bootstrapped
+S3/Glue/Catalog/Athena laboratory. [Owner bootstrap](docs/aws_owner_bootstrap.md),
+[operator IAM review](docs/aws_iam_matrix.md) and [runbook](docs/aws_runbook.md)
+separate offline evidence from pending owner setup and AWS live acceptance.
+Lambda, API Gateway and Redshift remain deferred.

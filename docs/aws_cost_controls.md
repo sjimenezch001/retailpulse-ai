@@ -1,7 +1,7 @@
 # AWS laboratory cost controls
 
 Review date: 2026-10-08. Proposed region: sa-east-1. No cloud spending is
-authorized in RP-12A. The later first-experiment target is **USD 5 of gross
+authorized in RP-12C; RP-12A estimates are retained as the regional price basis. The later first-experiment target is **USD 5 of gross
 service consumption before promotional credits**, not a hard billing cap.
 
 The owner supplied a Free Plan screenshot showing USD 100 credit and 183 days
@@ -23,10 +23,8 @@ Recheck the linked prices and account eligibility before any later spending.
 | S3 Standard | $0.0405/GB-month; $0.007/1,000 PUT/COPY/POST/LIST; $0.0056/10,000 GET/other requests | 0.1 GB for 7 days; 2,000 requests of each class | 0.016065 |
 | Glue Catalog | $1/100,000 object-months; $1/million requests | 6 objects for a full month; 1,000 requests; no free allowance deducted | 0.001060 |
 | Athena | $9/TB scanned | 18 queries billed at a 10 MB minimum each | 0.001620 |
-| Lambda x86 | $0.0000166667/GB-second; $0.20/million requests | 100 requests x 128 MiB x 5 seconds | 0.001062 |
-| HTTP API | $1.59/million requests | 100 requests | 0.000159 |
 | CloudWatch Logs | $0.90/GB ingest; $0.0408/GB-month storage | 0.05 GB ingested and retained 3 days | 0.045204 |
-| Total modeled consumption | Before promotional credits | Rounded planning baseline | **0.410170** |
+| Total modeled consumption | Before promotional credits | Rounded planning baseline | **0.408949** |
 
 Official regional sources:
 [Glue](https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSGlue/current/sa-east-1/index.json),
@@ -64,16 +62,17 @@ A cancelled or failed query can still incur charges and leave partial outputs;
 the [workgroup limits documentation](https://docs.aws.amazon.com/athena/latest/ug/workgroups-setting-control-limits-cloudwatch.html)
 explains why a scan threshold is not an account billing cap.
 
-The endpoint reads one <=64-KiB artifact. Lambda is 128 MiB / 5 seconds; API
-throttling is 1 request/second with burst 2. Throttling is best effort and is not
-a monthly request/spend cap. No provisioned/reserved concurrency is configured.
-Logs retain three days. S3 results expire after one day, all lab objects after
+Lambda and API Gateway are deferred; the estimate includes no endpoint requests.
+The owner-managed bucket, role and boundary survive workload teardown until
+separately approved manual cleanup.
+Logs retain three days. The owner configures S3 results to expire after one day, all lab objects after
 seven, noncurrent versions after one day and incomplete multipart uploads after
 one day. Deletion is asynchronous; delete markers and surviving resources still
 require the teardown checks. IAM/global service metadata and same-region data
 transfer assumptions must be revisited if the design changes.
 
-Project, Environment, LabId, Stage and ExpiresOn tags are set where supported.
+Project, Environment, LabId, Stage=RP12C and ExpiresOn tags are set where supported.
+Foundation tags/security/lifecycle settings are manually owner-managed.
 Catalog parameters also record run/lab provenance. ExpiresOn does not schedule
 deletion. Cost allocation tags may need owner activation and can have reporting
 delay; they are not the only safety control.
@@ -102,3 +101,12 @@ repository. In a separately approved session the owner should:
 
 Budget notifications are delayed warnings, not immediate cutoffs. No automated
 budget action, account plan change or spending authorization is implied.
+
+## RP-12C estimate and uncertainties
+
+The simplified model removes Lambda/API consumption from the previously reviewed
+sa-east-1 rates. It models three five-minute runs and eighteen small queries,
+not an authorization to execute them. No credit offset, Free Plan eligibility
+or measured AWS consumption is assumed. Recheck official regional offers and
+account service access before any later deployment. Owner foundations retained
+after teardown can continue storage charges until manually cleaned.

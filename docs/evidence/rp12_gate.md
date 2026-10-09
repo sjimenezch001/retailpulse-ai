@@ -118,3 +118,10 @@ verification is **PENDING, deferred by the owner**. Public video hosting,
 license changes, tags and release remain subject to separate authorization.
 No private interview material was read or restored. No push, PR, merge,
 tag, release, plan upgrade or AWS resource creation is part of this gate.
+
+## RP-12C successor — 2026-10-08
+
+This RP-12A gate is historical evidence. The current Terraform lifecycle now
+references owner-managed security foundations and defers Lambda/API Gateway.
+See the [RP-12C gate](rp12c_gate.md) for actual successor validation and remaining
+owner bootstrap/live acceptance conditions. RP-12B local evidence is preserved.

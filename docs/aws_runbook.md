@@ -1,252 +1,166 @@
-# RP-12A AWS laboratory runbook
+# AWS laboratory runbook
 
-Status on 2026-10-08: implemented and prepared for offline validation. No AWS
-identity check, account plan, deployment or cloud workload has been executed.
-Use the [gate](evidence/rp12_gate.md) for actual results. The existing
-FastAPI/Streamlit application remains independent of this optional lab.
+RP-12C candidate, reviewed locally on 2026-10-08. AWS live acceptance is **PENDING**.
+The workload is S3 → Glue 5.0 ETL → Glue Data Catalog → Athena, with two explicit
+CloudWatch log groups. Lambda, API Gateway and Redshift are deferred.
+The local FastAPI/Streamlit application and frozen model artifacts are independent.
 
-## Scope and data contract
+## Ownership and authorization
 
-Packaged synthetic inputs -> private S3 -> Glue 5.0 PySpark -> Parquet ->
-Glue Data Catalog -> Athena reconciliation -> small metric artifact ->
-optional Lambda / IAM-authenticated HTTP API. CloudWatch stores operational logs.
+The owner manually creates and controls one private SSE-S3 bucket, its security
+settings, one fixed-trust Glue execution role, its exact inline execution policy,
+and an immutable permissions boundary. Terraform reads these foundations; it never
+creates, edits, imports or destroys them. See the
+[owner bootstrap guide](aws_owner_bootstrap.md) and [IAM matrix](aws_iam_matrix.md).
 
-Only the checksum-verified synthetic manifest and four CSVs are uploaded:
-mart_sales_daily, dim_store, dim_product and pipeline_metadata. All six packaged
-CSV checksums are checked locally; simulated forecasts and metric definitions
-are excluded from the upload allowlist. Aggregate input limit: 10 MiB.
-Real M5, Gold, frozen models, PBIX, videos and private documents are outside
-this flow.
+Terraform manages only one Glue job, one catalog database/five tables, one Athena
+workgroup and two log groups. The operator cannot create or mutate IAM roles/policies
+or bucket security settings. PassRole is limited to the exact owner Glue role and
+glue.amazonaws.com. All operator policies and deny guardrail shards are mandatory.
 
-The independent Python and DuckDB references derive 1,386 units, 252 facts,
-3 stores and 2 products over 2020-01-01 through 2020-02-11. SYN_A contributes
-378 units, SYN_B 462 and SYN_C 546. Facts retain the date/store/item grain,
-null price and revenue_proxy values, source version and historical date bounds.
-These synthetic observations are not measured forecast performance.
+No owner bootstrap, policy attachment, login/refresh, account discovery, workload
+or live plan is authorized by this offline stage. Non-root temporary assumed-role
+credentials, explicit profile/account/region/environment and operation confirmation
+remain required. Existing MFA trust is unchanged. STS success alone establishes
+neither service eligibility nor a spending authorization.
 
-Input checksums plus implementation/SQL identity determine a fixed run_id.
-Partial runs overwrite only that run's curated prefixes. A completed rerun
-reads and reconciles existing Parquet, including keys and every logical row.
-Spark part filenames are not required to be identical. Glue writes a candidate
-and completion marker, never the serving artifact. Only six successful,
-matching Athena queries publish serving/<run_id>/units.json. A failed query
-leaves the endpoint unavailable rather than publishing unreconciled results.
-S3 object versioning retains replacements.
+## Offline preparation and verification
 
-## Reproduce the offline checks
-
-Use the existing Python 3.12 environment. AWS dependencies are separately pinned
-in [cloud/aws/requirements.txt](../cloud/aws/requirements.txt); they are not added
-to the application environment. From the repository root in PowerShell:
+Use the existing pinned application environment and isolated cloud SDK; dependency
+versions, package version and the Terraform/provider lock remain unchanged.
 
 ~~~powershell
-$python = ".venv/Scripts/python.exe"
-& $python -m pip install --ignore-installed --target artifacts/rp12/sdk -r cloud/aws/requirements.txt
-& $python scripts/install_terraform.py
-& $python scripts/aws_lab.py prepare
-& $python scripts/aws_lab.py validate
-& $python scripts/audit_aws_dependencies.py
-& $python scripts/tasks.py verify
-& $python scripts/tasks.py security
-& $python scripts/tasks.py build
+& .venv/Scripts/python.exe scripts/aws_lab.py prepare
+& .venv/Scripts/python.exe scripts/aws_lab.py validate
+& .venv/Scripts/python.exe scripts/prepare_aws_bootstrap.py --account "<approved-account>" --region sa-east-1 --environment rp12-demo
 ~~~
 
-Use a fresh SDK target when changing pinned versions; do not mix versions in an
-existing vendor directory. The installer downloads Terraform 1.15.9 from
-[HashiCorp releases](https://releases.hashicorp.com/terraform/1.15.9/) and verifies
-the published archive checksum. The signed AWS provider 6.68.0 is pinned in the
-committed dependency lock for Windows/Linux AMD64. Downloading development
-tools or provider metadata is not an AWS account operation.
+Prepare authenticates the packaged synthetic CSVs locally, builds the Glue bundle,
+round-trips local Parquet and independently computes six reference queries.
+It never reads real Gold for upload. Run identity includes cloud code, SQL,
+dependency pins and current infrastructure definitions. Any change requires a fresh
+prepare and owner policy review; stale prepared files are rejected.
 
-prepare produces ignored bundles, trusted input copies, local references and
-PyArrow Parquet round trips under artifacts/rp12/prepared/. validate first
-checks their freshness, then runs formatting, backend-disabled initialization,
-Terraform validation, four explicit mocked plan tests and socket-blocked Python
-tests. Any cloud Python/SQL change requires prepare again. The test guard
-rejects real providers, apply commands and alternate modules/providers.
-Offline validation clears AWS environment configuration, selects empty
-credential/config files and disables instance metadata. It uses no account.
-[Terraform mocking](https://developer.hashicorp.com/terraform/language/tests/mocking)
-does not establish account eligibility or live deployment success.
+The review generator writes exact-account/run JSON under
+artifacts/rp12c/<run_id>/owner-review/. Nothing is installed. The RP-12B bundle remains
+unchanged historical evidence and must not be used for the new run.
+No fresh Lambda deployment bundle is built; old ignored files are not authorized inputs.
 
-The local reference uses Python, DuckDB and PyArrow. Native Spark/Glue execution
-is NOT RUN on this workstation: Java and PySpark are unavailable. The actual
-Glue script uses explicit PySpark schemas, row/key/type/date validations,
-aggregation and Parquet readback. Tests of its publication path use stubs and
-are labeled accordingly. Glue 5.0 uses Spark 3.5.2/Python 3.11; G.1X with two
-workers is selected, with a five-minute timeout, no retries and one concurrent
-run. Regional support is documented in the
-[Glue 5.0 announcement](https://aws.amazon.com/about-aws/whats-new/2024/12/aws-glue-5-0/)
-and [worker reference](https://docs.aws.amazon.com/glue/latest/dg/worker-types.html);
-the owner's account access is still unverified.
+Validate uses empty AWS configuration, metadata disabled, backend-disabled init and
+only explicitly mocked Terraform plan tests. Python cloud tests forbid real sockets
+and credential discovery. Do not substitute a live Terraform plan for these tests.
+An optional offline policy checker consumes previously downloaded public AWS service
+authorization metadata; it performs no network or account request itself.
 
-## Future authorization and authentication prerequisites
+## Foundation verification and transport/encryption
 
-Only prepare and validate are authorized in this stage. The commands below
-describe a later owner-approved session; do not execute them as part of RP-12A.
+The runner verifies the exact owner/region/tags, all four public-access blocks,
+BucketOwnerEnforced ownership, AES256 bucket default, versioning, exact retention
+rules, deny-only TLS/encryption policy and nonpublic policy status. It checks the
+Glue role ARN/root path, fixed trust, exact boundary/default policy version, one
+named inline policy, and absence of managed policy attachments. Missing, denied,
+different or stale metadata fails closed before planning, uploading or running ETL.
 
-The owner must first approve an exact account, sa-east-1 or another explicitly
-reviewed region, environment, expiry within seven days, services and gross
-spending envelope. Confirm Free Plan service eligibility without accepting an
-upgrade or trial. Establish an existing non-root, temporary assumed-role
-profile with the selected region configured. Do not create users, access keys,
-Organizations or Identity Center infrastructure to satisfy this prerequisite.
-Never put credential values in commands, evidence, Terraform variables or Git.
+Terraform data sources additionally check exact identifiers, role trust/boundary/tags
+and verified bucket-policy/boundary hashes. Data references are not managed resources.
+Use the runner: Terraform's S3 data source alone does not verify every security setting.
 
-Review [cost controls](aws_cost_controls.md), activate appropriate gross-cost
-alerts, confirm subscribers and document the owner's authorization separately.
-STS identity alone does not prove service eligibility, price or permission.
+The Glue security configuration and job security_configuration property are omitted.
+The entire input/scripts/curated/temporary/results/serving namespace uses the one
+verified bucket default; alternate explicit SSE-KMS and SSE-C writes are denied.
+Absent encryption headers are allowed so Spark/multipart uploads inherit AES256.
+Runner JSON/CSV uploads explicitly request AES256; Athena enforces SSE_S3 results.
 
-Every live operation requires --authorize-live and explicit --profile,
---account, --region and --environment. The runner rejects root/IAM user
-identities, account/region mismatches, permanent credentials, ambient credential
-overrides, metadata credential sources and custom SDK endpoints. A profile
-may legitimately refer to an existing approved temporary-credential mechanism;
-review its credential_process/source-profile chain before use. No profile is
-created automatically.
+[S3 default encryption](https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-bucket-encryption.html)
+covers new uploads with absent headers. This does not retroactively encrypt older
+objects. The owner must bootstrap an empty dedicated bucket; existing objects or
+unexpected runs require review. TLS remains enforced by the reviewed bucket policy.
+This differs from a Glue security configuration: no customer KMS encryption for logs
+or bookmarks is configured. Bookmarks are disabled; log groups have default service
+encryption and three-day retention. No KMS administration is delegated.
+[AWS Glue security configuration](https://docs.aws.amazon.com/glue/latest/dg/encryption-security-configuration.html).
 
-| Operation | Behavior and additional controls |
-| --- | --- |
-| prepare | Offline allowlisting, reference computation and deterministic bundles. |
-| validate | Offline Terraform/schema/SQL/security regression checks. |
-| preflight | Future explicit STS identity check only; services remain UNVERIFIED. |
-| plan | Future real account plan; exact confirmation, budget and service review, expiry required. Saves ignored plan and checksums. |
-| deploy | Exact confirmation plus budget/service review; applies only unchanged saved plan, checks ownership, uploads approved files. |
-| run-etl | Exact confirmation and budget review; starts one bounded Glue job. |
-| query-checks | Exact confirmation and budget review; six allowlisted queries reconcile against local references before publication. |
-| endpoint-check | Exact confirmation and budget review; unsigned denial followed by a SigV4-signed request. |
-| inventory | Exact state/resource ownership checks, without account-wide scans. |
-| teardown | Exact confirmation; stops work, verifies ownership, empties only owned scope, destroys and checks absence. |
+The existing Glue SourceAccount and regional Glue SourceArn trust conditions remain.
+Real service-context propagation, native Spark, S3 publication and log delivery are
+unverified; stop for owner review if incompatible, without removing trust conditions.
 
-The confirmation string is operation:account:region:environment. The PowerShell
-wrapper accepts the same arguments. Illustrative future selection (placeholders
-must be replaced only after approval):
+## Later owner-approved acceptance sequence
+
+1. Review owner bootstrap JSON and the exact current run.
+2. Separately authorize manual bucket/role/boundary setup.
+3. Review all operator policy shards and potential resource-policy grants; only
+   after approval may the owner attach them to the existing operator role.
+4. Check Free Plan eligibility, regional service access and any existing
+   Lake Formation/catalog controls; do not create Organizations, Identity Center,
+   Control Tower, upgrade the plan or add broad permissions to resolve denials.
+5. Review gross consumption, credits/expiry and existing budget/notification coverage.
+6. Authorize STS-only preflight, then the distinct read-only foundation check.
+7. Authorize a saved plan; inspect only workload resources and read-only foundations.
+8. Authorize deployment of that exact reviewed plan.
+9. Authorize each Glue run and six-query Athena reconciliation separately.
+10. Authorize workload teardown, verify foundations survive, then separately review
+    manual foundation cleanup and delayed billing.
+
+[Cost controls](aws_cost_controls.md) are planning estimates and guards, not a hard
+billing cap. All live steps remain PENDING until actual receipts exist.
 
 ~~~powershell
-$selection = @("--authorize-live", "--profile", "approved-temporary-profile",
-  "--account", "<approved-account>", "--region", "sa-east-1",
-  "--environment", "rp12-demo")
-# Future session only; explicitly approve each operation separately.
+$selection = @("--profile", "<temporary-role-profile>", "--account", "<approved-account>", "--region", "sa-east-1", "--environment", "rp12-demo", "--authorize-live")
+# Future separately approved commands only; not executed by this stage.
 & .venv/Scripts/python.exe scripts/aws_lab.py preflight @selection
-& .venv/Scripts/python.exe scripts/aws_lab.py plan @selection --budget-reviewed --service-access-reviewed --enable-endpoint --expires-on "<approved-date>" --confirm "plan:<approved-account>:sa-east-1:rp12-demo"
+& .venv/Scripts/python.exe scripts/aws_lab.py foundation-check @selection
+& .venv/Scripts/python.exe scripts/aws_lab.py plan @selection --budget-reviewed --service-access-reviewed --expires-on "<approved-date>" --confirm "plan:<approved-account>:sa-east-1:rp12-demo"
 ~~~
 
-Then review the saved plan locally before a separately confirmed deploy.
-Use matching confirmation strings for each subsequent operation. Do not
-substitute a broad terraform apply or run an unreviewed plan. Endpoint defaults
-off; --enable-endpoint at planning includes it. Do not change environment/run
-identity mid-lab: clean up the old run first. A new code/input identity creates
-a different run prefix. Cleanup accepts only the known categories and valid
-24-hex run namespaces inside the verified lab bucket, including older run
-objects; all other keys stop deletion before any object is removed.
+Deploy/run-etl/query-checks/teardown use their matching confirmation strings.
+No endpoint flag is allowed; --enable-endpoint and endpoint-check fail before
+authentication. Expiry must be within seven days; a tag does not delete resources.
 
-## IAM boundaries and future operator permissions
+## Data and reconciliation contract
 
-Terraform creates distinct execution roles. Neither can deploy infrastructure
-or pass roles. The Glue role reads approved input/script objects, writes only
-its curated/temporary run prefixes and emits logs in pre-created groups.
-Lambda reads one exact serving key and writes its own logs. There are no
-AdministratorAccess or service FullAccess attachments.
+Only the authenticated synthetic-web-v1 CSV manifest/four tables are uploaded:
+55,218 bytes, 252 facts, three stores, two products and six store/item series.
+References remain 1,386 units: SYN_A 378, SYN_B 462, SYN_C 546, 2020-01-01 through
+2020-02-11. Forecast observations and real M5 are excluded.
 
-A future owner-approved deployment/operator role is separate and is not
-created or attached by this stack. Its policy must cover the following API
-operations on the exact resolved inventory, reviewed against the
-[AWS service authorization reference](https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html):
+Glue uses two G.1X workers, five-minute timeout, MaxRetries=0, MaxConcurrentRuns=1,
+no queue, autoscaling, crawler or schedule. ETL verifies schemas, keys, row/aggregate
+counts, logical Parquet readback and completed-run consistency. Native Spark and
+AWS execution must be verified later; local stubs are not those results.
 
-| Service | Required operator scope |
-| --- | --- |
-| S3 | Create/configure/delete the exact lab bucket; get bucket ownership/configuration/tags; list its versions/uploads; read/write/delete only approved input/scripts/curated/results/serving/temporary prefixes. No ListAllMyBuckets or unrelated bucket access. |
-| IAM | Create/read/update/delete/tag only the two execution roles in /retailpulse/<environment>/ and their two named inline policies. List attached/inline role policies for provider refresh. No users, keys, admin policy attachments or account security changes. |
-| iam:PassRole | Only the exact execution-role ARNs, with iam:PassedToService equal to glue.amazonaws.com or lambda.amazonaws.com. See Terraform output execution_role_pass_permissions. |
-| Glue | Create/read/update/delete/tag the exact job and database/five tables; start/get/stop only that job's runs. Catalog reads require the selected account catalog, database and exact table ARNs. |
-| Athena | Create/read/update/delete/tag the exact workgroup; start/get/results/stop/list executions restricted to that workgroup. No capacity reservations. |
-| Lambda | Create/read/update/delete/tag the exact metric function, manage its single invocation permission and read code signing/concurrency metadata needed by the provider. No function URL or quota changes. |
-| API Gateway | Only the selected regional HTTP API and its integration/route/stage/tags; exact execute-api ARN for the signed GET. Review API collection creation permissions separately because its generated ID is not known before creation. |
-| Logs | Create/read/tag/delete only the explicit lab log groups and their streams; retention changes only for those groups. |
-
-Wildcard inventory, individually justified: Glue create/get/delete security
-configuration APIs have no resource-level ARN support; permit only those three
-actions with Resource "*" and aws:RequestedRegion restricted to the chosen
-region. Logs DescribeLogGroups similarly requires a regional wildcard; the
-runner supplies exact known name prefixes and compares exact names. API
-Gateway creation needs the regional /apis collection, then a generated API-ID
-wildcard for the initial create transaction; narrow subsequent access to the
-saved API ID and lab tags wherever supported. STS GetCallerIdentity has no
-resource-specific permission scope. Verify current per-action support before
-granting a future profile; do not solve AccessDenied with service-wide FullAccess.
-
-Execution-role wildcards are limited to objects inside four exact run prefixes
-and streams inside exact log groups. S3 ListBucket uses StringLikeIfExists:
-prefix-bearing listings must match those prefixes; prefix-less bucket metadata
-probes can succeed on this one lab bucket. This also permits a prefix-less list
-of names in that bucket, never object reads outside the allowed prefixes.
-[HeadBucket requires ListBucket](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadBucket.html).
-The TLS bucket policy uses Principal "*" and s3:* only in a DENY statement, not
-as a permission grant. Glue trust additionally requires the selected SourceAccount and regional
-Glue SourceArn. These conditions are retained; service propagation of this
-context remains a live compatibility check. Do not silently remove them if
-role assumption fails. The caller's exact PassRole policy and execution
-policies provide additional resource boundaries. No KMS key, VPC, NAT, EC2 or remote state infrastructure is created.
-
-## Live acceptance to perform later
-
-Record actual Glue job ID/state/runtime, actual Athena IDs/scanned bytes/times,
-six matching query results and the publication receipt. Keep generated cloud
-identifiers and state in ignored local evidence. The client rejects arbitrary
-SQL, S3 keys and database names. Polling and result retrieval are bounded; it
-cancels a query after its deadline and rejects paginated oversized results.
-A stable query token reuses a prior execution for the same run/query; after
-the one-day result lifecycle, a new authorized run identity is needed rather
-than silently replaying charges.
-
-GET /metrics/units?store=SYN_A must reject unsigned requests and return a
-SigV4-authenticated response with mode synthetic, metric/unit units, value 378,
-period, version, run and manifest provenance. Lambda reads a bounded artifact,
-not Athena per request. It rejects unknown/duplicate arguments and returns safe
-errors for unavailable, stale or unreconciled artifacts. The endpoint is
-Internet-addressable with AWS_IAM authentication, not a private VPC endpoint.
-Its five-second/128-MiB Lambda and 1 request/second, burst 2 API throttles bound
-normal use; no reserved/provisioned concurrency or quota change is requested.
-[HTTP API IAM authorization](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-access-control-iam.html)
-requires SigV4 and an authorized invoke identity.
-
-These are future acceptance conditions, not completed measurements.
+Athena has one enforced engine-v3 workgroup, expected bucket owner, SSE_S3 results
+and a 10,485,760-byte scan cutoff. Six fixed SQL queries have bounded polling/results,
+with cancellation on timeout. Only successful real reconciliation can publish the
+serving metric. Retaining that artifact does not enable a Lambda/API workload.
 
 ## Shutdown, cleanup and recovery
 
-Keep the original source checkout, prepared bundle, local variables, reviewed
-plan, state and inventory together until cleanup succeeds. State lives under
-artifacts/rp12/live/<lab_id>/; do not commit it. An expiry tag is only a reminder.
+Use only the separately confirmed teardown command. It validates local state,
+inventory, service ownership and owner foundations, preserves recovery state, stops
+owned jobs/queries, and removes only current-run object versions/delete markers and
+multipart uploads plus results/. Unknown keys, older run IDs, denied reads or inventory
+limits stop deletion before the first destructive object call.
 
-The separately authorized teardown validates account/region, state resource IDs,
-Terraform outputs, service tags, database/table provenance and exact locations.
-It backs up recovery state, stops active runs/queries and waits for termination.
-Only then does it enumerate and remove this lab's object versions, delete
-markers and incomplete uploads. Unknown prefixes, ownership mismatches, denied
-access or inventory limits stop cleanup. No arbitrary bucket purge is available.
+Terraform destroy then removes only workload resources. The runner verifies exact
+job/database/workgroup/log absence and separately re-verifies that the owner bucket,
+role and boundary still exist unchanged. A successful workload report records owner
+cleanup PENDING; it is not evidence of account-wide cleanup.
 
-Terraform removes the known resources and explicit logs. The runner checks empty
-state and exact resource absence; AccessDenied or ambiguous errors are not proof
-of deletion. It retains recovery copies even on success. Review any unverified
-items and billing/log retention after cleanup; asynchronous billing can lag.
+A legacy state containing managed bucket, IAM, security-configuration or endpoint
+resources is rejected before planning or destroying. Never let a changed stack
+silently delete RP-12A foundations. If any old deployment exists, preserve state,
+obtain separate owner migration review and reconcile its lifecycle manually.
+No state removal/import or cloud migration was performed here.
 
-A partial apply, manually removed resource, >100 Glue runs, >50 query IDs,
->2,000 object versions or >100 multipart uploads can require manual recovery.
-Do not bypass the guards or delete state: use the saved state/plan/inventory to
-review the exact resource ARNs with the owner, obtain separate permission for
-the remaining cleanup and reconcile state only after ownership and deletion
-are verified. Never run account-wide cleanup or infer ownership from a prefix.
-Transient permission/service errors remain blockers for live cleanup.
+After complete workload teardown, the owner separately reviews all remaining
+versions/uploads and deletes the empty dedicated bucket, execution inline policy,
+role and unused boundary. The operator has no foundation deletion permissions.
+Keep all recovery evidence until these deletions and billing are verified.
+See the [manual cleanup checklist](aws_owner_bootstrap.md#manual-foundation-cleanup).
 
-## Service learning evidence
+## Remaining acceptance evidence
 
-| Service | Implemented evidence | What remains unproven |
-| --- | --- | --- |
-| S3/IAM | Private/encrypted/TLS-only storage, role separation, ownership and prefix checks. | Actual account policies, API permissions and lifecycle behavior. |
-| Glue | Genuine bounded PySpark ETL, explicit schemas and repeatable logical publication. | Native Spark and AWS job execution. |
-| Catalog/Athena | Five explicit tables, six independently checked SQL queries, workgroup controls. | Actual scan volume, latency and execution receipts. |
-| Lambda/API Gateway | Artifact-backed handler, IAM route and signed smoke client with offline tests. | Real unsigned denial and signed success. |
-| CloudWatch | Explicit groups, three-day retention, safe API log fields. | Actual service log delivery and volume. |
-
-This tiny synthetic lab demonstrates implementation decisions and offline
-reasoning. It does not establish production experience or measured scalability.
+Record genuine Glue run IDs/state/runtime, six Athena execution IDs/scanned bytes/
+latencies and reconciled results, actual logging and cleanup receipts. Live acceptance
+is PENDING. IAM static checks do not evaluate actual SCPs/RCPs, account resource
+policies, service availability, propagation or Free Plan restrictions.
