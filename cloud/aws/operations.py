@@ -11,8 +11,10 @@ from pathlib import Path
 from cloud.aws.athena import Queries, reconcile_and_publish
 from cloud.aws.auth import check_expiry, client
 from cloud.aws.contracts import LabError, canonical, digest, packaged_inputs
-from cloud.aws.endpoint_check import smoke_test
+from cloud.aws.foundations import verify_foundations
 from cloud.aws.ownership import (
+    FOUNDATION_DATA_TYPES,
+    MANAGED_TYPES,
     empty_owned_bucket,
     stop_workloads,
     validate_outputs,
@@ -21,30 +23,8 @@ from cloud.aws.ownership import (
 )
 from cloud.aws.validation import terraform_path
 
-SERVICES = ("s3", "glue", "athena", "iam", "logs", "lambda", "apigatewayv2")
-RESOURCE_TYPES = {
-    "aws_s3_bucket",
-    "aws_s3_bucket_public_access_block",
-    "aws_s3_bucket_ownership_controls",
-    "aws_s3_bucket_server_side_encryption_configuration",
-    "aws_s3_bucket_versioning",
-    "aws_s3_bucket_policy",
-    "aws_s3_bucket_lifecycle_configuration",
-    "aws_cloudwatch_log_group",
-    "aws_iam_role",
-    "aws_iam_role_policy",
-    "aws_glue_security_configuration",
-    "aws_glue_job",
-    "aws_glue_catalog_database",
-    "aws_glue_catalog_table",
-    "aws_athena_workgroup",
-    "aws_lambda_function",
-    "aws_apigatewayv2_api",
-    "aws_apigatewayv2_integration",
-    "aws_apigatewayv2_route",
-    "aws_apigatewayv2_stage",
-    "aws_lambda_permission",
-}
+SERVICES = ("s3", "glue", "athena", "iam", "logs")
+RESOURCE_TYPES = MANAGED_TYPES
 
 
 class Operations:
@@ -122,10 +102,14 @@ class Operations:
         ]
         return digest(canonical({p.name: digest(p.read_bytes()) for p in files}))
 
+    def foundation_check(self):
+        return verify_foundations(self.clients, self.settings)
+
     def plan(self):
         if not self.args.service_access_reviewed:
             raise LabError("service_access_review_required")
         check_expiry(self.args.expires_on)
+        foundations = self.foundation_check()
         variables = {
             "account_id": self.settings.account,
             "aws_region": self.settings.region,
@@ -134,10 +118,12 @@ class Operations:
             "expires_on": self.args.expires_on,
             "run_id": self.settings.run_id,
             "code_digest": self.prepared["code_digest"],
-            "enable_endpoint": self.args.enable_endpoint,
-            "lambda_bundle": (
-                self.root / "artifacts/rp12/prepared/lambda.zip"
-            ).as_posix(),
+            "enable_endpoint": False,
+            "owner_bucket_name": self.settings.bucket,
+            "owner_glue_role_arn": self.settings.glue_role_arn,
+            "owner_glue_boundary_arn": self.settings.glue_boundary_arn,
+            "bucket_policy_sha256": foundations["bucket_policy_sha256"],
+            "boundary_policy_sha256": foundations["boundary_sha256"],
         }
         self.variables.write_bytes(canonical(variables) + b"\n")
         self.initialize()
@@ -154,6 +140,12 @@ class Operations:
             self.tf("show", "-json", self.planfile.as_posix(), capture=True)
         )
         for resource in plan.get("resource_changes", []):
+            if resource.get("mode") == "data":
+                if resource["type"] not in FOUNDATION_DATA_TYPES or any(
+                    a not in {"read", "no-op"} for a in resource["change"]["actions"]
+                ):
+                    raise LabError("unexpected_foundation_plan")
+                continue
             if (
                 resource["type"] not in RESOURCE_TYPES
                 or resource.get("mode") != "managed"
@@ -171,6 +163,7 @@ class Operations:
             "plan_sha256": digest(self.planfile.read_bytes()),
             "variables_sha256": digest(self.variables.read_bytes()),
             "infra_sha256": self.infra_digest(),
+            "foundations": foundations,
             "resource_changes": len(plan.get("resource_changes", [])),
         }
         (self.directory / "plan_receipt.json").write_bytes(canonical(receipt) + b"\n")
@@ -195,6 +188,8 @@ class Operations:
         }
         if any(receipt.get(k) != v for k, v in expected.items()):
             raise LabError("reviewed_plan_changed")
+        if receipt.get("foundations") != self.foundation_check():
+            raise LabError("reviewed_foundations_changed")
         check_expiry(json.loads(self.variables.read_bytes())["expires_on"])
         self.initialize()
         self.tf("apply", "-input=false", "-no-color", self.planfile.as_posix())
@@ -203,8 +198,6 @@ class Operations:
         s3 = self.clients["s3"]
         base = self.root / "artifacts/rp12/prepared"
         for name in self.prepared["files"]:
-            if name == "lambda.zip":
-                continue  # Terraform supplies the reviewed local bundle directly.
             category = "input" if name.startswith("input/") else "scripts"
             filename = name.removeprefix("input/")
             s3.put_object(
@@ -217,7 +210,7 @@ class Operations:
         (self.directory / "inventory.json").write_bytes(canonical(outputs) + b"\n")
         return {
             "deployed": True,
-            "input_upload_files": len(self.prepared["files"]) - 1,
+            "input_upload_files": len(self.prepared["files"]),
             "lab_id": self.settings.lab_id,
         }
 
@@ -292,11 +285,7 @@ class Operations:
         )
 
     def endpoint_check(self):
-        outputs = self.outputs()
-        verify_resources(self.clients, self.settings, outputs)
-        return smoke_test(
-            self.session, self.settings, outputs, self.prepared["metric_reference"]
-        )
+        raise LabError("endpoint_deferred")
 
     def teardown(self):
         outputs = self.outputs()
@@ -321,14 +310,6 @@ class Operations:
         # Exact resource absence checks; AccessDenied never counts as absence.
         checks = [
             (
-                "s3_bucket",
-                lambda: self.clients["s3"].head_bucket(
-                    Bucket=self.settings.bucket,
-                    ExpectedBucketOwner=self.settings.account,
-                ),
-                {"404", "NoSuchBucket"},
-            ),
-            (
                 "glue_job",
                 lambda: self.clients["glue"].get_job(JobName=self.settings.name),
                 {"EntityNotFoundException"},
@@ -341,13 +322,6 @@ class Operations:
                 {"EntityNotFoundException"},
             ),
             (
-                "glue_security",
-                lambda: self.clients["glue"].get_security_configuration(
-                    Name=self.settings.name
-                ),
-                {"EntityNotFoundException"},
-            ),
-            (
                 "workgroup",
                 lambda: self.clients["athena"].get_work_group(
                     WorkGroup=self.settings.name
@@ -355,32 +329,6 @@ class Operations:
                 {"InvalidRequestException"},
             ),
         ]
-        for role in [outputs["glue_role"], outputs["lambda_role"]]:
-            if role:
-                checks.append(
-                    (
-                        "role:" + role,
-                        lambda role=role: self.clients["iam"].get_role(RoleName=role),
-                        {"NoSuchEntity"},
-                    )
-                )
-        if outputs["api_id"]:
-            checks += [
-                (
-                    "api",
-                    lambda: self.clients["apigatewayv2"].get_api(
-                        ApiId=outputs["api_id"]
-                    ),
-                    {"NotFoundException"},
-                ),
-                (
-                    "lambda",
-                    lambda: self.clients["lambda"].get_function(
-                        FunctionName=outputs["function"]
-                    ),
-                    {"ResourceNotFoundException"},
-                ),
-            ]
         unverified = []
         for label, call, codes in checks:
             try:
@@ -408,7 +356,10 @@ class Operations:
                     unverified.append("log:" + group)
             except Exception:
                 unverified.append("log:" + group)
+        foundations = self.foundation_check()
         report = {
+            "owner_foundations_preserved": foundations,
+            "owner_cleanup": "PENDING; separate manual bucket/role/boundary cleanup",
             "stopped": stopped,
             "s3_cleanup": cleared,
             "unverified_or_remaining": unverified,

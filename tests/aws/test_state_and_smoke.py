@@ -12,8 +12,8 @@ from cloud.aws.ownership import stop_workloads, verify_state
 
 
 def test_foreign_state_id_cannot_hide_behind_expected_name(settings, outputs):
-    values = {"bucket": settings.bucket, "id": settings.bucket, "tags": settings.tags}
-    resource = {"type": "aws_s3_bucket", "mode": "managed", "values": values}
+    values = {"name": settings.name, "id": settings.name, "tags": settings.tags}
+    resource = {"type": "aws_glue_job", "mode": "managed", "values": values}
     state = {"values": {"root_module": {"resources": [resource]}}}
     assert verify_state(state, settings, outputs)
     values["id"] = "another-bucket"

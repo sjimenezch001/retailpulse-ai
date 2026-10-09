@@ -48,8 +48,43 @@ variable "code_digest" {
 variable "enable_endpoint" {
   type    = bool
   default = false
+  validation {
+    condition     = var.enable_endpoint == false
+    error_message = "Lambda and API Gateway are deferred in RP-12C."
+  }
 }
-variable "lambda_bundle" {
-  type    = string
-  default = "../../artifacts/rp12/prepared/lambda.zip"
+variable "owner_bucket_name" {
+  type = string
+  validation {
+    condition     = var.owner_bucket_name == "retailpulse-${var.environment}-${var.account_id}-${var.aws_region}"
+    error_message = "Reference only the exact owner-managed lab bucket."
+  }
+}
+variable "owner_glue_role_arn" {
+  type = string
+  validation {
+    condition     = var.owner_glue_role_arn == "arn:aws:iam::${var.account_id}:role/retailpulse-${var.environment}-glue"
+    error_message = "Reference only the fixed root-path owner Glue role."
+  }
+}
+variable "owner_glue_boundary_arn" {
+  type = string
+  validation {
+    condition     = var.owner_glue_boundary_arn == "arn:aws:iam::${var.account_id}:policy/retailpulse-${var.environment}-glue-boundary"
+    error_message = "Reference only the exact owner-managed Glue boundary."
+  }
+}
+variable "bucket_policy_sha256" {
+  type = string
+  validation {
+    condition     = can(regex("^[0-9a-f]{64}$", var.bucket_policy_sha256))
+    error_message = "Use the checksum from fresh read-only foundation verification."
+  }
+}
+variable "boundary_policy_sha256" {
+  type = string
+  validation {
+    condition     = can(regex("^[0-9a-f]{64}$", var.boundary_policy_sha256))
+    error_message = "Use the reviewed current-run execution boundary checksum."
+  }
 }

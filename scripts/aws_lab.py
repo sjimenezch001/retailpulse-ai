@@ -1,4 +1,4 @@
-"""PowerShell-friendly lab runner. Only prepare/validate are authorized in RP-12A."""
+"""PowerShell-friendly lab runner. Only prepare/validate are authorized in RP-12C."""
 
 import argparse
 import json
@@ -18,6 +18,7 @@ OPERATIONS = (
     "prepare",
     "validate",
     "preflight",
+    "foundation-check",
     "plan",
     "deploy",
     "run-etl",
@@ -49,6 +50,8 @@ def main(argv=None):
         parser.add_argument("--" + name, action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.enable_endpoint or args.operation == "endpoint-check":
+            raise LabError("endpoint_deferred")
         if args.operation == "prepare":
             result = prepare(ROOT)
             summary = {

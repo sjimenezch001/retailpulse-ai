@@ -45,8 +45,20 @@ class Settings:
             "Project": "RetailPulseAI",
             "Environment": self.environment,
             "LabId": self.lab_id,
-            "Stage": "RP12A",
+            "Stage": "RP12C",
         }
+
+    @property
+    def glue_role_arn(self):
+        return f"arn:aws:iam::{self.account}:role/{self.name}-glue"
+
+    @property
+    def glue_boundary_arn(self):
+        return f"arn:aws:iam::{self.account}:policy/{self.name}-glue-boundary"
+
+    @property
+    def operator_arn(self):
+        return f"arn:aws:iam::{self.account}:role/RetailPulseLabOperator"
 
     def prefix(self, category):
         if category not in {
@@ -66,11 +78,17 @@ class Settings:
         return self.prefix(category) + filename
 
     def owned_key(self, key):
-        # Past run versions are still owned by this exact, tagged lab bucket.
-        return bool(
-            re.fullmatch(
-                r"(?:input|curated|scripts|serving|temporary)/[0-9a-f]{24}/.+|results/.+",
-                key,
+        # Exact-run cleanup mirrors the reviewed IAM object scope.
+        return any(
+            key.startswith(self.prefix(category))
+            and len(key) > len(self.prefix(category))
+            for category in (
+                "input",
+                "curated",
+                "scripts",
+                "serving",
+                "temporary",
+                "results",
             )
         )
 
