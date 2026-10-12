@@ -7,6 +7,11 @@ comerciais, analistas de BI e planejadores a consultar vendas históricas, compa
 erros de previsão e rastrear a origem das métricas. Não representa uma implantação
 em cliente nem comprova ganhos financeiros.
 
+Meu foco neste portfólio é conectar perguntas de negócio a métricas SQL
+reproduzíveis, interpretação de relatórios e avaliação de previsões. O desenvolvimento
+utilizou assistência de agentes e validações automatizadas, com resultados e
+decisões de lançamento identificados nas evidências.
+
 ![Captura real da aplicação com dados históricos M5](docs/evidence/rp10_ui/overview_light_en.png)
 
 ## Resultados verificados
@@ -21,8 +26,27 @@ em cliente nem comprova ganhos financeiros.
   selecionados, não prova de precisão universal. [Avaliação](docs/evidence/rp09_live_evaluation.json).
 - RP-11 corrigido: **254 testes**, **88,15% de cobertura** combinada de linhas e
   ramificações; mínimo de **85%**. [Relatório](docs/evidence/rp11/ci_corrections.json).
-  Windows, Linux e Docker passaram no [CI de main](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078)
-  da revisão `593dc50`; novos commits locais ainda não têm CI remoto.
+  A validação local mais recente reportou **440 testes** e **88,15% de cobertura**.
+  Windows, Ubuntu, container e aws-offline passaram no
+  [CI publicado de main](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38274725819)
+  da revisão `685839e7`, após os PRs #16 e #17. Esse CI antecede o candidato v1.0.0.
+
+## Decisões e relatórios
+
+A execução local e a demonstração sintética permitem reproduzir o fluxo sem
+provisionar nuvem. DuckDB concentra as definições SQL; o Power BI importa dados
+reconciliados com Gold. As ferramentas de leitura do assistente restringem o escopo
+das respostas. O laboratório AWS foi separado e temporário.
+
+- **Executive Overview:** tendências e comparação entre períodos, com cobertura
+  de preços e atualização histórica para interpretar os indicadores.
+- **Store & Product Diagnostics:** diferenças entre lojas, departamentos e produtos,
+  variações semanais e sinais de picos, sem atribuir causalidade.
+- **Forecast Performance:** demanda observada versus prevista, erros por horizonte
+  ou segmento e comparação com os modelos de referência.
+
+Veja [critérios técnicos](README.md#design-decisions-and-trade-offs) e
+[lições do laboratório AWS](README.md#engineering-lessons-from-the-aws-demonstration).
 
 ## Executar a demonstração portátil
 
@@ -56,13 +80,17 @@ Dados reais, bancos preenchidos, modelos e PBIX permanecem locais.
 
 Vendas históricas não são estoque atual. `revenue_proxy` não é receita auditada;
 preços ausentes não são zero. O assistente é limitado e sem contexto conversacional;
-a aplicação local não oferece autenticação para hospedagem pública. A reprodução
-automatizada não substitui a verificação por outra pessoa, ainda pendente.
+a aplicação local não oferece autenticação para hospedagem pública. A verificação
+por outra pessoa permanece **PENDING**. A reprodução automatizada continua
+sendo uma categoria distinta de evidência.
 
 RP-00 a RP-11 implementados; **RP-12D validou serviços AWS reais com dados
 sintéticos e documentou a remoção do laboratório**. Veja o [relatório final](docs/aws_teardown_report.md).
-O RP-13 prepara
-o portfólio. A versão do pacote segue `0.1.0`; v1.0.0 tem [notas preparadas](docs/release_notes_v1.0.0.md),
-sem publicação ou tag. A licença do código depende de decisão do proprietário;
-permissões dos dados da competição M5 são independentes. Veja o
+Os PRs #16 e #17 publicaram a documentação do portfólio. A versão
+**1.0.0** corresponde à **Portfolio Release**; consulte as
+[notas de versão](docs/release_notes_v1.0.0.md) e
+[publicações do GitHub](https://github.com/sjimenezch001/retailpulse-ai/releases)
+para conferir a publicação. Licencio o código original sob a [licença MIT](LICENSE);
+dependências e materiais externos mantêm suas próprias licenças. As permissões
+dos dados M5 são independentes; dados reais não são redistribuídos. Veja o
 [checklist de lançamento](docs/release_checklist.md).

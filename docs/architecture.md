@@ -109,9 +109,9 @@ runs in UTF-8 on both platforms with exact reviewed exceptions. Regression,
 coverage, dependency and secret checks fail closed. The
 [RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08) links successful
 Windows/Linux/Docker runs and the active main ruleset. The
-[current published CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38265271761)
-passed Windows, Ubuntu, container and aws-offline at `7eeb8e4` after PR #16
-published RP-12D/RP-13. Structured logs
+[published baseline CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38274725819)
+passed Windows, Ubuntu, container and aws-offline at `685839e7` after PRs #16
+and #17. It predates the local v1.0.0 candidate. Structured logs
 contain allowlisted operational metadata, not raw questions or provider bodies.
 
 Use the [portfolio evidence index](portfolio_evidence.md) for genuine screenshots,

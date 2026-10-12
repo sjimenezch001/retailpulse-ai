@@ -12,6 +12,11 @@ The reports help users compare demand across stores and products, investigate
 changes over time and assess where forecasts are less reliable. Reproducible
 processing makes those comparisons traceable to the same data and metric definitions.
 
+My focus in this portfolio is connecting business questions to reproducible SQL
+metrics, report interpretation and explicit forecast trade-offs. Development used
+agent-assisted editing and automated validation; recorded measurements and
+release decisions are distinguished in the linked evidence.
+
 ![Genuine real-M5 Overview: observed units, price coverage, historical scope and source limitations](docs/evidence/rp10_ui/overview_light_en.png)
 
 Actual browser capture from the [validated bilingual UI](docs/evidence/rp10_ui_gate.md).
@@ -33,7 +38,7 @@ This is historical M5 data, not a live customer deployment.
 | [Frozen test metrics](docs/model_card.md#final-one-time-test) | LightGBM **74.825958% WMAPE**, rolling mean **79.482353%**. MAE improves; RMSE worsens (**2.431177 vs 2.361194**). No measured revenue uplift. |
 | [Actual local Ollama evaluation](docs/evidence/rp09_live_evaluation.json) | **36 expected outcomes passed**: **22 validated model calls**, **14 preflight outcomes**, **zero fallback**. A curated evaluation, not universal accuracy. |
 | [Corrected RP-11 verification](docs/evidence/rp11/ci_corrections.json) | **254 passing tests**, **88.15%** combined line/branch coverage, **85%** enforced minimum. |
-| [Published post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38265271761) | Four successful jobs: Windows, Ubuntu, container and aws-offline at `7eeb8e4`, after PR #16 merged. |
+| [Published post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38274725819) | Four successful jobs: Windows, Ubuntu, container and aws-offline at `685839e7`, after PRs #16 and #17 merged. This run predates the v1.0.0 candidate. |
 | [Real AWS reconciliation](docs/evidence/rp12d_live_validation.json) | Glue 5.0 Spark **SUCCEEDED** and **six real Athena SELECTs passed**: **252 synthetic facts, 1,386 units**. Real cloud execution; synthetic business figures, not M5 or production performance. |
 
 The [claim-to-evidence index](docs/portfolio_evidence.md) links the measurements,
@@ -132,8 +137,8 @@ The portable dataset and its simulated forecast comparison are not real model
 performance evidence. [Mode details and troubleshooting](docs/web_demo.md).
 
 These commands are checked in an [isolated automated reproduction](docs/evidence/rp13_gate.md#clean-environment-reproduction).
-Independent verification by another person remains **PENDING**. PR #16 published
-the RP-12D/RP-13 documentation; the badge follows published `main`.
+Independent verification by another person remains **PENDING**. PRs #16 and #17
+published the portfolio documentation; the badge follows the currently published `main` revision.
 
 ## Real-data mode and entry points
 
@@ -181,15 +186,18 @@ the assistant is stateless with bounded English and Spanish patterns.
 RP-00 through RP-11 are implemented. **RP-12D live AWS ETL and six-query
 reconciliation passed**, and its teardown is documented; serving publication
 was not performed.
-RP-13 prepares the portfolio; independent human quick-start verification and
-release approval remain explicit checkpoints. See the [release checklist](docs/release_checklist.md)
-and [draft v1.0.0 notes](docs/release_notes_v1.0.0.md). Package version remains
-`0.1.0`; no release or tag is published by this work. No code license is declared
-yet: an owner decision is required. M5 competition-data permissions are separate.
+The **v1.0.0 Portfolio Release** packages these implemented features. See the
+[release notes](docs/release_notes_v1.0.0.md),
+[release checklist](docs/release_checklist.md) and
+[GitHub Releases](https://github.com/sjimenezch001/retailpulse-ai/releases)
+for the current publication status.
+I license the original project code under the [MIT license](LICENSE).
+Third-party dependencies and external assets retain their own licenses;
+M5 competition-data permissions are separate and real rows are not redistributed.
 
 ## AWS Live Demo — RP-12D
 
-On 2026-10-11, the owner completed **S3 → Glue 5.0 Spark → Parquet → Glue Data
+On 2026-10-11, I completed **S3 → Glue 5.0 Spark → Parquet → Glue Data
 Catalog → Athena engine v3** in sa-east-1. Six allowlisted SELECTs reconciled 252 facts and
 1,386 units: SYN_A 378, SYN_B 462 and SYN_C 546. Execution IDs, actual results,
 scanned bytes, lineage and resolved packaging/response-validation incidents are
@@ -203,10 +211,10 @@ establish commercial impact, a cloud model evaluation or a production deployment
 No serving metric, Lambda/API Gateway or Redshift workload was published.
 
 The [final teardown report](docs/aws_teardown_report.md) records the removed job,
-six Catalog resources, 27 S3 versions and owner-confirmed Console removals.
+six Catalog resources, 27 S3 versions and my reported Console removals.
 Terraform state is serial 31 with zero managed resources. Operator/bootstrap IAM
 resources remain intentionally retained; the cause of final CloudWatch absence
-is unverified. The owner-described October Billing observation is **USD 0.00
+is unverified. My reported October Billing observation is **USD 0.00
 estimated payable with credits, invoice Pending**; gross consumption and settled
 billing remain unverified. [Final handoff](RP-12D_FINAL_HANDOFF.md).
 Earlier [RP-12A](docs/evidence/rp12_gate.md)

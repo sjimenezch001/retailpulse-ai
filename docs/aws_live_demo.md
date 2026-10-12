@@ -5,14 +5,19 @@ ran **S3 → Glue 5.0 Spark → Parquet → Glue Data Catalog → Athena**. Its 
 data is synthetic-web-v1, not historical M5, customer sales or model-performance
 evidence. The local M5/DuckDB application and frozen models remain separate.
 
-The owner executed the controlled procedures. This document is an offline
-reconciliation of their preserved AWS receipts; no additional cloud calls were
+I ran this separate laboratory to exercise the cloud ETL and SQL path against
+a small, reproducible synthetic reference. I controlled execution and approvals;
+agent-assisted preparation and automated reconciliation supported the procedures.
+The temporary infrastructure was removed after execution and evidence preservation,
+so the demonstration does not imply continuous hosting.
+
+This document reconciles preserved AWS receipts offline; no additional cloud calls were
 made to prepare it. [Machine-readable evidence](evidence/rp12d_live_validation.json)
 contains the actual results and IDs. [Acceptance gate](evidence/rp12d_gate.md).
 
 Final closeout update: **2026-10-12**. The demonstration has been torn down;
 the [teardown report](aws_teardown_report.md) distinguishes recorded API cleanup
-from owner-confirmed Console removals, preserves the CloudWatch uncertainty,
+from my reported Console removals, preserves the CloudWatch uncertainty,
 and records the pending October invoice. The [final documentation gate](evidence/rp12d_teardown_gate.md)
 supersedes the earlier gate's pending closeout status. The execution JSON and
 original gate remain unchanged historical evidence.
@@ -37,7 +42,7 @@ null semantics; no audited revenue or commercial uplift is claimed.
 
 Successful Glue JobRunId:
 `jr_2705572727717d01f4a76ff67b5bc9b6540cde7aaaf79695e62ff315b7c62487`.
-AWS reported **125 execution seconds and 250 DPUSeconds**. The owner launcher
+AWS reported **125 execution seconds and 250 DPUSeconds**. The execution launcher
 observed 142.297 seconds including polling; this is a different timing measure.
 
 | Original SELECT | QueryExecutionId | State / comparison | Scanned bytes | Engine ms | Observed query wall seconds |
@@ -80,7 +85,7 @@ account-specific bucket URIs, IAM ARNs, credentials, caches and local user paths
 At execution time, seven resources were Terraform-tracked at state serial 20: the Athena workgroup,
 Glue database and five tables. The Glue job was created directly with Boto3;
 two CloudWatch groups were created manually in Console with STANDARD class,
-seven-day retention and five approved tags. The owner-managed S3/IAM foundations
+seven-day retention and five approved tags. The S3/IAM foundations I managed
 are outside workload state. The preceding Terraform partial applies and their
 recovery state are retained; this is not a fully Terraform-managed deployment.
 
@@ -124,11 +129,11 @@ engine 3, enforced SSE-S3/expected-owner results, **10,485,760 bytes per query**
 cancellation. A durable guard prevented accidental repetition. Internal AWS
 service retries and cancellation delays are not a dollar cap.
 
-The owner confirmed a USD 5 monthly budget with actual-cost alerts at USD 1/3/5,
+I confirmed a USD 5 monthly budget with actual-cost alerts at USD 1/3/5,
 and previously confirmed USD 120 promotional credits expiring 2027-10-08. Those
-are owner Console observations, not a fresh billing API audit. Current gross
+are my Console observations, not a fresh billing API audit. Current gross
 spend, settled charges and remaining credit after this run are **NOT VERIFIED**.
-The October 12 owner-described Billing screenshot shows an October estimated
+The October 12 Billing screenshot I described shows an October estimated
 payable total of USD 0.00 with Free Plan credits and a Pending invoice. It was
 not located locally for this offline review; payable is not gross consumption,
 and the final invoice has not been established as closed.
@@ -142,12 +147,14 @@ operator does not have that permission. Historical operator trust continuity
 remains unverified even though current MFA/foundation checks passed.
 
 No `serving/` metric publication, Lambda/API Gateway, Bedrock, Redshift or cloud
-forecast evaluation occurred. Public hosting, release, license decisions and
-independent human quick-start verification remain separate pending items.
+forecast evaluation occurred. Current release preparation, MIT licensing and the
+independent-verification status are recorded in the
+[release checklist](release_checklist.md). Public video hosting and release
+publication remain subject to my separate approval.
 The [historical cleanup proposal](aws_cleanup_plan.md) retains its original
 pre-deletion HOLD. Subsequent approvals, preservation and removals are reconciled
 in the [final teardown report](aws_teardown_report.md#ownership-and-teardown-sequence):
 the job and six Catalog resources were deleted and read back, all 27 S3 versions
-were deleted in one request, and the owner confirmed foundation removals and
+were deleted in one request, and I confirmed foundation removals and
 final CloudWatch absence. Operator/bootstrap IAM resources remain intentionally
 retained. No additional cleanup or cloud call was performed for this update.

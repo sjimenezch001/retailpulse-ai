@@ -1,54 +1,97 @@
 # v1.0.0 release checklist
 
-Status: **PREPARED / NOT PUBLISHED**. RP-13 does not authorize a push, merge, tag,
-release, repository-setting change or social-media post. The current package is
-`0.1.0`; drafting these notes does not change it. [Gate](evidence/rp13_gate.md).
+Release preparation snapshot: **2026-10-12**. Current publication status:
+[GitHub Releases](https://github.com/sjimenezch001/retailpulse-ai/releases).
+Baseline: `685839e7bcd3cc4ea33787c56124f9981bbcb305`, branch
+`release/v1.0.0-portfolio`. I authorized local version preparation and MIT licensing.
+At this snapshot, commit, push, PR, merge, tag and publication still required
+my approval.
+Historical [RP-13 gates](evidence/rp13_gate.md) retain their dated context.
 
-## Candidate review
+## Completed and accepted scope
 
-- [ ] Review the final portfolio diff and approve a future PR/push explicitly.
-- [ ] Confirm outgoing history contains only public portfolio material; personal
-  preparation remains outside the repository, including prior outgoing commits.
-- [ ] Obtain passing Windows, Linux and container checks on that candidate PR.
-  Historical main success is not a substitute.
-- [ ] Confirm the isolated clean-environment reproduction for the documented revision.
-- [ ] Have another person clone, install, launch, ask the synthetic example and stop
-  the demo; record their date, OS, Python, revision, commands and outcome with consent.
-  **PENDING — deferred by the owner on 2026-10-08.**
-- [x] Owner reviewed and approved the existing English recording's content and
-  presentation on 2026-10-08 (147.517067 seconds). Original MP4 and English captions
-  are preserved byte-for-byte.
-- [ ] Owner review of the new Spanish-interface and Portuguese-captioned exports.
-  Production and technical inspection are complete; see the
-  [localization update](evidence/rp13_gate.md#demo-localization--2026-10-08).
-  This review does not authorize public hosting or release publication.
-- [ ] Check documentation consistency, image/internal links and public links after
-  publication is authorized. Confirm English and Portuguese claims agree.
-- [ ] Run final verification, complete dependency audit, all-detector secret scan
-  and package build on the release candidate. Review exact new false positives only.
-- [ ] Confirm Gold and all 45 frozen model artifacts are unchanged and remain local.
+- [x] Portfolio documentation published through PRs #16 and #17. The
+  [baseline CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38274725819)
+  passed Windows, Ubuntu, container and aws-offline; it does not validate this candidate.
+- [x] I authorized `1.0.0`; package metadata, Python runtime, API project
+  version and the existing version test are coordinated. API identifier `rp10-v1`
+  and data/schema versions are unchanged.
+- [x] I approved MIT for original project code; root LICENSE and package
+  metadata are configured. The copyright notice uses the established public
+  project identity `sjimenezch001`, not an inferred legal name. Third-party and
+  M5 data permissions are separate; real rows remain excluded.
+- [x] Historical isolated automated reproduction passed; see the
+  [documented procedure and limits](evidence/rp13_gate.md#clean-environment-reproduction).
+  New candidate installation and smoke results are tracked separately below.
+- [ ] Independent human quick-start verification: **PENDING**. Automated
+  reproduction is a separate evidence category. On 2026-10-12, I authorized
+  portfolio release with this check still pending; I did not mark it PASS.
+- [x] English recording approved on 2026-10-08; original MP4 and English captions
+  remain protected. Localized production/technical inspection is complete.
 
-## Owner decisions and coordinated versioning
+## Required candidate validation and review
 
-- [ ] Choose/approve a code license and add the proper file/metadata in a separately
-  reviewed change. No code license is currently declared. Do not imply permission
-  to redistribute competition data; real rows and data-filled binaries remain excluded.
-- [ ] Approve the v1.0.0 version change only after acceptance. Coordinate
-  `pyproject.toml`, `src/retailpulse/__init__.py`, the API `project_version` default in
-  `src/retailpulse/api/contracts.py`, and `tests/test_smoke.py` in that future change.
-- [ ] Rerun checks/build; inspect wheel/sdist contents and verify version agreement.
-- [ ] After explicit authorization, merge the approved version change, verify its
-  post-merge CI, then create an annotated `v1.0.0` tag at that exact reviewed commit.
-  Push the tag and publish the reviewed release notes only with authorization.
-- [ ] Approve public video hosting separately. Do not attach real data, models,
-  populated databases or data-filled PBIX to the release.
-- [ ] Verify final public release/demo/evidence links and pin the repository on the
-  owner's profile if approved. No LinkedIn or other social posting is implied.
+- [ ] Review final diff and approve publication steps explicitly.
+- [x] Confirm outgoing history and current tree contain only public portfolio material;
+  private paths/blobs are absent from reachable history and no private passages were copied.
+- [x] Run tests with the unchanged 85% combined coverage threshold, Ruff lint,
+  configured mypy and dependency compatibility checks.
+- [x] On 2026-10-12, I accepted 58 pre-existing Ruff formatting findings for
+  this portfolio release. Global `format --check` remains **FAIL**; all three
+  modified Python files pass and the baseline shows no new findings.
+- [x] Run all-detector secret scan and the existing dependency vulnerability audit;
+  retain failures or unavailable checks explicitly rather than declaring PASS.
+- [x] Verify Markdown structure, internal links and English/Portuguese consistency.
+- [x] Build and inspect wheel/sdist for `1.0.0`, MIT metadata, LICENSE inclusion
+  and absence of restricted/private artifacts.
+- [x] Install the built wheel in a clean environment and smoke-test the synthetic
+  deterministic demo, including the 378-unit answer and shutdown where feasible.
+- [x] Confirm Gold, all 45 frozen artifacts, datasets, evidence and approved media
+  match the protected preservation baseline.
+- [ ] After an authorized commit/PR, obtain Windows, Ubuntu, container and aws-offline
+  CI on the exact candidate revision. Baseline CI is not a substitute.
 
-## Evidence to record
+## Publication steps requiring authorization
 
-The automated [RP-13 gate](evidence/rp13_gate.md) records completed machine checks.
-Leave human checkboxes open until an actual person performs them. Keep the exact
-release revision, approving decision, verification results, independent tester
-record and final public URLs with the release. Optional AWS work is not required
-for this local portfolio and must not be introduced as an unreviewed dependency.
+- [ ] Merge the reviewed candidate and verify post-merge CI before creating an
+  annotated `v1.0.0` tag on that exact revision.
+- [ ] Push the authorized tag and publish the reviewed
+  [RetailPulse AI v1.0.0 — Portfolio Release notes](release_notes_v1.0.0.md).
+- [ ] Verify final public release and evidence links after publication.
+
+## Optional presentation work
+
+- [ ] My review of Spanish-interface/Portuguese-captioned exports if they are
+  selected for public presentation. Their technical inspection does not imply approval.
+- [ ] Choose public video hosting only if desired; no upload is required for this
+  source/package release. Do not attach real data, models, databases or PBIX.
+- [ ] If separate English subtitles are hosted, prepare a reviewed clipped copy:
+  the original last cue exceeds the approved video's duration. Preserve the original.
+
+No additional AWS execution, platform technology, public application hosting or
+social posting is required. Store final candidate validation below; retain the
+exact release revision, my publication decision and final URLs when publication is authorized.
+
+## Local candidate validation
+
+Run on 2026-10-12 against the uncommitted local candidate. Reports remain under
+ignored task artifacts; baseline CI is linked above, not attributed to these changes.
+
+| Check | Result |
+| --- | --- |
+| Python tests / coverage | PASS: 440 tests, 2 existing warnings; 88.15% combined coverage, unchanged 85% minimum |
+| Ruff lint / configured mypy | PASS / PASS: four configured source modules |
+| Ruff formatting | PASS on the three changed Python files; FAIL globally on 58 files, all reproduced from the baseline |
+| Dependency compatibility / vulnerability audit | PASS in project and clean venv; 123 pinned packages audited, zero skipped entries or known vulnerabilities |
+| Secrets / privacy | PASS: 389 files scanned, zero unreviewed findings; 148 existing reviewed entries unchanged; 39 reachable commits checked for private paths/blobs |
+| Markdown / internal links | PASS: structure and English/Portuguese claims reviewed; 328 links/images/anchors, zero errors |
+| Version / license / distributions | PASS: runtime, health project version, wheel and sdist agree on 1.0.0; MIT metadata and LICENSE included; no restricted/private artifacts |
+| Clean installation / deterministic smoke | PASS: fresh Python 3.12 venv with pinned runtime dependencies and the built wheel; API/UI accessible, SYN_A returns 378 units; API identifier remains rp10-v1 |
+| Automated shutdown | PASS: launcher signal handler stopped both servers; no listeners remained. No physical keyboard or independent human check is claimed |
+| Protected artifacts | PASS: 125 baseline SHA-256 values unchanged, including Gold, 45 frozen model artifacts, data and approved media |
+| Candidate remote CI / publication | NOT RUN: no commit, push, PR, merge, tag or release authorized |
+
+The pre-existing global Ruff formatting result was accepted as documented technical
+debt, not reclassified as PASS. Candidate CI and publication authorization remained
+open at the preparation snapshot. Independent human verification is **PENDING**;
+optional media work is outside the release package validation.
