@@ -49,7 +49,7 @@ class ProviderState(Contract):
 class Health(Contract):
     status: Literal["ok", "degraded"]
     api_version: str = "rp10-v1"
-    project_version: str = "0.1.0"
+    project_version: str = "1.0.0"
     mode: Mode
     dataset_available: bool
     dataset: Dataset | None

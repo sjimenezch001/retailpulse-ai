@@ -17,7 +17,7 @@ packaging from independent human verification and release publication.
 | Selection used validation only | [Freeze chronology and leakage evidence](evidence/rp07_gate.md#evidence-of-isolation-and-freeze), [protocol](modeling.md) | Three predeclared candidates; final test opened once. No post-test tuning claimed. |
 | 36 live-evaluation expected outcomes passed | [Final live evaluation](evidence/rp09_live_evaluation.json), `total`, `passing`, `provider_usage`, `live_model` | 22 validated Ollama calls, 14 preflight outcomes, zero fallback. Twenty grounded answers and 16 correct refusals/clarifications; not 36 model-generated answers or universal accuracy. |
 | 254 tests and 88.15% coverage, minimum 85% | [Corrected RP-11 results](evidence/rp11/ci_corrections.json), `tests`, `coverage`; [current RP-13 validation](evidence/rp13_gate.md) | Combined lines/branches across `src/retailpulse` and `app`; scoped mypy is not whole-project type coverage. |
-| Published Windows/Ubuntu/container/aws-offline CI succeeded | [Current post-merge main](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38265271761); [historical RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08) | Four successful jobs at `7eeb8e4` after PR #16 published RP-12D/RP-13. Latest reported local validation is 440 passing tests and 88.15% coverage; those figures are separate from remote CI and the earlier RP-11 results. |
+| Published Windows/Ubuntu/container/aws-offline CI succeeded | [Published baseline main](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38274725819); [historical RP-11 closure](evidence/rp11_gate.md#verified-closure--2026-10-08) | Four successful jobs at `685839e7` after PRs #16 and #17. This run predates the local v1.0.0 candidate. Previously reported local validation: 440 passing tests and 88.15% coverage, separate from remote CI and RP-11. |
 | Portable mode needs no M5 or Ollama | [Packaged snapshot manifest](../src/retailpulse/api/synthetic/manifest.json), [isolated reproduction](evidence/rp13_gate.md#clean-environment-reproduction) | 1,386 total synthetic units; 378 for SYN_A. The simulated forecast series is demonstration content, not trained-model evidence. |
 | Real AWS Glue Spark and Athena reconciliation | [Sanitized actual results](evidence/rp12d_live_validation.json), [walkthrough](aws_live_demo.md), [historical execution gate](evidence/rp12d_gate.md) | Glue 5.0 SUCCEEDED; six real SELECTs passed, 252 synthetic facts and 1,386 units. Actual execution IDs retained; mixed Terraform/Boto3/Console ownership, no serving publication. |
 | AWS demonstration teardown | [Final teardown report](aws_teardown_report.md), [final documentation gate](evidence/rp12d_teardown_gate.md), [handoff](../RP-12D_FINAL_HANDOFF.md) | Job and six Catalog resources deleted/read back; 27 exact S3 versions deleted in one request; state serial 31, zero managed resources. Later bucket/Glue IAM removals and CloudWatch absence are owner-confirmed; the CloudWatch deleting cause is unverified. Operator/bootstrap IAM remains retained. |
@@ -53,9 +53,9 @@ accompany a separate export of the English walkthrough. Both were fully decoded
 and inspected across all six scenes and 14 caption cues per export; see
 [localization evidence](evidence/rp13/localization.json) and
 [recording status](evidence/rp13_gate.md#demo-localization--2026-10-08).
-The videos remain local and ignored. This does not establish independent human
-quick-start verification, which is PENDING and deferred by the owner, or authorize
-public hosting, a license, a version change or a release.
+The videos remain local and ignored. Independent human quick-start verification
+is **PENDING**. MIT licensing and local version preparation are authorized;
+public hosting and release publication are not. See the [release checklist](release_checklist.md).
 
 ## Scope of the proof
 
@@ -72,4 +72,5 @@ from offline fixtures and historical M5. No measured commercial revenue uplift,
 actual inventory or production customers are claimed. No cloud model-performance
 evaluation or authenticated serving endpoint was exercised.
 Real rows, model binaries, populated databases and data-filled PBIX are local-only.
-The owner still needs to choose a code license; competition-data rights are separate.
+Original project code uses the [MIT license](../LICENSE).
+Third-party materials and competition-data rights remain separate.
