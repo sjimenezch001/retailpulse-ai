@@ -8,6 +8,9 @@ A personal portfolio project for commercial managers, BI analysts and planners w
 need consistent answers about store demand, forecast error and data provenance.
 It connects historical sales to one analytical source, then exposes it through
 Power BI, a local web application and a bounded assistant.
+The reports help users compare demand across stores and products, investigate
+changes over time and assess where forecasts are less reliable. Reproducible
+processing makes those comparisons traceable to the same data and metric definitions.
 
 ![Genuine real-M5 Overview: observed units, price coverage, historical scope and source limitations](docs/evidence/rp10_ui/overview_light_en.png)
 
@@ -30,12 +33,14 @@ This is historical M5 data, not a live customer deployment.
 | [Frozen test metrics](docs/model_card.md#final-one-time-test) | LightGBM **74.825958% WMAPE**, rolling mean **79.482353%**. MAE improves; RMSE worsens (**2.431177 vs 2.361194**). No measured revenue uplift. |
 | [Actual local Ollama evaluation](docs/evidence/rp09_live_evaluation.json) | **36 expected outcomes passed**: **22 validated model calls**, **14 preflight outcomes**, **zero fallback**. A curated evaluation, not universal accuracy. |
 | [Corrected RP-11 verification](docs/evidence/rp11/ci_corrections.json) | **254 passing tests**, **88.15%** combined line/branch coverage, **85%** enforced minimum. |
-| [Post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078) | Windows, Linux and genuine Docker build/runtime checks passed at `593dc50`. New local portfolio commits are not claimed remotely validated. |
+| [Published post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/38265271761) | Four successful jobs: Windows, Ubuntu, container and aws-offline at `7eeb8e4`, after PR #16 merged. |
 | [Real AWS reconciliation](docs/evidence/rp12d_live_validation.json) | Glue 5.0 Spark **SUCCEEDED** and **six real Athena SELECTs passed**: **252 synthetic facts, 1,386 units**. Real cloud execution; synthetic business figures, not M5 or production performance. |
 
 The [claim-to-evidence index](docs/portfolio_evidence.md) links the measurements,
 screenshots and caveats. [Current packaging acceptance](docs/evidence/rp13_gate.md)
 separates completed checks from human and release work still pending.
+Latest reported local validation: **440 passing tests**, **88.15%** coverage.
+These local results are distinct from the published CI run and the earlier RP-11 result above.
 
 ## Actual architecture
 
@@ -60,6 +65,41 @@ This is not unrestricted text-to-SQL or general-purpose conversation.
 from read-only serving. The separate [AWS demonstration](docs/aws_live_demo.md)
 uses managed Glue Spark, private S3, Glue Data Catalog and Athena. The local
 application still uses pandas/DuckDB; PostgreSQL and MinIO are not deployed.
+
+## Design decisions and trade-offs
+
+- **Local-first reproduction:** explicit builds and a packaged synthetic demo let
+  reviewers inspect the pipeline without cloud provisioning or restricted M5 inputs.
+  Real data and model artifacts require a separate local build; this is not a hosted service.
+- **DuckDB as the analytical source:** local SQL marts define shared metrics for
+  reports and tools without a separate database server. This suits the portfolio's
+  local analytical workload; it does not establish production-scale capacity.
+- **Reconciled Power BI imports:** exported values are checked against Gold before
+  report consumption. Separate fact grains and dimension filters preserve metric
+  meaning; the reports use a refreshed snapshot rather than live transactions.
+- **A separate, temporary AWS demonstration:** synthetic inputs exercise managed
+  Glue Spark and Athena without moving historical M5 or frozen models into AWS.
+  Execution and teardown evidence demonstrate the cloud path, not continuous hosting.
+- **Controlled assistant tools:** parameterized templates and read-only access keep
+  figures tied to canonical definitions. The narrower supported question patterns
+  trade conversational flexibility for verifiable scope and explicit refusals.
+
+See [architecture and boundaries](docs/architecture.md) and the
+[validated BI model](dashboards/powerbi/dashboard_spec.md).
+
+## What the Power BI pages help investigate
+
+- **Executive Overview:** inspect demand trends and preceding-period comparisons,
+  while using price coverage and historical freshness to interpret headline KPIs.
+- **Store & Product Diagnostics:** compare stores, departments and products, then
+  inspect weekly demand variations and spike flags to identify segments for investigation.
+  These comparisons describe patterns; they do not establish causes.
+- **Forecast Performance:** compare actual and predicted demand, examine error by
+  horizon or segment, and assess the baseline comparison, including the RMSE trade-off.
+
+The [report specification](dashboards/powerbi/dashboard_spec.md) explains filters
+and metric boundaries; [Desktop acceptance and genuine screenshots](docs/evidence/rp08_gate.md)
+document all three pages.
 
 ## Portable quick start
 
@@ -92,8 +132,8 @@ The portable dataset and its simulated forecast comparison are not real model
 performance evidence. [Mode details and troubleshooting](docs/web_demo.md).
 
 These commands are checked in an [isolated automated reproduction](docs/evidence/rp13_gate.md#clean-environment-reproduction).
-Independent verification by another person remains pending. The badge follows
-published `main`; portfolio changes remain local until reviewed and authorized.
+Independent verification by another person remains **PENDING**. PR #16 published
+the RP-12D/RP-13 documentation; the badge follows published `main`.
 
 ## Real-data mode and entry points
 
@@ -172,3 +212,19 @@ billing remain unverified. [Final handoff](RP-12D_FINAL_HANDOFF.md).
 Earlier [RP-12A](docs/evidence/rp12_gate.md)
 and [RP-12C](docs/evidence/rp12c_gate.md) gates record their historical offline scope.
 The local demo still requires no AWS account, SDK, Terraform or Spark.
+
+## Engineering lessons from the AWS demonstration
+
+- **Glue dependency packaging:** the original dependency ZIP shadowed Glue's
+  built-in Botocore resources, causing `DataNotFoundError`. Offline reproduction
+  isolated the loader problem; a corrected package used Glue's built-in SDK and
+  the subsequent job succeeded. Dependency contents must be tested against the
+  managed runtime, not only checked for presence in an archive.
+- **Athena response validation:** strict comparisons encountered omitted terminal
+  semicolon/LF and default-catalog capitalization differences. Narrow normalization
+  accepted only the observed representations; regression checks preceded the
+  successful six-query run. Outgoing SQL and tool boundaries remained unchanged.
+
+The [incident and teardown report](docs/aws_teardown_report.md#engineering-incidents-and-resolutions)
+preserves the diagnosis and failure evidence. Both corrections illustrate bounded
+changes followed by reproduction and validation in a temporary demonstration.
