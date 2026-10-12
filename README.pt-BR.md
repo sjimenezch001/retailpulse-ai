@@ -59,7 +59,9 @@ preços ausentes não são zero. O assistente é limitado e sem contexto convers
 a aplicação local não oferece autenticação para hospedagem pública. A reprodução
 automatizada não substitui a verificação por outra pessoa, ainda pendente.
 
-RP-00 a RP-11 implementados; **RP-12 AWS é opcional e adiado**. O RP-13 prepara
+RP-00 a RP-11 implementados; **RP-12D validou serviços AWS reais com dados
+sintéticos e documentou a remoção do laboratório**. Veja o [relatório final](docs/aws_teardown_report.md).
+O RP-13 prepara
 o portfólio. A versão do pacote segue `0.1.0`; v1.0.0 tem [notas preparadas](docs/release_notes_v1.0.0.md),
 sem publicação ou tag. A licença do código depende de decisão do proprietário;
 permissões dos dados da competição M5 são independentes. Veja o

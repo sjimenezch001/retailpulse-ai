@@ -20,6 +20,7 @@ This is historical M5 data, not a live customer deployment.
 - Fixed-origin forecasting, validation-only model selection and frozen backtests.
 - Three Power BI pages and a FastAPI/Streamlit demo with English/Spanish and light/dark themes.
 - Grounded answers with explicit period, filters, source, provider and limitations.
+- A real AWS Glue 5.0 Spark and Athena demonstration, reconciled against synthetic data.
 
 ## Measured results
 
@@ -30,6 +31,7 @@ This is historical M5 data, not a live customer deployment.
 | [Actual local Ollama evaluation](docs/evidence/rp09_live_evaluation.json) | **36 expected outcomes passed**: **22 validated model calls**, **14 preflight outcomes**, **zero fallback**. A curated evaluation, not universal accuracy. |
 | [Corrected RP-11 verification](docs/evidence/rp11/ci_corrections.json) | **254 passing tests**, **88.15%** combined line/branch coverage, **85%** enforced minimum. |
 | [Post-merge CI](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078) | Windows, Linux and genuine Docker build/runtime checks passed at `593dc50`. New local portfolio commits are not claimed remotely validated. |
+| [Real AWS reconciliation](docs/evidence/rp12d_live_validation.json) | Glue 5.0 Spark **SUCCEEDED** and **six real Athena SELECTs passed**: **252 synthetic facts, 1,386 units**. Real cloud execution; synthetic business figures, not M5 or production performance. |
 
 The [claim-to-evidence index](docs/portfolio_evidence.md) links the measurements,
 screenshots and caveats. [Current packaging acceptance](docs/evidence/rp13_gate.md)
@@ -55,7 +57,9 @@ The router establishes approved scope; optional local Ollama confirms the struct
 selection. Tools retrieve figures and deterministic presentation renders the answer.
 This is not unrestricted text-to-SQL or general-purpose conversation.
 [Architecture and data grains](docs/architecture.md) distinguish pipeline writes
-from read-only serving. Spark, PostgreSQL, MinIO and AWS are not deployed.
+from read-only serving. The separate [AWS demonstration](docs/aws_live_demo.md)
+uses managed Glue Spark, private S3, Glue Data Catalog and Athena. The local
+application still uses pandas/DuckDB; PostgreSQL and MinIO are not deployed.
 
 ## Portable quick start
 
@@ -134,27 +138,37 @@ and spikes do not establish causes. Forecast gains on this pilot do not prove
 business revenue impact. The local app has no public-service authentication;
 the assistant is stateless with bounded English and Spanish patterns.
 
-RP-00 through RP-11 are implemented. **RP-12A is implemented for offline validation; AWS live acceptance is NOT RUN**.
+RP-00 through RP-11 are implemented. **RP-12D live AWS ETL and six-query
+reconciliation passed**, and its teardown is documented; serving publication
+was not performed.
 RP-13 prepares the portfolio; independent human quick-start verification and
 release approval remain explicit checkpoints. See the [release checklist](docs/release_checklist.md)
 and [draft v1.0.0 notes](docs/release_notes_v1.0.0.md). Package version remains
 `0.1.0`; no release or tag is published by this work. No code license is declared
 yet: an owner decision is required. M5 competition-data permissions are separate.
 
-## Optional AWS laboratory (RP-12A)
+## AWS Live Demo — RP-12D
 
-The [AWS lab](docs/aws_runbook.md) implements an isolated synthetic S3/Glue/Athena
-pipeline and optional IAM-authenticated metric endpoint. Infrastructure and code
-are prepared for offline validation; **AWS live acceptance is NOT RUN**.
-See the [gate](docs/evidence/rp12_gate.md),
-[cost controls](docs/aws_cost_controls.md) and
-[disabled Redshift extension](docs/aws_redshift_extension.md).
-The local demo requires no AWS account, SDK, Terraform or Spark.
+On 2026-10-11, the owner completed **S3 → Glue 5.0 Spark → Parquet → Glue Data
+Catalog → Athena engine v3** in sa-east-1. Six allowlisted SELECTs reconciled 252 facts and
+1,386 units: SYN_A 378, SYN_B 462 and SYN_C 546. Execution IDs, actual results,
+scanned bytes, lineage and resolved packaging/response-validation incidents are
+in the [live walkthrough](docs/aws_live_demo.md) and
+[sanitized execution evidence](docs/evidence/rp12d_live_validation.json).
 
-### AWS laboratory candidate
+Deployment ownership is explicit: seven resources were Terraform-tracked, one
+Glue job was created with Boto3, and two log groups were created in Console.
+This is synthetic business data executed on real AWS services. It does not
+establish commercial impact, a cloud model evaluation or a production deployment.
+No serving metric, Lambda/API Gateway or Redshift workload was published.
 
-The [RP-12C gate](docs/evidence/rp12c_gate.md) tracks the smaller owner-bootstrapped
-S3/Glue/Catalog/Athena laboratory. [Owner bootstrap](docs/aws_owner_bootstrap.md),
-[operator IAM review](docs/aws_iam_matrix.md) and [runbook](docs/aws_runbook.md)
-separate offline evidence from pending owner setup and AWS live acceptance.
-Lambda, API Gateway and Redshift remain deferred.
+The [final teardown report](docs/aws_teardown_report.md) records the removed job,
+six Catalog resources, 27 S3 versions and owner-confirmed Console removals.
+Terraform state is serial 31 with zero managed resources. Operator/bootstrap IAM
+resources remain intentionally retained; the cause of final CloudWatch absence
+is unverified. The owner-described October Billing observation is **USD 0.00
+estimated payable with credits, invoice Pending**; gross consumption and settled
+billing remain unverified. [Final handoff](RP-12D_FINAL_HANDOFF.md).
+Earlier [RP-12A](docs/evidence/rp12_gate.md)
+and [RP-12C](docs/evidence/rp12c_gate.md) gates record their historical offline scope.
+The local demo still requires no AWS account, SDK, Terraform or Spark.

@@ -40,7 +40,9 @@ the [Power BI build guide](../dashboards/powerbi/BUILD_GUIDE.md) to generate the
 The snapshot is historical, has no actual inventory, and does not establish
 causality or revenue impact. The assistant is bounded and stateless; this is a
 local application without public-service authentication. Synthetic forecast
-figures are simulated. RP-12 AWS is optional and deferred.
+figures are simulated. The separate RP-12D demonstration used real AWS services
+with synthetic inputs and was torn down; the [final report](aws_teardown_report.md)
+distinguishes recorded API results from owner-confirmed Console actions.
 
 No root LICENSE file or `[project].license` declaration was found. The code owner
 must choose and approve a license before representing this as licensed open-source
