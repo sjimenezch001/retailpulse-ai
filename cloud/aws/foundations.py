@@ -1,5 +1,6 @@
 """Fail-closed read-only verification of owner-controlled AWS foundations."""
 
+import copy
 import json
 from urllib.parse import unquote
 
@@ -25,6 +26,39 @@ def document(value):
     return value
 
 
+def bucket_policy_equivalent(expected, actual):
+    """Allow only an identical ARN Resource string versus singleton array.
+
+    Statement order and every other policy field remain strict. Neither input
+    is mutated; the actual document remains the source of the Terraform hash.
+    """
+    normalized = copy.deepcopy(document(actual))
+    left, right = expected.get("Statement"), normalized.get("Statement")
+    if not isinstance(left, list) or not isinstance(right, list):
+        return False
+    if len(left) != len(right):
+        return False
+    for approved, installed in zip(left, right, strict=True):
+        if not isinstance(approved, dict) or not isinstance(installed, dict):
+            return False
+        resource, other = approved.get("Resource"), installed.get("Resource")
+        if (
+            isinstance(resource, str)
+            and resource.startswith("arn:")
+            and isinstance(other, list)
+            and other == [resource]
+        ):
+            installed["Resource"] = resource
+        elif (
+            isinstance(other, str)
+            and other.startswith("arn:")
+            and isinstance(resource, list)
+            and resource == [other]
+        ):
+            installed["Resource"] = [other]
+    return canonical(expected) == canonical(normalized)
+
+
 def verify_bucket_security(s3, settings):
     args = {"Bucket": settings.bucket, "ExpectedBucketOwner": settings.account}
     expected = bucket_configuration()
@@ -48,7 +82,7 @@ def verify_bucket_security(s3, settings):
     ):
         raise LabError("bucket_lifecycle_incompatible")
     actual_policy = document(s3.get_bucket_policy(**args)["Policy"])
-    if actual_policy != bucket_policy(settings):
+    if not bucket_policy_equivalent(bucket_policy(settings), actual_policy):
         raise LabError("bucket_tls_or_encryption_policy_incompatible")
     if s3.get_bucket_policy_status(**args)["PolicyStatus"].get("IsPublic") is not False:
         raise LabError("bucket_public_policy_rejected")
