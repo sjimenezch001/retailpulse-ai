@@ -346,3 +346,44 @@ remains **PENDING, deferred by the owner**. New localized owner approval is not
 claimed. Public video hosting, code license, coordinated version change and
 release publication still require separate authorization. No push, merge, upload,
 tag, release, license/version change or AWS work was performed.
+
+## Express employment readiness — 2026-10-12
+
+This addendum follows owner review of the [RP-12D handoff](../../RP-12D_FINAL_HANDOFF.md).
+All preceding dates, branch descriptions, validation numbers and pending-AWS
+wording retain their historical context. The AWS demonstration and teardown are
+now documented in the [final report](../aws_teardown_report.md). This express
+review prioritizes **BI / Data Analyst** readiness within 48 hours.
+
+Existing gates, recordings, capture scripts, prior reproduction and privacy
+artifacts were inspected before preparing new deliverables. All three MP4s and
+their captions match their preserved SHA-256 values. Their existing durations
+remain 147.517067 s (English), 149.813500 s (Spanish) and 147.425333 s (Portuguese).
+The English recording remains owner-approved; localized owner approval is not
+claimed. No recording, decoding session, application rebuild or new live-model
+evaluation was performed. Prior technical inspection is reused honestly.
+
+The original English SRT's last cue ends at 150.000 s beyond the 147.517067 s
+MP4. Both originals remain unchanged. A future separate-caption publication
+should use a separately reviewed clipped copy; no rerecording is required.
+
+| Express item | Actual outcome |
+| --- | --- |
+| Existing assets | PASS / REUSED: recordings and captions match their baseline; historical automated installation/runtime/shutdown acceptance retained |
+| Protected data, models and media | PASS: all 125 existing baseline hashes match; Gold, 45 frozen artifacts and approved media preserved |
+| Former secret finding | RESOLVED: synthetic key-shaped test input constructed at runtime; same full-string redaction assertion remains |
+| Whole-tree secret scan | PASS: 388 files, zero unreviewed findings, 148 existing reviewed entries unchanged; all detectors and baseline retained |
+| Focused scanner/redaction regressions | PASS: 15 tests; existing unexpected-secret/checksum cases still fail closed |
+| Ruff and whitespace | PASS; no sanitizer, application, dependency or threshold change |
+| Independent human quick start | PREPARED / PENDING: [minimal candidate-specific procedure](../independent_quick_start.md); no independent result fabricated |
+| English application copy | PREPARED PRIVATELY: project CV bullets, profile summary, LinkedIn copy and interview answers for BI / Data Analyst; no personal documents restored into public files |
+| Portfolio presentation | [Readiness assessment](../portfolio_readiness.md): existing Power BI, SQL, quality/provenance and bounded claims; dated AWS status aligned in summaries |
+| Candidate publication | PENDING: local main at review was `51b95c5` with existing uncommitted changes; no push, new remote CI, release, license change or public video upload |
+
+The [RP-12D gate](rp12d_teardown_gate.md) and handoff preserve the earlier secret
+FAIL as dated evidence; this addendum records its subsequent narrow correction.
+Independent human verification, exact candidate review and owner-controlled
+publication remain open. **RP-13 FULL GATE: PENDING**. No AWS operation, new
+feature, paid service, unrelated refactoring or expanded implementation sprint
+was introduced. The private application material does not invent employment,
+education, customers, commercial ROI or certifications.

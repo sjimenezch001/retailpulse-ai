@@ -1,0 +1,420 @@
+{
+  "athena": {
+    "bounds": {
+      "automatic_client_retries": false,
+      "bytes_scanned_per_query": 10485760,
+      "max_result_rows_including_header": 1000,
+      "max_start_calls": 6,
+      "poll_seconds": 2,
+      "query_wall_seconds": 60,
+      "result_reuse": false,
+      "stop_confirmation_seconds": 20
+    },
+    "failed": 0,
+    "passing": 6,
+    "queries": [
+      {
+        "actual_result": {
+          "columns": [
+            "units"
+          ],
+          "rows": [
+            [
+              "1386"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.563,
+        "engine_execution_ms": 379,
+        "name": "total_units",
+        "query_id": "e1d3fbf3-dfca-4694-8ff7-7bff5bea1b4f",
+        "scanned_bytes": 194,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      },
+      {
+        "actual_result": {
+          "columns": [
+            "store_id",
+            "units"
+          ],
+          "rows": [
+            [
+              "SYN_A",
+              "378"
+            ],
+            [
+              "SYN_B",
+              "462"
+            ],
+            [
+              "SYN_C",
+              "546"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.515,
+        "engine_execution_ms": 444,
+        "name": "by_store",
+        "query_id": "88f34e25-15f5-4b73-98ae-1144e467ba9c",
+        "scanned_bytes": 276,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      },
+      {
+        "actual_result": {
+          "columns": [
+            "date",
+            "units"
+          ],
+          "rows": [
+            [
+              "2020-01-01",
+              "15"
+            ],
+            [
+              "2020-01-02",
+              "21"
+            ],
+            [
+              "2020-01-03",
+              "27"
+            ],
+            [
+              "2020-01-04",
+              "33"
+            ],
+            [
+              "2020-01-05",
+              "39"
+            ],
+            [
+              "2020-01-06",
+              "45"
+            ],
+            [
+              "2020-01-07",
+              "51"
+            ],
+            [
+              "2020-01-08",
+              "15"
+            ],
+            [
+              "2020-01-09",
+              "21"
+            ],
+            [
+              "2020-01-10",
+              "27"
+            ],
+            [
+              "2020-01-11",
+              "33"
+            ],
+            [
+              "2020-01-12",
+              "39"
+            ],
+            [
+              "2020-01-13",
+              "45"
+            ],
+            [
+              "2020-01-14",
+              "51"
+            ],
+            [
+              "2020-01-15",
+              "15"
+            ],
+            [
+              "2020-01-16",
+              "21"
+            ],
+            [
+              "2020-01-17",
+              "27"
+            ],
+            [
+              "2020-01-18",
+              "33"
+            ],
+            [
+              "2020-01-19",
+              "39"
+            ],
+            [
+              "2020-01-20",
+              "45"
+            ],
+            [
+              "2020-01-21",
+              "51"
+            ],
+            [
+              "2020-01-22",
+              "15"
+            ],
+            [
+              "2020-01-23",
+              "21"
+            ],
+            [
+              "2020-01-24",
+              "27"
+            ],
+            [
+              "2020-01-25",
+              "33"
+            ],
+            [
+              "2020-01-26",
+              "39"
+            ],
+            [
+              "2020-01-27",
+              "45"
+            ],
+            [
+              "2020-01-28",
+              "51"
+            ],
+            [
+              "2020-01-29",
+              "15"
+            ],
+            [
+              "2020-01-30",
+              "21"
+            ],
+            [
+              "2020-01-31",
+              "27"
+            ],
+            [
+              "2020-02-01",
+              "33"
+            ],
+            [
+              "2020-02-02",
+              "39"
+            ],
+            [
+              "2020-02-03",
+              "45"
+            ],
+            [
+              "2020-02-04",
+              "51"
+            ],
+            [
+              "2020-02-05",
+              "15"
+            ],
+            [
+              "2020-02-06",
+              "21"
+            ],
+            [
+              "2020-02-07",
+              "27"
+            ],
+            [
+              "2020-02-08",
+              "33"
+            ],
+            [
+              "2020-02-09",
+              "39"
+            ],
+            [
+              "2020-02-10",
+              "45"
+            ],
+            [
+              "2020-02-11",
+              "51"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.485,
+        "engine_execution_ms": 1119,
+        "name": "by_date",
+        "query_id": "83d4c087-5c7b-4a4c-8d52-2001269f042c",
+        "scanned_bytes": 492,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      },
+      {
+        "actual_result": {
+          "columns": [
+            "store_id",
+            "state_id",
+            "fact_rows",
+            "units"
+          ],
+          "rows": [
+            [
+              "SYN_A",
+              "SYN_STATE",
+              "84",
+              "378"
+            ],
+            [
+              "SYN_B",
+              "SYN_STATE",
+              "84",
+              "462"
+            ],
+            [
+              "SYN_C",
+              "SYN_STATE",
+              "84",
+              "546"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.469,
+        "engine_execution_ms": 865,
+        "name": "dimension_join",
+        "query_id": "9d0fcbbf-f41d-40c3-9612-fb39cf44ad73",
+        "scanned_bytes": 604,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      },
+      {
+        "actual_result": {
+          "columns": [
+            "fact_rows",
+            "unique_keys",
+            "invalid_units",
+            "missing_price_rows",
+            "invalid_null_semantics",
+            "first_date",
+            "last_date"
+          ],
+          "rows": [
+            [
+              "252",
+              "252",
+              "0",
+              "7",
+              "0",
+              "2020-01-01",
+              "2020-02-11"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.515,
+        "engine_execution_ms": 1025,
+        "name": "quality",
+        "query_id": "952451bf-e434-4516-959c-a5b77317b49e",
+        "scanned_bytes": 1599,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      },
+      {
+        "actual_result": {
+          "columns": [
+            "table_name",
+            "row_count"
+          ],
+          "rows": [
+            [
+              "dim_product",
+              "2"
+            ],
+            [
+              "dim_store",
+              "3"
+            ],
+            [
+              "mart_sales_daily",
+              "252"
+            ]
+          ]
+        },
+        "elapsed_wall_seconds": 2.469,
+        "engine_execution_ms": 660,
+        "name": "row_counts",
+        "query_id": "7bff21bd-1a3d-47b4-85df-c536aef4b64e",
+        "scanned_bytes": 0,
+        "state": "SUCCEEDED",
+        "status": "PASS_ACTUAL_ATHENA_RESULT"
+      }
+    ],
+    "sum_query_observed_wall_seconds": 15.016,
+    "total_scanned_bytes": 3165
+  },
+  "cleanup_executed": false,
+  "data_mode": "synthetic-web-v1",
+  "execution": "Real AWS Glue 5.0 Spark and Athena engine 3; owner-executed procedures; local receipt review",
+  "glue": {
+    "dpu_seconds": 250.0,
+    "execution_seconds": 125,
+    "job_run_id": "jr_2705572727717d01f4a76ff67b5bc9b6540cde7aaaf79695e62ff315b7c62487",
+    "max_concurrency": 1,
+    "max_retries": 0,
+    "observed_launcher_wall_seconds": 142.297,
+    "state": "SUCCEEDED",
+    "timeout_minutes": 5,
+    "version": "5.0",
+    "worker_type": "G.1X",
+    "workers": 2
+  },
+  "incidents": {
+    "athena_representation": {
+      "cancelled_query_id": "2ac3b9c6-37d3-4f84-9f46-a953fd400b7d",
+      "resolution": "Accept only omitted final semicolon plus LF and two exact default-catalog spellings in returned responses; outgoing SQL remains byte exact; 21 offline regressions and six subsequent real results pass."
+    },
+    "runtime_zip": {
+      "error": "DataNotFoundError: Unable to load data for: endpoints",
+      "first_job_run_id": "jr_ad278ffce47b5bcee168c3766b8c75b20be4fbbb673f960eb301d5dd166b496a",
+      "resolution": "Remove ZIP-vendored boto3/botocore; use Glue built-in SDK. Subsequent real Glue run SUCCEEDED; original version and seal retained.",
+      "state": "FAILED"
+    }
+  },
+  "infrastructure_ownership": {
+    "boto3_created_job": 1,
+    "console_created_log_groups": 2,
+    "state_serial": 20,
+    "terraform_tracked": 7
+  },
+  "input_lineage": [
+    "repository-packaged synthetic CSV manifest",
+    "seven versioned S3 input/script uploads",
+    "separately approved application-only runtime ZIP version",
+    "five actual Parquet datasets",
+    "two completion markers",
+    "five Glue Data Catalog external tables",
+    "six original allowlisted Athena SELECTs"
+  ],
+  "limitations": [
+    "Synthetic figures are not real M5 sales, commercial uplift or measured production performance.",
+    "Mixed infrastructure ownership; not a fully Terraform-managed deployment.",
+    "No serving metric publication, Lambda/API Gateway, Redshift or cloud forecast/model evaluation.",
+    "Current gross AWS charges not independently verified; recorded execution usage is not billing.",
+    "CloudWatch event messages were not API-read; local raw remote-output/log preservation remains a cleanup prerequisite.",
+    "Historical IAM trust continuity was not established; current-role checks do not prove an earlier baseline.",
+    "Live receipts prove execution at their observation time; no new AWS inventory in this offline preparation.",
+    "Cleanup, public release, license changes and Git publication remain separately unauthorized."
+  ],
+  "period": {
+    "end": "2020-02-11",
+    "start": "2020-01-01"
+  },
+  "recorded_on": "2026-10-11",
+  "region": "sa-east-1",
+  "rows": 252,
+  "run_id": "feadc609ee4301f4e723aa55",
+  "sanitization": "Selected operational IDs, synthetic results and timing only; excludes credentials, caches, local user paths, AWS account number, full IAM ARNs and account-specific bucket URI.",
+  "serving_publication": false,
+  "status": "PASS_SIX_ACTUAL_ATHENA_QUERIES_NO_SERVING_PUBLICATION",
+  "stores": {
+    "SYN_A": 378,
+    "SYN_B": 462,
+    "SYN_C": 546
+  },
+  "units": 1386
+}

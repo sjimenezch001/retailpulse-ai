@@ -2,7 +2,8 @@
 
 Reviewed on 2026-10-08. English is canonical. This is a personal portfolio project,
 not an employer engagement, customer deployment or measured commercial intervention.
-RP-12 AWS is optional and deferred. The [RP-13 gate](evidence/rp13_gate.md) distinguishes
+RP-12D now has a verified optional AWS demonstration using synthetic business
+data, with final teardown documentation reviewed on 2026-10-12. The [RP-13 gate](evidence/rp13_gate.md) distinguishes
 packaging from independent human verification and release publication.
 
 ## Claim-to-evidence map
@@ -18,6 +19,9 @@ packaging from independent human verification and release publication.
 | 254 tests and 88.15% coverage, minimum 85% | [Corrected RP-11 results](evidence/rp11/ci_corrections.json), `tests`, `coverage`; [current RP-13 validation](evidence/rp13_gate.md) | Combined lines/branches across `src/retailpulse` and `app`; scoped mypy is not whole-project type coverage. |
 | Genuine Windows/Linux/Docker CI succeeded | [Corrected PR](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37732985345), [post-merge main](https://github.com/sjimenezch001/retailpulse-ai/actions/runs/37734804078), [closure](evidence/rp11_gate.md#verified-closure--2026-10-08) | Applies to `bb2a0c9` and `593dc50`. No remote pass claimed for unpublished RP-13 commits. |
 | Portable mode needs no M5 or Ollama | [Packaged snapshot manifest](../src/retailpulse/api/synthetic/manifest.json), [isolated reproduction](evidence/rp13_gate.md#clean-environment-reproduction) | 1,386 total synthetic units; 378 for SYN_A. The simulated forecast series is demonstration content, not trained-model evidence. |
+| Real AWS Glue Spark and Athena reconciliation | [Sanitized actual results](evidence/rp12d_live_validation.json), [walkthrough](aws_live_demo.md), [historical execution gate](evidence/rp12d_gate.md) | Glue 5.0 SUCCEEDED; six real SELECTs passed, 252 synthetic facts and 1,386 units. Actual execution IDs retained; mixed Terraform/Boto3/Console ownership, no serving publication. |
+| AWS demonstration teardown | [Final teardown report](aws_teardown_report.md), [final documentation gate](evidence/rp12d_teardown_gate.md), [handoff](../RP-12D_FINAL_HANDOFF.md) | Job and six Catalog resources deleted/read back; 27 exact S3 versions deleted in one request; state serial 31, zero managed resources. Later bucket/Glue IAM removals and CloudWatch absence are owner-confirmed; the CloudWatch deleting cause is unverified. Operator/bootstrap IAM remains retained. |
+| October estimated payable USD 0.00 with credits | [Billing evidence and limitations](aws_teardown_report.md#billing-observation-and-evidence-gaps) | Owner-described October 12 observation; October invoice Pending. Screenshot not located locally; neither zero gross consumption nor a closed invoice is established. |
 
 Live RP-09 latency was a median **8,398.5 ms** and maximum **12,156 ms** for
 successful provider selections, excluding discovery. The 36-case end-to-end
@@ -62,7 +66,10 @@ presents them. [Code](../src/retailpulse/agent/orchestrator.py) and
 nor unrestricted SQL supplies the displayed numbers.
 
 Historical M5, synthetic fixtures, prior live-model validation and deterministic
-offline operation are separate evidence categories. No measured commercial
-revenue uplift, actual inventory, production customers or AWS deployment is claimed.
+offline operation are separate evidence categories. The RP-12D synthetic dataset
+was also processed by genuine AWS Spark and Athena; those executions are distinct
+from offline fixtures and historical M5. No measured commercial revenue uplift,
+actual inventory or production customers are claimed. No cloud model-performance
+evaluation or authenticated serving endpoint was exercised.
 Real rows, model binaries, populated databases and data-filled PBIX are local-only.
 The owner still needs to choose a code license; competition-data rights are separate.
